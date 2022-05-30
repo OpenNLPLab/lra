@@ -1,371 +1,0 @@
-Global seed set to 2222
-CONFIG
-├── train
-│   └── seed: 2222                                                              
-│       interval: step                                                          
-│       monitor: val/accuracy                                                   
-│       mode: max                                                               
-│       ema: 0.0                                                                
-│       test: false                                                             
-│       debug: false                                                            
-│       ignore_warnings: false                                                  
-│       state:                                                                  
-│         mode: null                                                            
-│         chunk_len: null                                                       
-│         overlap_len: null                                                     
-│         n_context: 0                                                          
-│         n_context_eval: 0                                                     
-│       sweep: null                                                             
-│       group: null                                                             
-│       benchmark_step: false                                                   
-│       benchmark_step_k: 1                                                     
-│       benchmark_step_T: 1                                                     
-│       checkpoint_path: null                                                   
-│       visualizer: filters                                                     
-│       disable_dataset: false                                                  
-│                                                                               
-├── wandb
-│   └── None                                                                    
-├── trainer
-│   └── gpus: 2                                                                 
-│       accumulate_grad_batches: 1                                              
-│       max_epochs: 20                                                          
-│       gradient_clip_val: 0.0                                                  
-│       log_every_n_steps: 10                                                   
-│       limit_train_batches: 1.0                                                
-│       limit_val_batches: 1.0                                                  
-│       weights_summary: top                                                    
-│       progress_bar_refresh_rate: 1                                            
-│       track_grad_norm: -1                                                     
-│       resume_from_checkpoint: null                                            
-│                                                                               
-├── loader
-│   └── batch_size: 64                                                          
-│       num_workers: 4                                                          
-│       pin_memory: true                                                        
-│       drop_last: true                                                         
-│       train_resolution: 1                                                     
-│       eval_resolutions:                                                       
-│       - 1                                                                     
-│                                                                               
-├── dataset
-│   └── _name_: aan                                                             
-│       l_max: 4000                                                             
-│       max_vocab: 100                                                          
-│       append_bos: false                                                       
-│       append_eos: true                                                        
-│                                                                               
-├── task
-│   └── _name_: base                                                            
-│       loss: cross_entropy                                                     
-│       metrics:                                                                
-│       - accuracy                                                              
-│       torchmetrics: null                                                      
-│                                                                               
-├── optimizer
-│   └── _name_: adamw                                                           
-│       lr: 0.01                                                                
-│       weight_decay: 0.05                                                      
-│                                                                               
-├── scheduler
-│   └── _name_: cosine_warmup                                                   
-│       num_warmup_steps: 2500                                                  
-│       num_training_steps: 50000                                               
-│                                                                               
-├── encoder
-│   └── embedding                                                               
-├── decoder
-│   └── _name_: retrieval                                                       
-│       mode: pool                                                              
-│       use_lengths: true                                                       
-│       nli: true                                                               
-│       activation: gelu                                                        
-│       d_model: null                                                           
-│                                                                               
-├── model
-│   └── layer:                                                                  
-│         _name_: s4                                                            
-│         d_state: 64                                                           
-│         channels: 1                                                           
-│         bidirectional: true                                                   
-│         activation: gelu                                                      
-│         postact: glu                                                          
-│         initializer: null                                                     
-│         weight_norm: false                                                    
-│         hyper_act: null                                                       
-│         dropout: 0.0                                                          
-│         measure: legs                                                         
-│         rank: 1                                                               
-│         dt_min: 0.001                                                         
-│         dt_max: 0.1                                                           
-│         trainable:                                                            
-│           dt: true                                                            
-│           A: true                                                             
-│           P: true                                                             
-│           B: true                                                             
-│         lr: 0.001                                                             
-│         mode: nplr                                                            
-│         n_ssm: 256                                                            
-│         resample: false                                                       
-│         deterministic: false                                                  
-│         l_max: 4000                                                           
-│         verbose: true                                                         
-│         lr_dt: 0.01                                                           
-│       _name_: model                                                           
-│       prenorm: true                                                           
-│       transposed: true                                                        
-│       n_layers: 6                                                             
-│       d_model: 256                                                            
-│       residual: R                                                             
-│       pool:                                                                   
-│         _name_: sample                                                        
-│         stride: 1                                                             
-│         expand: 1                                                             
-│       norm: batch                                                             
-│       dropout: 0.0                                                            
-│                                                                               
-└── callbacks
-    └── learning_rate_monitor:                                                  
-          logging_interval: step                                                
-        timer:                                                                  
-          step: true                                                            
-          inter_step: false                                                     
-          epoch: true                                                           
-          val: true                                                             
-        params:                                                                 
-          total: true                                                           
-          trainable: true                                                       
-          fixed: true                                                           
-        model_checkpoint:                                                       
-          monitor: val/accuracy                                                 
-          mode: max                                                             
-          save_top_k: 1                                                         
-          save_last: true                                                       
-          dirpath: checkpoints/                                                 
-          filename: val/accuracy                                                
-          auto_insert_metric_name: false                                        
-          verbose: true                                                         
-                                                                                
-Global seed set to 2222
-[2022-05-26 19:12:22,990][__main__][INFO] - Instantiating callback <src.callbacks.timer.Timer>
-[2022-05-26 19:12:23,351][__main__][INFO] - Instantiating callback <src.callbacks.params.ParamsLog>
-[2022-05-26 19:12:23,379][__main__][INFO] - Instantiating callback <pytorch_lightning.callbacks.ModelCheckpoint>
-Multiprocessing is handled by SLURM.
-GPU available: True, used: True
-TPU available: False, using: 0 TPU cores
-IPU available: False, using: 0 IPUs
-HPU available: False, using: 0 HPUs
-`Trainer(limit_train_batches=1.0)` was configured so 100% of the batches per epoch will be used..
-`Trainer(limit_val_batches=1.0)` was configured so 100% of the batches will be used..
-Global seed set to 2222
-Global seed set to 2222
-Initializing distributed: GLOBAL_RANK: 1, MEMBER: 2/2
-Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/2
-[2022-05-26 19:12:28,601][torch.distributed.distributed_c10d][INFO] - Added key: store_based_barrier_key:1 to store for rank: 0
-[2022-05-26 19:12:28,601][torch.distributed.distributed_c10d][INFO] - Added key: store_based_barrier_key:1 to store for rank: 1
-[2022-05-26 19:12:28,601][torch.distributed.distributed_c10d][INFO] - Rank 0: Completed store-based barrier for key:store_based_barrier_key:1 with 2 nodes.
-[2022-05-26 19:12:28,601][torch.distributed.distributed_c10d][INFO] - Rank 1: Completed store-based barrier for key:store_based_barrier_key:1 with 2 nodes.
-----------------------------------------------------------------------------------------------------
-distributed_backend=nccl
-All distributed processes registered. Starting with 2 processes
-----------------------------------------------------------------------------------------------------
-
-[2022-05-26 19:12:51,060][datasets.builder][WARNING] - Using custom data configuration default-c3a6625ba5b00726
-[2022-05-26 19:12:51,060][datasets.builder][WARNING] - Using custom data configuration default-c3a6625ba5b00726
-Downloading and preparing dataset csv/default to /mnt/lustre/hanxiaodong/.cache/huggingface/datasets/csv/default-c3a6625ba5b00726/0.0.0/433e0ccc46f9880962cc2b12065189766fbb2bee57a221866138fb9203c83519...
-Downloading data files:   0%|          | 0/3 [00:00<?, ?it/s]Downloading data files: 100%|██████████| 3/3 [00:00<00:00, 10708.86it/s]
-Extracting data files:   0%|          | 0/3 [00:00<?, ?it/s]Extracting data files:  33%|███▎      | 1/3 [00:00<00:00,  3.65it/s]Extracting data files: 100%|██████████| 3/3 [00:00<00:00,  8.56it/s]
-Dataset csv downloaded and prepared to /mnt/lustre/hanxiaodong/.cache/huggingface/datasets/csv/default-c3a6625ba5b00726/0.0.0/433e0ccc46f9880962cc2b12065189766fbb2bee57a221866138fb9203c83519. Subsequent calls will reuse this data.
-  0%|          | 0/3 [00:00<?, ?it/s][2022-05-26 19:13:05,038][datasets.builder][WARNING] - Reusing dataset csv (/mnt/lustre/hanxiaodong/.cache/huggingface/datasets/csv/default-c3a6625ba5b00726/0.0.0/433e0ccc46f9880962cc2b12065189766fbb2bee57a221866138fb9203c83519)
-  0%|          | 0/3 [00:00<?, ?it/s] 33%|███▎      | 1/3 [00:00<00:01,  1.30it/s] 33%|███▎      | 1/3 [00:00<00:01,  1.18it/s]100%|██████████| 3/3 [00:00<00:00,  3.83it/s]100%|██████████| 3/3 [00:00<00:00,  3.47it/s]
-Casting the dataset:   0%|          | 0/15 [00:00<?, ?ba/s]
-Casting the dataset:   0%|          | 0/15 [00:00<?, ?ba/s]Casting the dataset:   7%|▋         | 1/15 [00:18<04:14, 18.20s/ba]Casting the dataset:   7%|▋         | 1/15 [00:18<04:14, 18.20s/ba]Casting the dataset:  13%|█▎        | 2/15 [00:18<01:39,  7.64s/ba]Casting the dataset:  13%|█▎        | 2/15 [00:18<01:39,  7.64s/ba]Casting the dataset:  80%|████████  | 12/15 [00:18<00:02,  1.22ba/s]Casting the dataset:  87%|████████▋ | 13/15 [00:18<00:01,  1.33ba/s]Casting the dataset: 100%|██████████| 15/15 [00:18<00:00,  1.24s/ba]Casting the dataset: 100%|██████████| 15/15 [00:18<00:00,  1.24s/ba]
-
-Casting the dataset:   0%|          | 0/2 [00:00<?, ?ba/s]Casting the dataset:   0%|          | 0/2 [00:00<?, ?ba/s]Casting the dataset: 100%|██████████| 2/2 [00:00<00:00, 114.67ba/s]Casting the dataset: 100%|██████████| 2/2 [00:00<00:00, 110.54ba/s]
-Casting the dataset:   0%|          | 0/2 [00:00<?, ?ba/s]
-Casting the dataset:   0%|          | 0/2 [00:00<?, ?ba/s]Casting the dataset: 100%|██████████| 2/2 [00:00<00:00, 119.37ba/s]Casting the dataset: 100%|██████████| 2/2 [00:00<00:00, 118.82ba/s]
-
-
-
-#2:   0%|          | 0/36771 [00:00<?, ?ex/s][A[A#0:   0%|          | 0/36772 [00:00<?, ?ex/s]
-
-
-#1:   0%|          | 0/36772 [00:00<?, ?ex/s][A#2:   0%|          | 0/36771 [00:00<?, ?ex/s][A[A
-#0:   0%|          | 0/36772 [00:00<?, ?ex/s]
-
-
-#1:   0%|          | 0/36772 [00:00<?, ?ex/s][A
-
-
-#3:   0%|          | 0/36771 [00:00<?, ?ex/s][A[A[A#3:   0%|          | 0/36771 [00:00<?, ?ex/s][A[A[A#2:   0%|          | 0/36771 [00:00<?, ?ex/s]#0:   0%|          | 0/36772 [00:00<?, ?ex/s]#3:   0%|          | 0/36771 [00:00<?, ?ex/s]#1:   0%|          | 0/36772 [00:00<?, ?ex/s]#2:   0%|          | 0/36771 [00:00<?, ?ex/s]#0:   0%|          | 0/36772 [00:00<?, ?ex/s]#1:   0%|          | 0/36772 [00:00<?, ?ex/s]#3:   0%|          | 0/36771 [00:00<?, ?ex/s]
-
-
-
-
-Error executing job with overrides: ['wandb=null', 'experiment=s4-lra-aan-new', 'trainer.gpus=2']
-multiprocess.pool.RemoteTraceback: 
-"""
-Traceback (most recent call last):
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/multiprocess/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 532, in wrapper
-    out: Union["Dataset", "DatasetDict"] = func(self, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 499, in wrapper
-    out: Union["Dataset", "DatasetDict"] = func(self, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/fingerprint.py", line 458, in wrapper
-    out = func(self, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2715, in _map_single
-    example = apply_function_on_filtered_inputs(example, i, offset=offset)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2614, in apply_function_on_filtered_inputs
-    processed_inputs = function(*fn_args, *additional_args, **fn_kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2306, in decorated
-    result = f(decorated_item, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/src/dataloaders/datasets.py", line 1367, in <lambda>
-    "tokens1": tokenizer(example["text1"])[:l_max],
-TypeError: 'NoneType' object is not iterable
-"""
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/runpy.py", line 194, in _run_module_as_main
-    return _run_code(code, main_globals, None,
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/runpy.py", line 87, in _run_code
-    exec(code, run_globals)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 557, in <module>
-    main()
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/main.py", line 90, in decorated_main
-    _run_hydra(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 389, in _run_hydra
-    _run_app(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 452, in _run_app
-    run_and_report(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 216, in run_and_report
-    raise ex
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 213, in run_and_report
-    return func()
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 453, in <lambda>
-    lambda: hydra.run(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/hydra.py", line 132, in run
-    _ = ret.return_value
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/core/utils.py", line 260, in return_value
-    raise self._return_value
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/core/utils.py", line 186, in run_job
-    ret.return_value = task_function(task_cfg)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 553, in main
-    train(config)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 498, in train
-    trainer.fit(model)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 768, in fit
-    self._call_and_handle_interrupt(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 721, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 809, in _fit_impl
-    results = self._run(model, ckpt_path=self.ckpt_path)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1172, in _run
-    self._call_setup_hook()  # allow user to setup lightning_module in accelerator environment
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1492, in _call_setup_hook
-    self._call_lightning_module_hook("setup", stage=fn)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1593, in _call_lightning_module_hook
-    output = fn(*args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 56, in setup
-    self.dataset.setup()
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/src/dataloaders/datasets.py", line 1303, in setup
-    dataset, self.tokenizer, self.vocab = self.process_dataset()
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/src/dataloaders/datasets.py", line 1370, in process_dataset
-    dataset = dataset.map(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/dataset_dict.py", line 770, in map
-    {
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/dataset_dict.py", line 771, in <dictcomp>
-    k: dataset.map(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2459, in map
-    transformed_shards[index] = async_result.get()
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/multiprocess/pool.py", line 771, in get
-    raise self._value
-TypeError: 'NoneType' object is not iterable
-Error executing job with overrides: ['wandb=null', 'experiment=s4-lra-aan-new', 'trainer.gpus=2']
-multiprocess.pool.RemoteTraceback: 
-"""
-Traceback (most recent call last):
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/multiprocess/pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 532, in wrapper
-    out: Union["Dataset", "DatasetDict"] = func(self, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 499, in wrapper
-    out: Union["Dataset", "DatasetDict"] = func(self, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/fingerprint.py", line 458, in wrapper
-    out = func(self, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2715, in _map_single
-    example = apply_function_on_filtered_inputs(example, i, offset=offset)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2614, in apply_function_on_filtered_inputs
-    processed_inputs = function(*fn_args, *additional_args, **fn_kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2306, in decorated
-    result = f(decorated_item, *args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/src/dataloaders/datasets.py", line 1367, in <lambda>
-    "tokens1": tokenizer(example["text1"])[:l_max],
-TypeError: 'NoneType' object is not iterable
-"""
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/runpy.py", line 194, in _run_module_as_main
-    return _run_code(code, main_globals, None,
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/runpy.py", line 87, in _run_code
-    exec(code, run_globals)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 557, in <module>
-    main()
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/main.py", line 90, in decorated_main
-    _run_hydra(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 389, in _run_hydra
-    _run_app(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 452, in _run_app
-    run_and_report(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 216, in run_and_report
-    raise ex
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 213, in run_and_report
-    return func()
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/utils.py", line 453, in <lambda>
-    lambda: hydra.run(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/_internal/hydra.py", line 132, in run
-    _ = ret.return_value
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/core/utils.py", line 260, in return_value
-    raise self._return_value
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/hydra/core/utils.py", line 186, in run_job
-    ret.return_value = task_function(task_cfg)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 553, in main
-    train(config)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 498, in train
-    trainer.fit(model)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 768, in fit
-    self._call_and_handle_interrupt(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 721, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 809, in _fit_impl
-    results = self._run(model, ckpt_path=self.ckpt_path)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1172, in _run
-    self._call_setup_hook()  # allow user to setup lightning_module in accelerator environment
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1492, in _call_setup_hook
-    self._call_lightning_module_hook("setup", stage=fn)
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1593, in _call_lightning_module_hook
-    output = fn(*args, **kwargs)
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/train.py", line 56, in setup
-    self.dataset.setup()
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/src/dataloaders/datasets.py", line 1303, in setup
-    dataset, self.tokenizer, self.vocab = self.process_dataset()
-  File "/mnt/lustre/hanxiaodong/multimodal/state-spaces/src/dataloaders/datasets.py", line 1370, in process_dataset
-    dataset = dataset.map(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/dataset_dict.py", line 770, in map
-    {
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/dataset_dict.py", line 771, in <dictcomp>
-    k: dataset.map(
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2459, in map
-    transformed_shards[index] = async_result.get()
-  File "/mnt/lustre/hanxiaodong/.conda/envs/s4/lib/python3.8/site-packages/multiprocess/pool.py", line 771, in get
-    raise self._value
-TypeError: 'NoneType' object is not iterable
-srun: error: SH-IDC1-10-198-6-126: task 1: Exited with exit code 1
-srun: Terminating job step 4707702.0
-slurmstepd: *** STEP 4707702.0 ON SH-IDC1-10-198-6-126 CANCELLED AT 2022-05-26T19:15:07 ***
-srun: Job step aborted: Waiting up to 2 seconds for job step to finish.
-srun: error: SH-IDC1-10-198-6-126: task 0: Exited with exit code 1
