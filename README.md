@@ -1,12 +1,12 @@
 # 1986/1024 environment
 ## v2:
-CUDA 11.3
-python 3.8
-torch 1.10.0+cu113
-torchaudio 0.10.0+cu113
-torchvision 0.11.1+cu113
-setuptools 59.5.0
-torch/torchaudio/torchvision download url: http://download.pytorch.org/whl/cu113
+> CUDA 11.3
+> python 3.8
+> torch 1.10.0+cu113
+> torchaudio 0.10.0+cu113
+> torchvision 0.11.1+cu113
+> setuptools 59.5.0
+> torch/torchaudio/torchvision download url: http://download.pytorch.org/whl/cu113
 
 # Structured State Spaces for Sequence Modeling
 
