@@ -24,10 +24,10 @@ pool:
   expand: 1
 norm: layer
 dropout: 0.1
+encoder:
+  _name_: position
+  dropout: 0.1
 # init:
 #   init: normal  # Parameter initializer to use
 #   init_range: 0.1  # Parameters initialized by U(-init_range, init_range)
 #   init_std: 0.02  # Parameters initialized by N(0, init_std)
-encoder:
-  _name_: position
-  dropout: 0.1
