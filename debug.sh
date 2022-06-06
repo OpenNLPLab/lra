@@ -1,10 +1,11 @@
 export HYDRA_FULL_ERROR=1
 
 spring.submit run --gpu \
--n$1 \
---ntasks-per-node $1 \
+-n2 \
+--ntasks-per-node 2 \
 --cpus-per-task 5 \
 --partition MMG \
---job-name=lra-debug \
-'python -m train wandb=null experiment=s4-lra-imdb-new \
-trainer.gpus=2 model=transformer' 
+--quotatype spot \
+--job-name=debug \
+'python -m train wandb=null experiment=trans-lra-imdb \
+trainer.gpus=2 loader.batch_size=10' 

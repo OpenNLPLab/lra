@@ -6,6 +6,6 @@ spring.submit arun --gpu \
 --cpus-per-task 5 \
 --partition MMG \
 --quotatype spot \
---job-name=s4-lra-cifar \
-'python -m train wandb=null experiment=s4-lra-cifar-new \
+--job-name=trans-lra-cifar \
+'python -m train wandb=null experiment=trans-lra-cifar \
 trainer.gpus=2 loader.batch_size=25' 

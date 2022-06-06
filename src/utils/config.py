@@ -63,6 +63,7 @@ def instantiate(registry, config, *args, partial=False, wrap=None, **kwargs):
     *args, **kwargs: additional arguments to override the config to pass into the target constructor
     """
 
+    # import pdb;pdb.set_trace()
     # Case 1: no config
     if config is None:
         return None

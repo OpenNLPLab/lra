@@ -15,6 +15,7 @@ from src.utils import registry
 from src.tasks import encoders, decoders, tasks
 import src.models.nn.utils as U
 from src.dataloaders import SequenceDataset  # TODO make registry
+from src.models.baselines.transformer import Transformer
 from tqdm.auto import tqdm
 
 log = src.utils.train.get_logger(__name__)
@@ -72,14 +73,14 @@ class SequenceLightningModule(pl.LightningModule):
 
         # Instantiate model
         self.model = utils.instantiate(registry.model, self.hparams.model)
-
+        # self.model = Transformer()
+        print(self.model)
         # Instantiate the task
         if "task" not in self.hparams:  # TODO maybe don't need this?
             self.hparams.task = self.dataset.default_task
         self.task = task = utils.instantiate(
             tasks.registry, self.hparams.task, dataset=self.dataset, model=self.model
         )
-
         # Create encoders and decoders
         encoder = encoders.instantiate(
             encoder_cfg, dataset=self.dataset, model=self.model
@@ -87,7 +88,6 @@ class SequenceLightningModule(pl.LightningModule):
         decoder = decoders.instantiate(
             self.hparams.decoder, model=self.model, dataset=self.dataset
         )
-
         # Extract the modules so they show up in the top level parameter count
         self.encoder = U.TupleSequential(task.encoder, encoder)
         self.decoder = U.TupleSequential(decoder, task.decoder)

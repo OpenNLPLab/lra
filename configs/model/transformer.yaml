@@ -14,14 +14,14 @@ layer:
     expand: 4
     dropout: null
     transposed: False
-n_layers: 16
+n_layers: 6
 d_model: 512
 residual: R
 prenorm: False
-pool:
-  _name_: sample
-  pool: 1
-  expand: 1
+# pool:
+#   _name_: sample
+#   pool: 1
+#   expand: 1
 norm: layer
 dropout: 0.1
 encoder:

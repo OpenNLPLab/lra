@@ -19,6 +19,7 @@ scheduler = {
 }
 
 model = {
+    "transformer":"src.models.baselines.transformer.Transformer",
     "model": "src.models.sequence.SequenceModel",
     "unet": "src.models.sequence.SequenceUNet",
     "lstm": "src.models.sequence.rnns.lstm.TorchLSTM",
