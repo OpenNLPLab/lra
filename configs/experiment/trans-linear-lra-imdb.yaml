@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /pipeline: imdb
-  - /model: transformer
+  - /model: transformer_linear
   - override /scheduler: cosine_warmup
 
 decoder:
@@ -11,18 +11,7 @@ model:
   dropout: 0.0
   n_layers: 4
   d_model: 64
-  prenorm: true
-  norm: batch
-  # layer:
-  #   d_state: 64
-  #   lr: 0.001
-  #   lr_dt: 0.01
-  #   dt_min: 0.001
-  #   dt_max: 0.1
-  #   measure: legs
-  #   bidirectional: true
-  #   postact: glu
-  #   n_ssm: ${..d_model}
+  prenorm: False
 
 dataset:
   l_max: 4096

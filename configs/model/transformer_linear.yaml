@@ -1,28 +1,30 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: mha
+  - _name_: localattn
     n_heads: 8
-    causal: True
-    dropout: null
-    bias: True
-    add_bias_kv: False
-    add_zero_attn: False
-    kdim: null
-    vdim: null
-  - _name_: ff
-    expand: 4
-    dropout: null
-    transposed: False
+    max_l: 512
+    chunk_size: 64
+    act_fun: relu
+    norm_type: layer
+    use_orpe: true
+  - _name_: linearattn
+    n_heads: 8
+    max_l: 512
+    act_fun: elu
+    norm_type: layer
+    use_orpe: true
+  - _name_: glu
+    act_fun: swish
+
 n_layers: 6
 d_model: 512
 residual: R
-prenorm: False
+# prenorm: true
 pool:
   _name_: sample
   stride: 1
   expand: 1
-norm: layer
 dropout: 0.1
 encoder:
   _name_: position

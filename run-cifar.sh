@@ -1,6 +1,6 @@
 export HYDRA_FULL_ERROR=1
 
-spring.submit arun --gpu \
+spring.submit run --gpu \
 -n2 \
 --ntasks-per-node 2 \
 --cpus-per-task 5 \

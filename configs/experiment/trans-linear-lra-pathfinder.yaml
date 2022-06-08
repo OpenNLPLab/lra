@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /pipeline: pathfinder
-  - /model: transformer
+  - /model: transformer_linear
   - override /scheduler: cosine_warmup
 
 scheduler:
@@ -11,18 +11,8 @@ scheduler:
 model:
   dropout: 0.1
   n_layers: 6
-  prenorm: true
+  prenorm: false
   d_model: 256
-  norm: batch
-  # layer:
-  #   d_state: 64
-  #   lr: 0.001
-  #   dt_min: 0.001
-  #   dt_max: 0.1
-  #   measure: legs
-  #   bidirectional: true
-  #   postact: glu
-  #   n_ssm: 256
 
 decoder:
   mode: last

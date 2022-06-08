@@ -8,4 +8,4 @@ spring.submit arun --gpu \
 --quotatype spot \
 --job-name=trans-lra-cifar \
 'python -m train wandb=null experiment=trans-lra-cifar \
-trainer.gpus=2 loader.batch_size=25' 
+trainer.gpus=2 loader.batch_size=10 ' 

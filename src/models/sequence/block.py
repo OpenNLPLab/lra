@@ -14,7 +14,9 @@ from src.models.nn.components import Normalization
 from src.models.sequence import SequenceModule
 from src.models.sequence.pool import registry as pool_registry
 from src.models.nn.residual import registry as residual_registry
+from src.models.sequence.utils import SimpleRMSNorm
 import src.utils.registry as registry
+from einops import rearrange
 
 
 class SequenceResidualBlock(SequenceModule):
@@ -52,6 +54,7 @@ class SequenceResidualBlock(SequenceModule):
             self.norm = None
         elif isinstance(norm, str):
             self.norm = Normalization(d_norm, transposed=self.transposed, _name_=norm)
+            # self.norm = SimpleRMSNorm(d_norm)
         else:
             self.norm = Normalization(d_norm, transposed=self.transposed, **norm)
 
@@ -83,15 +86,15 @@ class SequenceResidualBlock(SequenceModule):
         return self.layer.default_state(*args, **kwargs)
 
     def forward(self, x, *args, state=None, **kwargs):
+        # x: (bs, l, e)
         y = x
-
         # Pre-norm
         if self.norm is not None and self.prenorm: y = self.norm(y)
-
         # Black box module
         y, state = self.layer(y, *args, state=state, **kwargs)
 
         # Residual
+        # if y.shape[0] != x.shape[0]: x = rearrange(x, 'b l e -> l b e')
         if self.residual is not None: x = self.residual(x, self.drop(y), self.transposed)
 
         # Post-norm
@@ -100,7 +103,6 @@ class SequenceResidualBlock(SequenceModule):
         # Pool
         # x = pool.downpool(x, self.pool, self.expand, self.transposed)
         if self.pool is not None: x = self.pool(x)
-
         return x, state
 
     def step(self, x, state, *args, **kwargs): # TODO needs fix for transpose logic

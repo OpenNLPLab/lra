@@ -15,6 +15,7 @@ from src.utils.config import to_list, to_dict
 from src.models.sequence.block import SequenceResidualBlock
 from src.models.sequence.base import SequenceModule
 from src.models.nn.components import Normalization
+from src.models.sequence.utils import SimpleRMSNorm
 from src.models.nn.initialization import weights_init
 from src.tasks import encoders, decoders
 
@@ -48,20 +49,30 @@ class SequenceModel(SequenceModule):
             self.drop = nn.Dropout2d(dropinp) if self.transposed else nn.Dropout(dropinp)
         else:
             self.drop = nn.Identity()
-
         layer = to_list(layer, recursive=False)
 
-        # Some special arguments are passed into each layer
-        for _layer in layer:
-            # If layers don't specify dropout, add it
-            if _layer.get('dropout', None) is None:
-                _layer['dropout'] = dropout
-            # Ensure all layers are shaped the same way
-            _layer['transposed'] = transposed
-
         # Duplicate layers
-        layers = layer * n_layers
-
+        if layer[0]['_name_'] == 'localattn':
+            # Some special arguments are passed into each layer
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            nums_local = int(n_layers/2)
+            local_layers = nums_local * [layer[0],layer[2]]
+            linear_layers = (n_layers- nums_local) * [layer[1], layer[2]]
+            layers = local_layers + linear_layers
+        else:
+            # Some special arguments are passed into each layer
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+                _layer['transposed'] = transposed
+            layers = layer * n_layers
+        
         # Instantiate layers
         _layers = []
         d = d_model
@@ -69,17 +80,19 @@ class SequenceModel(SequenceModule):
             block = SequenceResidualBlock(d, l+1, prenorm=prenorm, dropout=dropout, layer=layer, residual=residual, norm=norm, pool=pool)
             _layers.append(block)
             d = block.d_output
-
+        
         self.d_output = d
         self.layers = nn.ModuleList(_layers)
 
-        if prenorm:
+        if True:
             if norm is None:
                 self.norm = None
             elif isinstance(norm, str):
                 self.norm = Normalization(self.d_output, transposed=self.transposed, _name_=norm)
+                # self.norm = SimpleRMSNorm(self.d_output)
             else:
                 self.norm = Normalization(self.d_output, transposed=self.transposed, **norm)
+                # self.norm = SimpleRMSNorm(self.d_output)
         else:
             self.norm = nn.Identity()
 
