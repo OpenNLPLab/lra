@@ -1330,6 +1330,11 @@ class AAN(SequenceDataset):
             # return xs1, xs2, ys, lengths1, lengths2
 
             # Concatenate two batches
+            # print("++++++++++++++++++++++++++++++++++++++")
+            # print(xs1.shape)
+            # print(xs2.shape)
+            # print(ys.shape)
+            # print("++++++++++++++++++++++++++++++++++++++")
             xs = torch.cat([xs1, xs2], dim=0)
             lengths = torch.cat([lengths1, lengths2], dim=0)
             return xs, ys, lengths

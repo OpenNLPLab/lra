@@ -6,13 +6,13 @@ layer:
     max_l: 512
     chunk_size: 64
     act_fun: relu
-    norm_type: layer
+    norm_type: ${model.norm}
     use_orpe: true
   - _name_: linearattn
     n_heads: 8
     max_l: 512
     act_fun: elu
-    norm_type: layer
+    norm_type: ${model.norm}
     use_orpe: true
   - _name_: glu
     act_fun: swish
@@ -20,11 +20,11 @@ layer:
 n_layers: 6
 d_model: 512
 residual: R
-# prenorm: true
-pool:
-  _name_: sample
-  stride: 1
-  expand: 1
+prenorm: true
+# pool:
+#   _name_: sample
+#   stride: 1
+#   expand: 1
 dropout: 0.1
 encoder:
   _name_: position

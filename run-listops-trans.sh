@@ -8,4 +8,4 @@ spring.submit arun --gpu \
 --quotatype spot \
 --job-name=trans-lra-listops \
 'python -m train wandb=null experiment=trans-lra-listops \
-trainer.gpus=2 loader.batch_size=10 ' 
+trainer.gpus=2 loader.batch_size=10 layer.localattn.' 

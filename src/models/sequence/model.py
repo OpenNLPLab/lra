@@ -84,7 +84,7 @@ class SequenceModel(SequenceModule):
         self.d_output = d
         self.layers = nn.ModuleList(_layers)
 
-        if True:
+        if prenorm:
             if norm is None:
                 self.norm = None
             elif isinstance(norm, str):

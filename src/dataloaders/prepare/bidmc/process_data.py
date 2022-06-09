@@ -7,7 +7,7 @@ import sktime
 from sktime.utils.data_io import load_from_tsfile_to_dataframe
 import data_loader as data
 
-DATA_PATH = "data/"
+DATA_PATH = "/mnt/lustre/share_data/qinzhen/lra_data/"
 # DATASET = 'RR'
 
 

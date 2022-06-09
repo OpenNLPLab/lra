@@ -8,4 +8,4 @@ spring.submit arun --gpu \
 --quotatype spot \
 --job-name=s4-lra-aan \
 'python -m train wandb=null experiment=s4-lra-aan-new \
-trainer.gpus=2 loader.batch_size=32 model.layer.lr=0.002' 
+trainer.gpus=2 loader.batch_size=20 model.layer.lr=0.002' 
