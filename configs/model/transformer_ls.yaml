@@ -1,19 +1,15 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: mha
-    n_heads: 8
-    causal: True
-    dropout: null
-    bias: True
-    add_bias_kv: False
-    add_zero_attn: False
-    kdim: null
-    vdim: null
+  - _name_: ls_attn
+    max_seq_len: 512
+    num_landmarks: 32
+    window_size: 8
   - _name_: ff
-    expand: 4
+    expand: 3
     dropout: null
     transposed: False
+
 residual: R
 dropout: 0.1
 encoder:

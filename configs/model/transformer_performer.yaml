@@ -1,20 +1,18 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: mha
+  - _name_: performer_attn
     n_heads: 8
-    causal: True
-    dropout: null
-    bias: True
-    add_bias_kv: False
-    add_zero_attn: False
-    kdim: null
-    vdim: null
+    approx_attn_dim: 64
   - _name_: ff
-    expand: 4
+    expand: 3
     dropout: null
     transposed: False
+
+n_layers: 6
+d_model: 512
 residual: R
+prenorm: true
 dropout: 0.1
 encoder:
   _name_: position

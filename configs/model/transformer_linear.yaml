@@ -3,24 +3,19 @@ _name_: model
 layer:
   - _name_: localattn
     n_heads: 8
-    max_l: 512
     chunk_size: 64
     act_fun: relu
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: linearattn
     n_heads: 8
-    max_l: 512
     act_fun: elu
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: glu
     act_fun: swish
 
-n_layers: 6
-d_model: 512
 residual: R
-prenorm: true
 # pool:
 #   _name_: sample
 #   stride: 1

@@ -1,19 +1,11 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: mha
-    n_heads: 8
-    causal: True
-    dropout: null
-    bias: True
-    add_bias_kv: False
-    add_zero_attn: False
-    kdim: null
-    vdim: null
-  - _name_: ff
-    expand: 4
-    dropout: null
-    transposed: False
+  - _name_: flash_attn
+    s: 128
+    eps: 1e-5
+    max_position_embeddings: 4096
+
 residual: R
 dropout: 0.1
 encoder:

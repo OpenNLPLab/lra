@@ -5,7 +5,7 @@ spring.submit arun --gpu \
 --ntasks-per-node 2 \
 --cpus-per-task 5 \
 --partition MMG \
---quotatype auto \
---job-name=trans-lra-imdb \
-'python -m train wandb=null experiment=trans-lra-imdb \
+--quotatype spot \
+--job-name=trans-ls-lra-imdb \
+'python -m train wandb=null experiment=trans-ls-lra-imdb \
 trainer.gpus=2 loader.batch_size=5 ' 

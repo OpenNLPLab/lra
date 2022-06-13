@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /pipeline: imdb
-  - /model: transformer_linear
+  - /model: transformer_flash
   - override /scheduler: cosine_warmup
 
 decoder:
@@ -9,8 +9,8 @@ decoder:
 
 model:
   dropout: 0.0
-  n_layers: 6
-  d_model: 512
+  n_layers: 8
+  d_model: 64
   prenorm: true
   norm: batch
 

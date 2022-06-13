@@ -1,32 +1,29 @@
 # @package _global_
 defaults:
-  - /pipeline: imdb
+  - /pipeline: cifar
   - /model: transformer_linear
   - override /scheduler: cosine_warmup
 
-decoder:
-  mode: pool
-
 model:
-  dropout: 0.0
+  dropout: 0.2
   n_layers: 6
   d_model: 512
   prenorm: true
   norm: batch
 
 dataset:
-  l_max: 4096
-  level: char
+  grayscale: true
+
 
 optimizer:
-  lr: 0.001
-  weight_decay: 0.0
-
-scheduler:
-  num_training_steps: 50000
+  lr: 0.004
+  weight_decay: 0.05
 
 trainer:
-  max_epochs: 32
+  max_epochs: 200
+
+scheduler:
+  num_training_steps: 200000
 
 train:
   seed: 2222

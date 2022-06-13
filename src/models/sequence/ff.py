@@ -31,8 +31,8 @@ class FF(SequenceModule):
 
         self.ff = nn.Sequential(
             linear1,
-            drop,
             linear2,
+            drop,
         )
 
     def forward(self, x, *args, **kwargs):
