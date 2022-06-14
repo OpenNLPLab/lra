@@ -75,6 +75,7 @@ layer = {
     "ls_attn":"src.models.sequence.ls_attention.LSAttentionNonCausal",
     "performer_attn":"src.models.sequence.performer.MultiheadPerformerAttention",
     "flash_attn":"src.models.sequence.flash.FlashAttention",
+    "flash_linear_attn":"src.models.sequence.flash_linear.FlashLinearAttention",
     "conv1d": "src.models.sequence.conv1d.Conv1d",
     "attsimp": "src.models.sequence.mha.AttentionSimple",
     "performer": "src.models.sequence.attention.linear.Performer",

@@ -220,7 +220,6 @@ class FlashAttention(nn.Module):
         x = u * torch.bmm(kernel, v)
         x = self.o(x)
         output = x
-        # tgt_len, bsz, s
         output = output.contiguous()
         return output, None
 

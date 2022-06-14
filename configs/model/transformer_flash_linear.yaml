@@ -1,25 +1,12 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: localattn
-    n_heads: 8
-    chunk_size: 64
-    act_fun: relu
-    norm_type: ${model.norm}
-    use_orpe: true
-  - _name_: linearattn
-    n_heads: 8
-    act_fun: elu
-    norm_type: ${model.norm}
-    use_orpe: true
-  - _name_: glu
-    act_fun: swish
+  - _name_: flash_linear_attn
+    s: 128
+    eps: 1e-5
+    max_position_embeddings: 4096
 
 residual: R
-# pool:
-#   _name_: sample
-#   stride: 1
-#   expand: 1
 dropout: 0.1
 encoder:
   _name_: position

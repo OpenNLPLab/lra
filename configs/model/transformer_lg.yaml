@@ -1,16 +1,21 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: performer_attn
+  - _name_: localattn
     n_heads: 8
-    approx_attn_dim: 8
-  - _name_: ff
-    expand: 3
-    dropout: null
-    transposed: False
+    chunk_size: 512
+    act_fun: relu
+    norm_type: ${model.norm}
+    use_orpe: true
+  - _name_: linearattn
+    n_heads: 8
+    act_fun: elu
+    norm_type: ${model.norm}
+    use_orpe: true
+  - _name_: glu
+    act_fun: swish
 
 residual: R
-prenorm: true
 dropout: 0.1
 encoder:
   _name_: position

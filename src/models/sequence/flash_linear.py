@@ -14,10 +14,6 @@ from typing import Dict, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
-from fairseq import utils
-from fairseq.incremental_decoding_utils import with_incremental_state
-from fairseq.modules.fairseq_dropout import FairseqDropout
-from fairseq.modules.quant_noise import quant_noise
 from torch import Tensor, nn
 from torch.nn import Parameter
 from torch.nn import Dropout
@@ -65,7 +61,6 @@ class ScaleNorm(nn.Module):
         x = x * torch.rsqrt(mean_square + self.eps) * self.scala
         return x
 
-@with_incremental_state
 class FlashLinearAttention(nn.Module):
     """Multi-headed attention.
 
@@ -74,8 +69,7 @@ class FlashLinearAttention(nn.Module):
 
     def __init__(
         self,
-        embed_dim,
-        num_heads,
+        d_model,
         kdim=None,
         vdim=None,
         dropout=0.0,
@@ -88,7 +82,7 @@ class FlashLinearAttention(nn.Module):
         qn_block_size=8,
         # add
         s=128,
-        norm_type="layer_norm",
+        norm_type="scale_norm",
         eps=1e-5,
         max_position_embeddings=512,
         expansion_factor=2,
@@ -96,13 +90,12 @@ class FlashLinearAttention(nn.Module):
     ):
         super().__init__()
         self.s = s
-        # self.e = int(embed_dim * expansion_factor)
-        # self.uv = nn.Linear(expansion_factor, 2 * self.e + self.s)
-        self.embed_dim = embed_dim
+        self.d_output = d_model
+        self.embed_dim = d_model
         self.e = int(self.embed_dim * expansion_factor)
-        self.u_proj = nn.Linear(embed_dim, self.e)
-        self.v_proj = nn.Linear(embed_dim, self.e)
-        self.base_proj = nn.Linear(embed_dim, self.s)
+        self.u_proj = nn.Linear(d_model, self.e)
+        self.v_proj = nn.Linear(d_model, self.e)
+        self.base_proj = nn.Linear(d_model, self.s)
         self.quad_q_weight = nn.Parameter(torch.randn(1, self.s))
         self.quad_q_bias = nn.Parameter(torch.zeros(1, self.s))
         self.lin_q_weight = nn.Parameter(torch.randn(1, self.s))
@@ -155,7 +148,7 @@ class FlashLinearAttention(nn.Module):
 
     def rel_pos_bias(self, seq_len):
         """Relative position bias."""
-        if seq_len <= 512:
+        if seq_len <= self.max_position_embeddings:
             # Construct Toeplitz matrix directly when the sequence length is less than 512
             t = F.pad(self.w[: 2 * seq_len - 1], [0, seq_len]).repeat(seq_len)
             t = t[..., :-seq_len].reshape(-1, seq_len, 3 * seq_len - 2)
@@ -178,8 +171,8 @@ class FlashLinearAttention(nn.Module):
     def forward(
         self,
         query,
-        key: Optional[Tensor],
-        value: Optional[Tensor],
+        # key: Optional[Tensor],
+        # value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
         need_weights: bool = True,
@@ -187,6 +180,7 @@ class FlashLinearAttention(nn.Module):
         attn_mask: Optional[Tensor] = None,
         before_softmax: bool = False,
         need_head_weights: bool = False,
+        state = None,
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
@@ -205,6 +199,8 @@ class FlashLinearAttention(nn.Module):
                 weights for each head. Implies *need_weights*. Default:
                 return the average attention weights over all heads.
         """
+        key = query
+        value = query
         if need_head_weights:
             need_weights = True
 
@@ -218,17 +214,16 @@ class FlashLinearAttention(nn.Module):
         - value: :math:`(S, N, E)` where S is the source sequence length, N is the batch size, E is
           the embedding dimension.
         '''
-        tgt_len, bsz, embed_dim = query.size()
+        bsz, tgt_len, embed_dim = query.size()
         causal_flag = False
         # pad
         d = tgt_len
         len_pad = (self.chunk_size - d % self.chunk_size) % self.chunk_size
-        query = F.pad(query, (0, 0, 0, 0, 0, len_pad))
-        pad_tgt_len = query.shape[0]
+        query = F.pad(query, (0, 0, 0, len_pad))
+        pad_tgt_len = query.shape[1]
         num_chunks = pad_tgt_len // self.chunk_size
         # pad
         # bsz, tgt_len, embed_dim
-        query = query.transpose(0, 1)
 
         shortcut, x = query, self.norm(query)
         # bsz, tgt_len, e
@@ -286,10 +281,9 @@ class FlashLinearAttention(nn.Module):
         x = self.o(x)
 
         # bsz, tgt_len, s
-        output = x + shortcut
-        # tgt_len, bsz, s
-        output = output.contiguous().transpose(0, 1)
-        output = output[:tgt_len, ...]
+        output = x
+        output = output.contiguous()
+        output = output[:,:tgt_len,:]
 
         return output, None
 

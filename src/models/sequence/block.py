@@ -92,7 +92,6 @@ class SequenceResidualBlock(SequenceModule):
         if self.norm is not None and self.prenorm: y = self.norm(y)
         # Black box module
         y, state = self.layer(y, *args, state=state, **kwargs)
-
         # Residual
         # if y.shape[0] != x.shape[0]: x = rearrange(x, 'b l e -> l b e')
         if self.residual is not None: x = self.residual(x, self.drop(y), self.transposed)

@@ -71,6 +71,14 @@ class SequenceModel(SequenceModule):
                     _layer['dropout'] = dropout
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
+        elif layer[0]['_name_'] == 'flash_linear_attn':
+            # Some special arguments are passed into each layer
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
         elif layer[0]['_name_'] == 'performer_attn':
             for _layer in layer:
                 # If layers don't specify dropout, add it

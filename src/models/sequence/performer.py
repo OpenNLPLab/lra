@@ -8,7 +8,6 @@ from typing import Dict, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
-from fairseq import utils
 from torch import Tensor, nn
 from torch.nn import Parameter
 from einops import rearrange
@@ -121,6 +120,7 @@ class MultiheadPerformerAttention(nn.Module):
         修改causal默认为true
         '''
         super().__init__()
+        self.d_output = d_model
         self.embed_dim = d_model
         self.kdim = kdim if kdim is not None else d_model
         self.vdim = vdim if vdim is not None else d_model
@@ -128,7 +128,7 @@ class MultiheadPerformerAttention(nn.Module):
 
 		# q, k, v projection
         self.num_heads = n_heads
-        self.head_dim = self.embed_dim // self.n_heads
+        self.head_dim = self.embed_dim // self.num_heads
         self.k_proj = nn.Linear(d_model, d_model)
         self.v_proj = nn.Linear(d_model, d_model)
         self.q_proj = nn.Linear(d_model, d_model)

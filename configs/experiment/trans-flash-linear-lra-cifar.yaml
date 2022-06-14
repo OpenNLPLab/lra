@@ -1,12 +1,12 @@
 # @package _global_
 defaults:
   - /pipeline: cifar
-  - /model: transformer_linear
+  - /model: transformer_flash_linear
   - override /scheduler: cosine_warmup
 
 model:
   dropout: 0.2
-  n_layers: 6
+  n_layers: 12
   d_model: 512
   prenorm: true
   norm: batch

@@ -1,32 +1,26 @@
 # @package _global_
 defaults:
-  - /pipeline: pathfinder
-  - /model: transformer_linear
+  - /pipeline: aan
+  - /model: transformer_flash_linear
   - override /scheduler: cosine_warmup
 
 scheduler:
-  num_training_steps: 500000 # 200 epochs
+  num_training_steps: 50000 # 20 epochs
   num_warmup_steps: 2500 # 1 epoch
 
 model:
-  dropout: 0.1
+  dropout: 0.0
   n_layers: 6
   prenorm: true
   d_model: 256
-  norm: layer
-
-decoder:
-  mode: last
-
-loader:
-  batch_size: 64
+  norm: batch
 
 optimizer:
-  lr: 0.0005
-  weight_decay: 0.0
+  lr: 0.01
+  weight_decay: 0.00
 
 trainer:
-  max_epochs: 200
+  max_epochs: 20
 
 train:
   seed: 2222

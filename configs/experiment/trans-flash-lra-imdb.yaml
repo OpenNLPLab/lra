@@ -9,7 +9,7 @@ decoder:
 
 model:
   dropout: 0.0
-  n_layers: 8
+  n_layers: 4
   d_model: 64
   prenorm: true
   norm: batch

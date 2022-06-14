@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /pipeline: imdb
-  - /model: transformer_linear
+  - /model: transformer_performer
   - override /scheduler: cosine_warmup
 
 decoder:

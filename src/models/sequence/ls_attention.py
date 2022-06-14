@@ -19,7 +19,7 @@ class LSAttentionNonCausal(nn.Module):
                  d_model, n_heads, max_seq_len, 
                  dropout, num_landmarks=32, window_size=8):
         super().__init__()
-
+        self.d_output = d_model
         self.cls_from_seq = False
 
         self.num_head = n_heads
@@ -142,12 +142,14 @@ class LSAttentionNonCausal(nn.Module):
         before_softmax: bool = False,
         need_head_weights: bool = False,
         eps=1e-6,
-        cls_embed=None
+        cls_embed=None,
+        state=None,
     ):
         assert not (self.num_landmarks <= 0 and cls_embed is None and self.window_size <= 0)
         # bsz, tgt_len, embed_dim
         # print(query.shape)
         # X = query.transpose(0, 1)
+        X = query
         bsz, tgtlen, d_model = X.shape
         len_pad = (self.window_size - tgtlen % self.window_size) % self.window_size
         # print(X.shape)
@@ -268,7 +270,7 @@ class LSAttentionNonCausal(nn.Module):
         # print(self.W_o(self.combine_heads(C)).shape)
         out = self.W_o(self.combine_heads(C))
         # print(out.shape)
-        out = out[:tgtlen, ...]
+        out = out[:,:tgtlen,:]
         # print(out.shape)
         return out, None
 

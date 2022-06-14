@@ -6,6 +6,6 @@ spring.submit arun --gpu \
 --cpus-per-task 4 \
 --partition MMG \
 --quotatype spot \
---job-name=trans-linear-lra-cifar \
-'python -m train wandb=null experiment=trans-linear-lra-cifar \
+--job-name=trans-lg-lra-cifar \
+'python -m train wandb=null experiment=trans-lg-lra-cifar \
 trainer.gpus=2 loader.batch_size=10 ' 

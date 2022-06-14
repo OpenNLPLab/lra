@@ -2,7 +2,8 @@
 _name_: model
 layer:
   - _name_: ls_attn
-    max_seq_len: 512
+    n_heads: 8
+    max_seq_len: 4096
     num_landmarks: 32
     window_size: 8
   - _name_: ff
