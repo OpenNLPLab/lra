@@ -4,7 +4,7 @@ layer:
   - _name_: flash_attn
     s: 128
     eps: 1e-5
-    max_position_embeddings: 4096
+    max_position_embeddings: 1024
 
 residual: R
 dropout: 0.1

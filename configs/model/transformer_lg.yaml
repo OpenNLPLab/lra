@@ -2,13 +2,13 @@
 _name_: model
 layer:
   - _name_: localattn
-    n_heads: 8
-    chunk_size: 512
+    n_heads: 4
+    chunk_size: 64
     act_fun: relu
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: linearattn
-    n_heads: 8
+    n_heads: 4
     act_fun: elu
     norm_type: ${model.norm}
     use_orpe: true
