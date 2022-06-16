@@ -6,6 +6,6 @@ spring.submit arun --gpu \
 --cpus-per-task 5 \
 --partition MMG \
 --quotatype spot \
---job-name=trans-lg-lra-listops \
-'python -m train wandb=null experiment=trans-lg-lra-listops \
+--job-name=trans-performer-lra-listops \
+'python -m train wandb=null experiment=trans-performer-lra-listops \
 trainer.gpus=2 loader.batch_size=10 ' 
