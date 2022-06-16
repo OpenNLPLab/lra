@@ -2,10 +2,12 @@
 _name_: model
 layer:
   - _name_: flash_attn
-    s: 128
+    s: ${model.flash_s}
     eps: 1e-5
-    max_position_embeddings: 2048
+    max_position_embeddings: ${model.flash_max_position_embed}
 
+flash_s: 128
+flash_max_position_embed: 2048
 residual: R
 dropout: 0.1
 encoder:
