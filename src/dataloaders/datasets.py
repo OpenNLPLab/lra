@@ -1333,9 +1333,19 @@ class AAN(SequenceDataset):
             # print("++++++++++++++++++++++++++++++++++++++")
             # print(xs1.shape)
             # print(xs2.shape)
-            # print(ys.shape)
+            # print(lengths1)
+            # print(lengths2)
             # print("++++++++++++++++++++++++++++++++++++++")
-            xs = torch.cat([xs1, xs2], dim=0)
+            try:
+                xs = torch.cat([xs1, xs2], dim=0)
+            except:
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                print(xs1.shape)
+                print(xs2.shape)
+                print(lengths1)
+                print(lengths2)
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            
             lengths = torch.cat([lengths1, lengths2], dim=0)
             return xs, ys, lengths
 

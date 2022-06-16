@@ -8,4 +8,4 @@ spring.submit arun --gpu \
 --quotatype spot \
 --job-name=trans-flash-linear-lra-imdb \
 "python -m train wandb=null experiment=trans-flash-linear-lra-imdb \
-trainer.gpus=1 loader.batch_size=5"
+trainer.gpus=2 loader.batch_size=5"

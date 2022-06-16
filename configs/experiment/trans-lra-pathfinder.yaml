@@ -9,10 +9,10 @@ scheduler:
   num_warmup_steps: 2500 # 1 epoch
 
 model:
-  dropout: 0.1
-  n_layers: 6
+  # dropout: 0.1
+  n_layers: 4
   prenorm: true
-  d_model: 256
+  d_model: 128
   norm: batch
   # layer:
   #   d_state: 64
@@ -31,7 +31,7 @@ loader:
   batch_size: 64
 
 optimizer:
-  lr: 0.0005
+  lr: 0.01
   weight_decay: 0.0
 
 trainer:

@@ -3,8 +3,8 @@ export JOBLIB_TEMP_FOLDER=/mnt/cache/hanxiaodong/lra/data/tmp
 # export DATA_PATH=/mnt/lustre/share_data/hanxiaodong/lra_data
 
 spring.submit run --gpu \
--n2 \
---ntasks-per-node 2 \
+-n1 \
+--ntasks-per-node 1 \
 --cpus-per-task 4 \
 --partition MMG \
 --quotatype spot \

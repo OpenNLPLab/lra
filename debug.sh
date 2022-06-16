@@ -7,5 +7,5 @@ spring.submit run --gpu \
 --partition MMG \
 --quotatype spot \
 --job-name=debug \
-'python -m train wandb=null experiment=trans-ls-lra-cifar \
+'python -m train wandb=null experiment=trans-ls-lra-imdb \
 trainer.gpus=1 loader.batch_size=10'

@@ -9,7 +9,7 @@ model:
   n_layers: 12
   d_model: 512
   prenorm: true
-  norm: batch
+  norm: layer
 
 dataset:
   grayscale: true
