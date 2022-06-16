@@ -18,5 +18,6 @@ torchtext==0.11.0
 setuptools==59.5.0
 datasets
 transformers
+timm
 # pytorch-fast-transformers
 # pykeops==1.5 # Install to enable fast Cauchy kernel through pykeops
