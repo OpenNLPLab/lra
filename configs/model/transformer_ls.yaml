@@ -11,6 +11,7 @@ layer:
     dropout: null
     transposed: False
 
+heads: 10
 residual: R
 dropout: 0.1
 encoder:

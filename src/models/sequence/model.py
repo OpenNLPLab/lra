@@ -36,6 +36,19 @@ class SequenceModel(SequenceModule):
         verbose=False,
         track_norms=True,
         dropinp=0.0,
+        # add para
+        flash_max_position_embed=512,
+        flash_s=128,
+        flash_linear_max_position_embeddings=512,
+        flash_linear_s=128,
+        lg_local_heads=8,
+        lg_linear_heads=8,
+        lg_local_chunk_size=64,
+        ls_attn_heads=8,
+        ls_attn_window_size=8,
+        ls_attn_max_seq_len=512,
+        performer_heads=8,
+        performer_approx_attn_dim=32,
     ):
         super().__init__()
         # Save arguments needed for forward pass
