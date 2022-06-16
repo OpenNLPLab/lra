@@ -41,7 +41,8 @@ for i, arch in enumerate(archs):
                 seq_len = 4096
                 args=flash_args[task]
                 if arch == 'flash':
-                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh 8 {arch} {name} 0.0005 0.0 MMG')
+                    
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh ')
                 if arch == 'flash_linear':
                     flash_linear_max_position_embeddings = 4096
                     flash_linear_s = 128
@@ -56,7 +57,7 @@ for i, arch in enumerate(archs):
                 if arch == 'performer':
                     performer_heads = 8
                     performer_approx_attn_dim = 32
-# TODO check cifar task
+            # TODO check cifar task
             elif task == 'cifar':
                             seq_len = 1024
                 if arch == 'flash':
