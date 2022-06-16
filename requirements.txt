@@ -14,7 +14,8 @@ wandb
 einops
 opt_einsum
 cmake
-torchtext
+torchtext==0.11.0
+setuptools==59.5.0
 datasets
 transformers
 pytorch-fast-transformers
