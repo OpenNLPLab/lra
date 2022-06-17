@@ -32,15 +32,19 @@ LS_ATTN_MAX_SEQ_LEN=${16}
 PERFORMER_HEADS=${17}
 PERFORMER_APPROX_ATTN_DIM=${18}
 
+echo here
+
+cards=${19}
+
 spring.submit arun --gpu \
--n2 \
---ntasks-per-node 2 \
+-n$cards \
+--ntasks-per-node $cards \
 --cpus-per-task 5 \
 --partition MMG \
---quotatype spot \
+--quotatype reserved \
 --job-name=${TASK}_${ARCH} \
 "python -m train wandb=null experiment=trans-${ARCH}-lra-${TASK} \
-trainer.gpus=2 \
+trainer.gpus=$cards \
 loader.batch_size=${BS} model.n_layers=${N_LAYERS} model.d_model=${D_MODEL} model.norm=${NORM} model.prenorm=true \
 model.flash_max_position_embed=${FLASH_MAX_POSITION_EMBED} model.flash_s=${FLASH_S} \
 model.flash_linear_max_position_embeddings=${FLASH_LINEAR_MAX_POSITION_EMBEDDINGS} model.flash_linear_s=${FLASH_LINEAR_S} \

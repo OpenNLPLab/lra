@@ -7,10 +7,10 @@ layer:
     act_fun: relu
     norm_type: ${model.norm}
     use_orpe: true
-    use_softmax: false
+    use_softmax: true
   - _name_: linearattn
     n_heads: ${model.lg_linear_heads}
-    act_fun: elu
+    act_fun: 1+elu
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: glu
