@@ -36,6 +36,7 @@ class SequenceModel(SequenceModule):
         verbose=False,
         track_norms=True,
         dropinp=0.0,
+        # add args
         flash_max_position_embed=512,
         flash_s=128,
         flash_linear_max_position_embeddings=512,
