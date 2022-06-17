@@ -346,7 +346,11 @@ class NormLocalAttention(nn.Module):
             k = self.orpe(k)
 
         logits = torch.einsum("bgle,bgse->bgls", q, k)
-        prob = self.act(logits)
+        if not self.use_softmax:
+            prob = self.act(logits)
+        else:
+            # logits *= scaling
+            prob = F.softmax(logits, dim=-1)
 
         if self.causal:
             attn_mask = (torch.triu(torch.ones(self.chunk_size, self.chunk_size)) == 1).transpose(0, 1).to(q)

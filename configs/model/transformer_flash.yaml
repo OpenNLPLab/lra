@@ -7,7 +7,7 @@ layer:
     max_position_embeddings: ${model.flash_max_position_embed}
 
 flash_s: 128
-flash_max_position_embed: 2048
+flash_max_position_embed: 512
 residual: R
 dropout: 0.1
 encoder:

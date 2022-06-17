@@ -7,6 +7,7 @@ layer:
     act_fun: relu
     norm_type: ${model.norm}
     use_orpe: true
+    use_softmax: false
   - _name_: linearattn
     n_heads: ${model.lg_linear_heads}
     act_fun: elu
