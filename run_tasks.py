@@ -32,7 +32,7 @@ norm='batch'
 
 for i, arch in enumerate(archs):
     for j, task in enumerate(tasks):
-        # time.sleep(30)
+        time.sleep(30)
         pid = os.fork()
         if pid == 0:
             name = f"{arch}_{task}"
@@ -52,7 +52,7 @@ for i, arch in enumerate(archs):
                 # if arch == 'performer':
                 #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check cifar task
-            elif task == 'cifar':
+            if task == 'cifar':
                 seq_len = 1024
                 if arch == 'flash':
                     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
@@ -65,7 +65,7 @@ for i, arch in enumerate(archs):
                 # if arch == 'performer':
                 #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check listops task
-            elif task == 'listops':
+            if task == 'listops':
                 seq_len = 2048
                 if arch == 'flash':
                     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
@@ -78,7 +78,7 @@ for i, arch in enumerate(archs):
                 # if arch == 'performer':
                 #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check pathfinder task
-            elif task == 'pathfinder':
+            if task == 'pathfinder':
                 seq_len = 1024
                 if arch == 'flash':
                     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
@@ -91,7 +91,7 @@ for i, arch in enumerate(archs):
                 # if arch == 'performer':
                 #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check aan task
-            elif task == 'aan':
+            if task == 'aan':
                 seq_len = 4000
                 if arch == 'flash':
                     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
