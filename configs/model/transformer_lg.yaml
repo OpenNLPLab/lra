@@ -2,19 +2,22 @@
 _name_: model
 layer:
   - _name_: localattn
-    n_heads: 8
-    chunk_size: 64
+    n_heads: ${model.lg_local_heads}
+    chunk_size: ${model.lg_local_chunk_size}
     act_fun: relu
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: linearattn
-    n_heads: 8
+    n_heads: ${model.lg_linear_heads}
     act_fun: elu
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: glu
     act_fun: swish
 
+lg_local_heads: 8
+lg_local_chunk_size: 64
+lg_linear_heads: 8
 residual: R
 dropout: 0.1
 encoder:

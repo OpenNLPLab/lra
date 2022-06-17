@@ -2,16 +2,18 @@
 _name_: model
 layer:
   - _name_: ls_attn
-    n_heads: 8
-    max_seq_len: 4000
+    n_heads: ${model.ls_attn_heads}
+    max_seq_len: ${model.ls_attn_max_seq_len}
     num_landmarks: 32
-    window_size: 8
+    window_size: ${model.ls_attn_window_size}
   - _name_: ff
     expand: 3
     dropout: null
     transposed: False
 
-heads: 10
+ls_attn_heads: 8
+ls_attn_window_size: 8
+ls_attn_max_seq_len: 4000
 residual: R
 dropout: 0.1
 encoder:
