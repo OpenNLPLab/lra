@@ -2,13 +2,15 @@
 _name_: model
 layer:
   - _name_: performer_attn
-    n_heads: 8
-    approx_attn_dim: 32
+    n_heads: ${model.performer_heads}
+    approx_attn_dim: ${model.performer_approx_attn_dim}
   - _name_: ff
     expand: 3
     dropout: null
     transposed: False
 
+performer_heads: 8
+performer_approx_attn_dim: 32
 residual: R
 prenorm: true
 dropout: 0.1

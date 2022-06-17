@@ -9,7 +9,7 @@ model:
   n_layers: 11
   d_model: 512
   prenorm: true
-  norm: layer
+  norm: batch
 
 decoder:
   mode: pool

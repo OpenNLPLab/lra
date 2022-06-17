@@ -2,10 +2,12 @@
 _name_: model
 layer:
   - _name_: flash_linear_attn
-    s: 128
+    s: ${model.flash_linear_s}
     eps: 1e-5
-    max_position_embeddings: 4096
+    max_position_embeddings: ${model.flash_linear_max_position_embeddings}
 
+flash_linear_s: 128
+flash_linear_max_position_embeddings: 512
 residual: R
 dropout: 0.1
 encoder:
