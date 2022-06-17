@@ -28,6 +28,7 @@ arch_args={'cifar':
                 "lra":{"flash":[6,128],"flash_linear":[6,128],"lg":[4,128],"ls":[4,128]}}
                 }
 
+norm='batch'
 
 for i, arch in enumerate(archs):
     for j, task in enumerate(tasks):
@@ -41,98 +42,68 @@ for i, arch in enumerate(archs):
                 seq_len = 4096
                 args=flash_args[task]
                 if arch == 'flash':
-                    
-                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh ')
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
                 if arch == 'flash_linear':
-                    flash_linear_max_position_embeddings = 4096
-                    flash_linear_s = 128
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
                 if arch == 'lg':
-                    lg_local_heads = 8
-                    lg_linear_heads = 8
-                    lg_local_chunk_size = 64
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[task][0]} {lg_args[task][1]} {lg_args[task][2]} 0 0 0 0 0')
                 if arch == 'ls':
-                    ls_attn_heads = 8
-                    ls_attn_window_size = 8
-                    ls_attn_max_seq_len = 4096
-                if arch == 'performer':
-                    performer_heads = 8
-                    performer_approx_attn_dim = 32
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check cifar task
             elif task == 'cifar':
-                            seq_len = 1024
+                seq_len = 1024
                 if arch == 'flash':
-                    flash_max_position_embed = 1024
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
                 if arch == 'flash_linear':
-                    flash_linear_max_position_embeddings = 1024
-                    flash_linear_s = 128
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
                 if arch == 'lg':
-                    lg_local_heads = 8
-                    lg_linear_heads = 8
-                    lg_local_chunk_size = 64
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[task][0]} {lg_args[task][1]} {lg_args[task][2]} 0 0 0 0 0')
                 if arch == 'ls':
-                    ls_attn_heads = 8
-                    ls_attn_window_size = 8
-                    ls_attn_max_seq_len = 1024
-                if arch == 'performer':
-                    performer_heads = 8
-                    performer_approx_attn_dim = 32
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check listops task
             elif task == 'listops':
                 seq_len = 2048
                 if arch == 'flash':
-                    flash_max_position_embed = 2048
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
                 if arch == 'flash_linear':
-                    flash_linear_max_position_embeddings = 2048
-                    flash_linear_s = 128
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
                 if arch == 'lg':
-                    lg_local_heads = 8
-                    lg_linear_heads = 8
-                    lg_local_chunk_size = 64
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[task][0]} {lg_args[task][1]} {lg_args[task][2]} 0 0 0 0 0')
                 if arch == 'ls':
-                    ls_attn_heads = 8
-                    ls_attn_window_size = 8
-                    ls_attn_max_seq_len = 2048
-                if arch == 'performer':
-                    performer_heads = 8
-                    performer_approx_attn_dim = 32
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check pathfinder task
             elif task == 'pathfinder':
                 seq_len = 1024
                 if arch == 'flash':
-                    flash_max_position_embed = 1024
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
                 if arch == 'flash_linear':
-                    flash_linear_max_position_embeddings = 1024
-                    flash_linear_s = 128
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
                 if arch == 'lg':
-                    lg_local_heads = 8
-                    lg_linear_heads = 8
-                    lg_local_chunk_size = 64
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[task][0]} {lg_args[task][1]} {lg_args[task][2]} 0 0 0 0 0')
                 if arch == 'ls':
-                    ls_attn_heads = 8
-                    ls_attn_window_size = 8
-                    ls_attn_max_seq_len = 1024
-                if arch == 'performer':
-                    performer_heads = 8
-                    performer_approx_attn_dim = 32
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
             # TODO check aan task
             elif task == 'aan':
                 seq_len = 4000
                 if arch == 'flash':
-                    flash_max_position_embed = 4000
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
                 if arch == 'flash_linear':
-                    flash_linear_max_position_embeddings = 4000
-                    flash_linear_s = 128
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
                 if arch == 'lg':
-                    lg_local_heads = 8
-                    lg_linear_heads = 8
-                    lg_local_chunk_size = 64
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[task][0]} {lg_args[task][1]} {lg_args[task][2]} 0 0 0 0 0')
                 if arch == 'ls':
-                    ls_attn_heads = 8
-                    ls_attn_window_size = 8
-                    ls_attn_max_seq_len = 4000
-                if arch == 'performer':
-                    performer_heads = 8
-                    performer_approx_attn_dim = 32
+                    os.system(f'sh /mnt/cache/hanxiaodong/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     performer_heads = 8
+                #     performer_approx_attn_dim = 32
             
             # os.system(f'bash /mnt/lustre/qinzhen/experiment/nlp/roberta_m3t.sh 8 {arch} {name} 0.0005 0.0 MMG')
-            # sys.exit(0)
+            sys.exit(0)
