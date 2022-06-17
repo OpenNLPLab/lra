@@ -49,6 +49,8 @@ class SequenceModel(SequenceModule):
         ls_attn_max_seq_len=512,
         performer_heads=8,
         performer_approx_attn_dim=32,
+        use_softmax=False,
+        act_fun="elu"
     ):
         super().__init__()
         # Save arguments needed for forward pass

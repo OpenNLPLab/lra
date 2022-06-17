@@ -24,7 +24,7 @@ train:
   monitor: ??? # Should be specified by pipeline. Used by scheduler (plateau) and checkpointer
   mode: ??? # Should be specified by pipeline. Used by scheduler (plateau) and checkpointer
   ema: 0.0 # Moving average model for validation # TODO move into callback
-  test: False # Test after training
+  test: True # Test after training
   debug: False # Special settings to make debugging more convenient
   ignore_warnings: False # Disable python warnings
   # These control state

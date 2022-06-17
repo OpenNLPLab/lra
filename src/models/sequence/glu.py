@@ -7,7 +7,8 @@ class GLU(nn.Module):
         super().__init__()
         self.d_output = d_model
         d_model1 = d_model
-        d_model2 = int(8/3*d_model1)
+        # d_model2 = int(8/3*d_model1)
+        d_model2 = int(4/3*d_model1)
         self.l1 = nn.Linear(d_model1, d_model2)
         self.l2 = nn.Linear(d_model1, d_model2)
         self.l3 = nn.Linear(d_model2, d_model1)

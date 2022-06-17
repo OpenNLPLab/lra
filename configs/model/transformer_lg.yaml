@@ -7,10 +7,10 @@ layer:
     act_fun: relu
     norm_type: ${model.norm}
     use_orpe: true
-    use_softmax: true
+    use_softmax: ${model.use_softmax}
   - _name_: linearattn
     n_heads: ${model.lg_linear_heads}
-    act_fun: 1+elu
+    act_fun: ${model.act_fun}
     norm_type: ${model.norm}
     use_orpe: true
   - _name_: glu
@@ -19,6 +19,8 @@ layer:
 lg_local_heads: 8
 lg_local_chunk_size: 64
 lg_linear_heads: 8
+use_softmax: true
+act_fun: 1+elu
 
 flash_linear_s: 0
 flash_linear_max_position_embeddings: 0

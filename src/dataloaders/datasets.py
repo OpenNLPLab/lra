@@ -1385,10 +1385,10 @@ class AAN(SequenceDataset):
         dataset = dataset.map(
             tokenize,
             remove_columns=["text1", "text2"],
-            keep_in_memory=True,
+            keep_in_memory=False,
             load_from_cache_file=False,
             num_proc=max(self.n_workers, 1),
-            # cache_file_names={"train":"/mnt/cache/hanxiaodong/lra/data/tmp/train.arrow","val":"/mnt/cache/hanxiaodong/lra/data/tmp/val.arrow","test":"/mnt/cache/hanxiaodong/lra/data/test.arrow"},
+            cache_file_names={"train":"/mnt/lustre/share_data/qinzhen/lra_data/tmp/train.arrow","val":"/mnt/lustre/share_data/qinzhen/lra_data/tmp/val.arrow","test":"/mnt/lustre/share_data/qinzhen/lra_data/tmp/test.arrow"},
         )
         vocab = torchtext.vocab.build_vocab_from_iterator(
             dataset["train"]["tokens1"] + dataset["train"]["tokens2"],
