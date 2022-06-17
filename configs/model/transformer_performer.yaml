@@ -11,6 +11,17 @@ layer:
 
 performer_heads: 8
 performer_approx_attn_dim: 32
+flash_linear_s: 0
+flash_linear_max_position_embeddings: 0
+flash_max_position_embed: 0
+flash_s: 0
+lg_local_heads: 0
+lg_linear_heads: 0
+lg_local_chunk_size: 0
+ls_attn_heads: 0
+ls_attn_window_size: 0
+ls_attn_max_seq_len: 0
+
 residual: R
 prenorm: true
 dropout: 0.1

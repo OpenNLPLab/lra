@@ -8,6 +8,17 @@ layer:
 
 flash_linear_s: 128
 flash_linear_max_position_embeddings: 512
+flash_max_position_embed: 0
+flash_s: 0
+lg_local_heads: 0
+lg_linear_heads: 0
+lg_local_chunk_size: 0
+ls_attn_heads: 0
+ls_attn_window_size: 0
+ls_attn_max_seq_len: 0
+performer_heads: 0
+performer_approx_attn_dim: 0
+
 residual: R
 dropout: 0.1
 encoder:
@@ -15,5 +26,5 @@ encoder:
   dropout: 0.1
 # init:
 #   init: normal  # Parameter initializer to use
-#   init_range: 0.1  # Parameters initialized by U(-init_range, init_range)
-#   init_std: 0.02  # Parameters initialized by N(0, init_std)
+#   init_range: 0.1  # Parameters initialized by U(-init_range init_range)
+#   init_std: 0.02  # Parameters initialized by N(0 init_std)
