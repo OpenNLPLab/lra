@@ -43,6 +43,7 @@ tasks_tmp = ["aan"]
 archs_tmp = ["lg"]
 # tasks_tmp = ["imdb"]
 # archs_tmp = ["ls"]
+<<<<<<< HEAD
 for use_softmax, act_fun in [(True, "1+elu"), (False, "elu")]:
     print(use_softmax, act_fun)
     for norm in ['batch', 'layer']:
@@ -129,3 +130,84 @@ for use_softmax, act_fun in [(True, "1+elu"), (False, "elu")]:
                         sys.exit(0)
                     # os.system(f'bash /mnt/lustre/qinzhen/experiment/nlp/roberta_m3t.sh 8 {arch} {name} 0.0005 0.0 MMG')
                     sys.exit(0)
+=======
+for i, arch in enumerate(archs_tmp):
+    for j, task in enumerate(tasks_tmp):
+        time.sleep(10)
+        pid = os.fork()
+        if pid == 0:
+            name = f"{arch}_{task}"
+            print(name)
+            # TODO check imdb task
+            if task == 'imdb':
+                seq_len = 4096
+                lg_args=[2,2,64]
+                args=flash_args[task]
+                if arch == 'flash':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
+                if arch == 'flash_linear':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
+                if arch == 'lg':
+                    # os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {4} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
+                if arch == 'ls':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+            # TODO check cifar task
+            if task == 'cifar':
+                seq_len = 1024
+                lg_args=[2,2,64]
+                if arch == 'flash':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
+                if arch == 'flash_linear':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
+                if arch == 'lg':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {64} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
+                if arch == 'ls':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
+            # TODO check listops task
+            if task == 'listops':
+                seq_len = 2048
+                if arch == 'flash':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
+                if arch == 'flash_linear':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
+                if arch == 'lg':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {4} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
+                if arch == 'ls':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {10} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
+            # TODO check pathfinder task
+            if task == 'pathfinder':
+                seq_len = 1024
+                if arch == 'flash':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
+                if arch == 'flash_linear':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
+                if arch == 'lg':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
+                if arch == 'ls':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {25} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}')
+            # TODO check aan task
+            if task == 'aan':
+                seq_len = 4000
+                lg_args=[2,2,64]
+                if arch == 'flash':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0')
+                if arch == 'flash_linear':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0')
+                if arch == 'lg':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {2} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
+                if arch == 'ls':
+                    os.system(f'bash /mnt/cache/qinzhen/software/lra/run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0')
+                # if arch == 'performer':
+                #     performer_heads = 8
+                #     performer_approx_attn_dim = 32
+            
+            # os.system(f'bash /mnt/lustre/qinzhen/experiment/nlp/roberta_m3t.sh 8 {arch} {name} 0.0005 0.0 MMG')
+            sys.exit(0)
+>>>>>>> 54cb1929cf4d3b8ccdb464417c0201d94c9494ea
