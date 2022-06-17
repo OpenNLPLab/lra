@@ -536,7 +536,7 @@ def benchmark_step(config):
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def main(config: OmegaConf):
-
+    print(torch.cuda.is_available())
     # Process config:
     # - register evaluation resolver
     # - filter out keys used only for interpolation
