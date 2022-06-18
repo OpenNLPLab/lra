@@ -48,7 +48,8 @@ tasks_tmp = ["imdb","cifar","aan", "listops","pathfinder"]
 tasks_tmp = ["aan"]
 tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 # archs_tmp = ["lg"]
-archs_tmp = ["flash","flash_linear","lg","ls"]
+tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
+archs_tmp = ["lg", "flash","flash_linear","ls"]
 # tasks_tmp = ["imdb"]
 # archs_tmp = ["ls"]
 for j, task in enumerate(tasks_tmp):
@@ -58,7 +59,7 @@ for j, task in enumerate(tasks_tmp):
                 tmp = [(True, "1+elu"), (False, "elu")]
             else:
                 tmp = [(True, "1+elu")]
-            print(arch, tmp)
+            print(task, arch, tmp)
             for use_softmax, act_fun in tmp:
                 print(use_softmax, act_fun)
                 time.sleep(10)
