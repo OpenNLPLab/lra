@@ -40,6 +40,7 @@ archs_tmp = ["flash","ls"]
 
 tasks_tmp = ["imdb","cifar","aan", "listops","pathfinder"]
 tasks_tmp = ["aan"]
+tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 archs_tmp = ["lg"]
 # tasks_tmp = ["imdb"]
 # archs_tmp = ["ls"]
