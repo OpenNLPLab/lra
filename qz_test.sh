@@ -1,4 +1,5 @@
 TASK=cifar
+TASK=aan
 ARCH=lg
 BS=1
 N_LAYERS=2
