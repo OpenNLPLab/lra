@@ -6,7 +6,7 @@ defaults:
 
 scheduler:
   num_training_steps: 50000 # 20 epochs
-  num_warmup_steps: 2500 # 1 epoch
+  num_warmup_steps: 800 # 1 epoch
 
 model:
   dropout: 0.0
@@ -16,7 +16,7 @@ model:
   norm: batch
 
 optimizer:
-  lr: 0.01
+  lr: 0.0002
   weight_decay: 0.00
 
 trainer:

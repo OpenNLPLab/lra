@@ -1,8 +1,8 @@
-TASK=cifar
-TASK=aan
+TASK=pathfinder
+# TASK=aan
 ARCH=lg
-BS=1
-N_LAYERS=2
+BS=128
+N_LAYERS=4
 D_MODEL=64
 NORM=batch
 NORM=layer

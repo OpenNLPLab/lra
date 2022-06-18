@@ -35,6 +35,10 @@ PERFORMER_APPROX_ATTN_DIM=${18}
 echo here
 
 cards=${19}
+cards=8
+
+USE_SOFTMAX=${19}
+ACT_FUN=${20}
 
 spring.submit arun --gpu \
 -n$cards \
@@ -50,4 +54,5 @@ model.flash_max_position_embed=${FLASH_MAX_POSITION_EMBED} model.flash_s=${FLASH
 model.flash_linear_max_position_embeddings=${FLASH_LINEAR_MAX_POSITION_EMBEDDINGS} model.flash_linear_s=${FLASH_LINEAR_S} \
 model.lg_local_heads=${LG_LOCAL_HEADS} model.lg_linear_heads=${LG_LINEAR_HEADS} model.lg_local_chunk_size=${LG_LOCAL_CHUNK_SIZE} \
 model.ls_attn_heads=${LS_ATTN_HEADS} model.ls_attn_window_size=${LS_ATTN_WINDOW_SIZE} model.ls_attn_max_seq_len=${LS_ATTN_MAX_SEQ_LEN} \
-model.performer_heads=${PERFORMER_HEADS} model.performer_approx_attn_dim=${PERFORMER_APPROX_ATTN_DIM}"
+model.performer_heads=${PERFORMER_HEADS} model.performer_approx_attn_dim=${PERFORMER_APPROX_ATTN_DIM} \
+model.use_softmax=${USE_SOFTMAX} model.act_fun=${ACT_FUN}"

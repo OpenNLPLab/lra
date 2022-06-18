@@ -19,6 +19,8 @@ ls_attn_window_size: 0
 ls_attn_max_seq_len: 0
 performer_heads: 0
 performer_approx_attn_dim: 0
+use_softmax: true
+act_fun: 1+elu
 
 residual: R
 dropout: 0.1
