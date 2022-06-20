@@ -1,10 +1,3 @@
-#! /bin/bash
-export CUDA_HOME='/mnt/lustre/share/cuda-10.2'
-export PATH="/mnt/lustre/share/cuda-10.2/bin:$PATH"
-export LD_LIBRARY_PATH="/mnt/lustre/share/cuda-10.2/lib64/:$LD_LIBRARY_PATH"
-export LIBRARY_PATH="/mnt/lustre/share/cuda-10.2/lib64/:$LIBRARY_PATH"
-export DATA_PATH=/mnt/lustre/share_data/qinzhen/lra_data
-
 export HYDRA_FULL_ERROR=1
 
 TASK=$1
@@ -32,13 +25,10 @@ LS_ATTN_MAX_SEQ_LEN=${16}
 PERFORMER_HEADS=${17}
 PERFORMER_APPROX_ATTN_DIM=${18}
 
-echo here
-
-cards=${19}
-cards=8
-
 USE_SOFTMAX=${19}
 ACT_FUN=${20}
+
+cards=${21}
 
 spring.submit arun --gpu \
 -n$cards \
