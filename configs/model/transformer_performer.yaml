@@ -5,7 +5,7 @@ layer:
     n_heads: ${model.performer_heads}
     approx_attn_dim: ${model.performer_approx_attn_dim}
   - _name_: ff
-    expand: 3
+    expand: 2
     dropout: null
     transposed: False
 
@@ -21,6 +21,8 @@ lg_local_chunk_size: 0
 ls_attn_heads: 0
 ls_attn_window_size: 0
 ls_attn_max_seq_len: 0
+use_softmax: true
+act_fun: 1+elu
 
 residual: R
 prenorm: true

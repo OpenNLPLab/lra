@@ -7,7 +7,7 @@ layer:
     num_landmarks: 32
     window_size: ${model.ls_attn_window_size}
   - _name_: ff
-    expand: 3
+    expand: 2
     dropout: null
     transposed: False
 

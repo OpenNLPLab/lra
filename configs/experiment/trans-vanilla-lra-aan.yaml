@@ -14,16 +14,6 @@ model:
   prenorm: true
   d_model: 64
   norm: batch
-  # layer:
-  #   d_state: 64
-  #   lr: 0.001
-  #   lr_dt: ${optimizer.lr}
-  #   dt_min: 0.001
-  #   dt_max: 0.1
-  #   measure: legs
-  #   bidirectional: true
-  #   postact: glu
-  #   n_ssm: 256
 
 optimizer:
   lr: 0.01

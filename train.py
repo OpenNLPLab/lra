@@ -17,6 +17,8 @@ import src.models.nn.utils as U
 from src.dataloaders import SequenceDataset  # TODO make registry
 from src.models.baselines.transformer import Transformer
 from tqdm.auto import tqdm
+from gpu_mem_track import MemTracker
+import inspect
 
 log = src.utils.train.get_logger(__name__)
 
@@ -52,6 +54,13 @@ class SequenceLightningModule(pl.LightningModule):
         self._has_setup = False
         self._has_on_post_move_to_device = False
 
+        # TODO memory tracker
+        # arch = config['experiement']
+        # seq_len = config['dataset']['l_max']
+        # frame = inspect.currentframe()          # define a frame to track
+        # self.gpu_tracker = MemTracker(frame, arch, seq_len)         # define a GPU tracker
+
+
     def setup(self, stage=None):
         if not self.hparams.train.disable_dataset:
             self.dataset.setup()
@@ -70,10 +79,10 @@ class SequenceLightningModule(pl.LightningModule):
             self.hparams.model.pop("encoder", None)
         )
         decoder_cfg = utils.to_list(self.hparams.model.pop("decoder", None)) + utils.to_list(self.hparams.decoder)
-
+        
         # Instantiate model
         self.model = utils.instantiate(registry.model, self.hparams.model)
-        # self.model = Transformer()
+
         print(self.model)
         # Instantiate the task
         if "task" not in self.hparams:  # TODO maybe don't need this?
@@ -179,10 +188,14 @@ class SequenceLightningModule(pl.LightningModule):
         # z holds arguments such as sequence length
         x, y, *z = batch
         # w can model-specific constructions such as key_padding_mask for transformers or state for RNNs
+        
+        # TODO gpu memory tracker
+        # self.gpu_tracker.track()
         x, *w = self.encoder(x, *z)
         x, state = self.model(x, *w, state=self._state)
         self._state = state
         x, *w = self.decoder(x, state, *z)
+        # self.gpu_tracker.track()
         return x, y, *w
 
     @torch.inference_mode()
@@ -440,6 +453,7 @@ class SequenceLightningModule(pl.LightningModule):
     def test_dataloader(self):
         test_loader_names, test_loaders = self._eval_dataloaders()
         self.test_loader_names = ["final/" + name for name in test_loader_names]
+        test_loaders = self.dataset.train_dataloader(**self.hparams.loader)
         return test_loaders
 
 
@@ -500,6 +514,15 @@ def train(config):
         trainer.test(model)
 
 
+def test(config):
+    if config.train.seed is not None:
+        pl.seed_everything(config.train.seed, workers=True)
+    model_infer = SequenceLightningModule(config)
+    try_dataloader = model_infer.train_dataloader()
+    inputs, labels = next(iter(try_dataloader))
+    m=1
+
+
 def benchmark_step(config):
     """Utility function to benchmark speed of 'stepping', i.e. recurrent view. Unused for main train logic"""
     pl.seed_everything(config.train.seed, workers=True)
@@ -550,8 +573,10 @@ def main(config: OmegaConf):
     if config.train.benchmark_step:
         benchmark_step(config)
         exit()
-
-    train(config)
+    if False:
+        test(config)
+    else:
+        train(config)
 
 
 if __name__ == "__main__":

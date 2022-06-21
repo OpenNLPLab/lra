@@ -11,11 +11,27 @@ layer:
     kdim: null
     vdim: null
   - _name_: ff
-    expand: 4
+    expand: 2
     dropout: null
     transposed: False
 residual: R
 dropout: 0.1
+
+performer_heads: 0
+performer_approx_attn_dim: 0
+flash_linear_s: 0
+flash_linear_max_position_embeddings: 0
+flash_max_position_embed: 0
+flash_s: 0
+lg_local_heads: 0
+lg_linear_heads: 0
+lg_local_chunk_size: 0
+ls_attn_heads: 0
+ls_attn_window_size: 0
+ls_attn_max_seq_len: 0
+use_softmax: true
+act_fun: 1+elu
+
 encoder:
   _name_: position
   dropout: 0.1
