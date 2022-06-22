@@ -37,7 +37,22 @@ class BigBirdAttention(nn.Module):
 
         assert self.all_head_size == d_model
 
-    def forward(self, q, mask=None, state=None):
+        # add
+        self.k_proj = nn.Linear(d_model, d_model)
+        self.v_proj = nn.Linear(d_model, d_model)
+        self.q_proj = nn.Linear(d_model, d_model)
+
+    def combine_heads(self, X):
+        X = X.transpose(1, 2)
+        X = X.reshape(X.size(0), X.size(1), self.num_attention_heads * self.attention_head_size)
+        return X
+
+    def split_heads(self, X):
+        X = X.reshape(X.size(0), X.size(1), self.num_attention_heads, self.attention_head_size)
+        X = X.transpose(1, 2)
+        return X
+
+    def forward(self, x, mask=None, state=None):
 
         '''
         input of original BigBirdBlockSparseAttention
@@ -49,26 +64,30 @@ class BigBirdAttention(nn.Module):
             to_blocked_mask=None,
             output_attentions=None,
         '''
-        k = q
-        v = q
-        # band_mask=None,
-        # from_mask=None,
-        # to_mask=None,
-        # from_blocked_mask=None,
-        # to_blocked_mask=None,
-        # output_attentions=None,
+        # b, l, d
+        q = self.split_heads(self.q_proj(x))
+        k = self.split_heads(self.k_proj(x))
+        v = self.split_heads(self.v_proj(x))
+        b, h, l, d = q.shape
+        
+        len_pad = (self.block_size - l % self.block_size) % self.block_size
+        q = F.pad(q, (0, 0, 0, len_pad, 0, 0, 0, 0))
+        k = F.pad(k, (0, 0, 0, len_pad, 0, 0, 0, 0))
+        v = F.pad(v, (0, 0, 0, len_pad, 0, 0, 0, 0))
+
+
+        mask = torch.ones(b, l + len_pad).to(q)
         # mask is None, or blocked_encoder_mask is None
-        # if type(mask) == torch.Tensor:
-        #     blocked_encoder_mask, band_mask, from_mask, to_mask = self.create_masks_for_block_sparse_attn(
-        #         mask, self.block_size
-        #     )
-        # else:
-        #     (blocked_encoder_mask, band_mask, from_mask, to_mask) = mask
-        from_blocked_mask = to_blocked_mask = blocked_encoder_mask =None
+        if type(mask) == torch.Tensor:
+            blocked_encoder_mask, band_mask, from_mask, to_mask = self.create_masks_for_block_sparse_attn(
+                mask, self.block_size
+            )
+        else:
+            (blocked_encoder_mask, band_mask, from_mask, to_mask) = mask
+        from_blocked_mask = to_blocked_mask = blocked_encoder_mask
         output_attentions=None
-        import pdb;pdb.set_trace()
-        # batch_size, nb_heads, seq_len, dim_head = q.shape
-        batch_size, seq_len, dim_head = q.shape
+        # import pdb;pdb.set_trace()
+        batch_size, nb_heads, seq_len, dim_head = q.shape
 
         to_seq_length = from_seq_length = seq_len
         from_block_size = to_block_size = self.block_size
@@ -80,9 +99,9 @@ class BigBirdAttention(nn.Module):
             q,
             k,
             v,
-            None,
-            None,
-            None,
+            band_mask,
+            from_mask,
+            to_mask,
             from_blocked_mask,
             to_blocked_mask,
             self.num_attention_heads,
@@ -99,9 +118,12 @@ class BigBirdAttention(nn.Module):
             output_attentions=output_attentions,
         )
 
-        # context_layer = context_layer.contiguous().view(batch_size, from_seq_length, -1)
-        # outputs = (context_layer, attention_probs) if output_attentions else (context_layer,)
-        return context_layer.contiguous()
+        context_layer = context_layer.contiguous()
+        # b, l, e
+        attn_out = self.combine_heads(context_layer)
+        attn_out = attn_out[:, :l, ...]
+
+        return attn_out, None
 
     def transpose_for_scores(self, x):
         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
@@ -834,7 +856,7 @@ class BigBirdAttention(nn.Module):
 
             for blk_rw_idx in range(from_start_block_id, plan_block_length[plan_idx]):
                 for h in range(num_heads):
-                    rand_attn[h][blk_rw_idx, rnd_r_cnt:curr_r_cnt] = self._get_single_block_row_attention(
+                    t1 = self._get_single_block_row_attention(
                         block_id=blk_rw_idx,
                         to_start_block_id=to_start_block_id,
                         to_end_block_id=plan_block_length[plan_idx],
@@ -844,6 +866,22 @@ class BigBirdAttention(nn.Module):
                         global_block_left=global_block_left,
                         global_block_right=global_block_right,
                     )
+                    # print("===================")
+                    # print(t1)
+                    # print(t1.shape)
+                    # print(rand_attn[h][blk_rw_idx, rnd_r_cnt:curr_r_cnt].shape)
+                    # print(t1)
+                    rand_attn[h][blk_rw_idx, rnd_r_cnt:curr_r_cnt] = t1
+                    # rand_attn[h][blk_rw_idx, rnd_r_cnt:curr_r_cnt] = self._get_single_block_row_attention(
+                    #     block_id=blk_rw_idx,
+                    #     to_start_block_id=to_start_block_id,
+                    #     to_end_block_id=plan_block_length[plan_idx],
+                    #     num_rand_blocks=plan_num_rand_blocks[plan_idx],
+                    #     window_block_left=window_block_left,
+                    #     window_block_right=window_block_right,
+                    #     global_block_left=global_block_left,
+                    #     global_block_right=global_block_right,
+                    # )
 
         for nh in range(num_heads):
             rand_attn[nh] = rand_attn[nh][global_block_top : num_blocks - global_block_bottom, :]
@@ -896,10 +934,11 @@ class BigBirdAttention(nn.Module):
             illegal_blocks.append(1)
 
         selected_random_blokcs = []
-
         for i in range(to_end_block_id - to_start_block_id):
-            if perm_block[i] not in illegal_blocks:
-                selected_random_blokcs.append(perm_block[i])
+            # for test !!!!!!!!!!!!!!!!!!!!!!
+            # if perm_block[i] not in illegal_blocks:
+            #     selected_random_blokcs.append(perm_block[i])
+            selected_random_blokcs.append(perm_block[i])
             if len(selected_random_blokcs) == num_rand_blocks:
                 break
         return np.array(selected_random_blokcs, dtype=np.int32)
@@ -908,7 +947,7 @@ class BigBirdAttention(nn.Module):
 
     @staticmethod
     def create_masks_for_block_sparse_attn(attention_mask: torch.Tensor, block_size: int):
-
+        # import pdb;pdb.set_trace()
         batch_size, seq_length = attention_mask.size()
         assert (
                 seq_length % block_size == 0

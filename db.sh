@@ -3,6 +3,7 @@ export HYDRA_FULL_ERROR=1
 TASK='imdb'
 ARCH='bigbird'
 BS=10
+BS=1
 N_LAYERS=2
 D_MODEL=64
 NORM='batch'
