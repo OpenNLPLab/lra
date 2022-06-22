@@ -1,0 +1,30 @@
+# @package _global_
+defaults:
+  - /pipeline: cifar
+  - /model: transformer_ls
+  - override /scheduler: cosine_warmup
+
+model:
+  dropout: 0.2
+  n_layers: 6
+  d_model: 512
+  prenorm: true
+  norm: batch
+
+dataset:
+  grayscale: true
+
+
+optimizer:
+  lr: 0.0001
+  weight_decay: 0
+
+trainer:
+  max_epochs: 200
+
+scheduler:
+  num_training_steps: 50000
+  num_warmup_steps: 175
+
+train:
+  seed: 2222

@@ -1,0 +1,33 @@
+# @package _global_
+defaults:
+  - /pipeline: imdb
+  - /model: transformer_linformer
+  - override /scheduler: cosine_warmup
+
+decoder:
+  mode: pool
+
+model:
+  dropout: 0.0
+  n_layers: 4
+  d_model: 64
+  prenorm: true
+  norm: batch
+
+dataset:
+  l_max: 4096
+  level: char
+
+optimizer:
+  lr: 0.0001
+  weight_decay: 0.0
+
+scheduler:
+  num_training_steps: 50000
+  num_warmup_steps: 80
+
+trainer:
+  max_epochs: 32
+
+train:
+  seed: 2222

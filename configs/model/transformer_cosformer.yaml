@@ -25,6 +25,7 @@ ls_attn_window_size: 0
 ls_attn_max_seq_len: 0
 use_softmax: true
 act_fun: 1+elu
+linformer_max_seq_len: 0
 
 residual: R
 prenorm: true

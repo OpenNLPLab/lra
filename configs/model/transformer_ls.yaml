@@ -28,6 +28,7 @@ use_softmax: true
 act_fun: 1+elu
 cosformer_heads: 0 
 cosformer_max_length: 0
+linformer_max_seq_len: 0
 
 residual: R
 dropout: 0.1

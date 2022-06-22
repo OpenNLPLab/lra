@@ -53,6 +53,7 @@ class SequenceModel(SequenceModule):
         act_fun="elu",
         cosformer_heads=8,
         cosformer_max_length=512,
+        linformer_max_seq_len=1024,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -118,6 +119,13 @@ class SequenceModel(SequenceModule):
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
         elif layer[0]['_name_'] == 'bigbird_attn':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
+        elif layer[0]['_name_'] == 'linformer_attn':
             for _layer in layer:
                 # If layers don't specify dropout, add it
                 if _layer.get('dropout', None) is None:

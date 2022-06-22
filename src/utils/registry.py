@@ -78,6 +78,7 @@ layer = {
     "flash_linear_attn":"src.models.sequence.flash_linear.FlashLinearAttention",
     "cosformer_attn":"src.models.sequence.cosformer.MultiheadCosformerAttention_",
     "bigbird_attn":"src.models.sequence.bigbird_attention.BigBirdAttention",
+    "linformer_attn":"src.models.sequence.linformer_attention.LinformerAttention",
     "conv1d": "src.models.sequence.conv1d.Conv1d",
     "attsimp": "src.models.sequence.mha.AttentionSimple",
     "performer": "src.models.sequence.attention.linear.Performer",

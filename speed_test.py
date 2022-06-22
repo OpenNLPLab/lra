@@ -58,7 +58,7 @@ tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 archs_tmp = ["lg", "flash","flash-linear","ls"]
 
 tasks_tmp = ["imdb"]
-archs_tmp = ["lg"]
+archs_tmp = ["performer"]
 for j, task in enumerate(tasks_tmp):
     for i, arch in enumerate(archs_tmp):
         for norm in ['batch']:
