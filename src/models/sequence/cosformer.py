@@ -129,6 +129,12 @@ class MultiheadCosformerAttention_(nn.Module):
         # return ~diag_mask
         return nn.Parameter(~diag_mask, requires_grad=False)
 
+    def get_index(self, seq_len):
+        index = np.pi / 2 * torch.arange(1, seq_len + 1).reshape(1, -1, 1)
+
+        return nn.Parameter(index, requires_grad=False)
+
+
     def forward(
         self,
         query,
@@ -142,6 +148,7 @@ class MultiheadCosformerAttention_(nn.Module):
         before_softmax: bool = False,
         need_head_weights: bool = False,
         state = None,
+        eps = 1e-4,
     ) -> Tuple[Tensor, Optional[Tensor]]:
         """Input shape: Time x Batch x Channel
 
@@ -193,51 +200,38 @@ class MultiheadCosformerAttention_(nn.Module):
         # S, N, E2
         v = self.v_proj(value)
 
-
-        # N, L, H, E, batch, length, head, dim
-        # # N * b, L, e1
-        # q = q.contiguous().view(tgt_len,  bsz * num_heads, head_dim).transpose(0, 1)
-        # # N * b, S, e2
-        # if k is not None:
-        #     k = k.contiguous().view(-1, bsz * num_heads, head_dim).transpose(0, 1)
-        # # N * b, S, e2
-        # if v is not None:
-        #     v = v.contiguous().view(-1, bsz * num_heads, head_dim).transpose(0, 1)
-
-        # N, L, H, E, batch, length, head, dim
-        # N * b, L, e1
-        q = q.view(tgt_len, bsz, num_heads, head_dim).transpose(0, 1)
-        # N * b, S, e2
-        if k is not None:
-            k = k.view(-1, bsz, num_heads, head_dim).transpose(0, 1)
-        # N * b, S, e2
-        if v is not None:
-            v = v.view(-1, bsz, num_heads, head_dim).transpose(0, 1)
-
+        # activation
         q = F.relu(q)
         k = F.relu(k)
 
-
-        # N * b, L, e1
-        q_sin = q * torch.sin(self.weight_index[:, :tgt_len, :, :] / m)
-        q_cos = q * torch.cos(self.weight_index[:, :tgt_len, :, :] / m)
-        # N * b, S, e2
-        k_sin = k * torch.sin(self.weight_index[:, :src_len, :, :] / m)
-        k_cos = k * torch.cos(self.weight_index[:, :src_len, :, :] / m)
-        eps = 1e-6
+        # multihead reshape
+        # (N * h, L, d)
+        q = q.contiguous().view(-1, bsz * num_heads, head_dim).transpose(0, 1)
+        # (N * h, S, d)
+        k = k.contiguous().view(-1, bsz * num_heads, head_dim).transpose(0, 1)
+        # (N * h, S, d)
+        v = v.contiguous().view(-1, bsz * num_heads, head_dim).transpose(0, 1)
+        
+        # cos transform
+        m = max(src_len, tgt_len)
+        # get index and send to cuda
+        weight_index = self.get_index(m).to(q)
+        # (N * h, L, 2 * d)
+        q_ = torch.cat([q * torch.sin(weight_index[:, :tgt_len, :] / m), q * torch.cos(weight_index[:, :tgt_len, :] / m)], dim=-1)
+        # (N * h, S, 2 * d)
+        k_ = torch.cat([k * torch.sin(weight_index[:, :src_len, :] / m), k * torch.cos(weight_index[:, :src_len, :] / m)], dim=-1)
 
         # (N * b, e1, e2)
-        kv_cos = torch.einsum('btk,btd->bkd', k_cos, v)
-        kv_sin = torch.einsum('btk,btd->bkd', k_sin, v)
-        # (N * b, S, e1) (N * b, e1) -> (N * b, S)
-        z_cos_sin = 1 / torch.clamp_min(torch.einsum('btk,bd->bt', q_cos, torch.sum(k_cos, axis=1)) + torch.einsum('btk,bd->bt', q_sin, torch.sum(k_sin, axis=1)), eps)
-        # (N * b, S, e1) (N * b, e1, e2) (N * b, S)
-        attn_output = torch.einsum('btk,bkd,bt->btd', q_cos, kv_cos, z_cos_sin) + \
-                    torch.einsum('btk,bkd,bt->btd', q_sin, kv_sin, z_cos_sin)
-
-        attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, embed_dim)
+        # (N * h, L, 2 * d) (N * h, L, d) -> (N * h, 2 * d, d)
+        kv_ = torch.einsum('nld,nlm->ndm', k_, v)
+        # (N * h, L, 2 * d) (N * h, 2 * d) -> (N * h, L)
+        z_ = 1 / torch.clamp_min(torch.einsum('nld,nd->nl', q_, torch.sum(k_, axis=1)), eps)
+        # (N * h, L, 2 * d) (N * h, d, 2 * d) (N * h, L) -> (N * h, L, d)
+        attn_output = torch.einsum('nld,ndm,nl->nlm', q_, kv_, z_)
+        # (N * h, L, d) -> (L, N * h, d) -> (L, N, E)
+        attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, -1)
 
         attn_output = self.out_proj(attn_output)
-        output = rearrange(output, 'l n e -> n l e')
+        attn_output = rearrange(attn_output, 'l n e -> n l e')
 
         return attn_output, None

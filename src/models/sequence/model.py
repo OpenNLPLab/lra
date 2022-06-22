@@ -170,12 +170,12 @@ class SequenceModel(SequenceModule):
         outputs = inputs
         prev_states = [None] * len(self.layers) if state is None else state
         next_states = []
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         for layer, prev_state in zip(self.layers, prev_states):
             outputs, state = layer(outputs, *args, state=prev_state, **kwargs) # TODO handle state
             next_states.append(state)
             if self.track_norms: output_norms.append(torch.mean(outputs.detach() ** 2))
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         outputs = self.norm(outputs)
 
         if self.transposed: outputs = rearrange(outputs, 'b d l -> b l d')
