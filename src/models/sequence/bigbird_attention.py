@@ -1,3 +1,4 @@
+from fcntl import DN_DELETE
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -15,18 +16,26 @@ class BigBirdAttention(nn.Module):
     modified from BigBirdBlockSparseAttention and BigBirdModel
     https://huggingface.co/transformers/_modules/transformers/models/big_bird/modeling_big_bird.html#BigBirdModel
     '''
-    def __init__(self, config):
+    def __init__(self,
+        d_model,
+        n_heads,
+        max_seq_len,
+        num_random_blocks=3,
+        block_size=64
+        ):
         super().__init__()
-        self.max_seqlen = config["max_seq_len"]
-        self.seed = config["random_seed"] if "random_seed" in config else None
-        self.num_attention_heads = config['num_head']
-        self.num_random_blocks = config["num_random_blocks"]
-        self.block_size = config["block_size"]
-        self.attention_head_size = config["head_dim"]
+        self.embed_dim = d_model
+        self.max_seqlen = max_seq_len
+        self.seed = 2222
+        self.num_attention_heads = n_heads
+        self.num_random_blocks = num_random_blocks
+        self.block_size = block_size
+        self.attention_head_size = int(d_model / n_heads)
         self.all_head_size = self.num_attention_heads * self.attention_head_size
 
+        assert self.all_head_size == d_model
 
-    def forward(self, q,k,v,mask):
+    def forward(self, q, mask=None, state=None):
 
         '''
         input of original BigBirdBlockSparseAttention
@@ -38,7 +47,8 @@ class BigBirdAttention(nn.Module):
             to_blocked_mask=None,
             output_attentions=None,
         '''
-
+        k = q
+        v = q
         # mask is None, or blocked_encoder_mask is None
         if type(mask) == torch.Tensor:
             blocked_encoder_mask, band_mask, from_mask, to_mask = self.create_masks_for_block_sparse_attn(
@@ -49,7 +59,8 @@ class BigBirdAttention(nn.Module):
         from_blocked_mask = to_blocked_mask = blocked_encoder_mask
         output_attentions=None
 
-        batch_size, nb_heads, seq_len, dim_head = q.shape
+        # batch_size, nb_heads, seq_len, dim_head = q.shape
+        batch_size, seq_len, dim_head = q.shape
 
         to_seq_length = from_seq_length = seq_len
         from_block_size = to_block_size = self.block_size
