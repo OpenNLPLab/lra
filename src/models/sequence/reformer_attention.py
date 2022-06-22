@@ -17,7 +17,7 @@ class LSHAttention(LSHSelfAttention):
         self.query_key.weight = query.weight
         self.value.weight = value.weight
 
-    def forward(self, X, mask):
+    def forward(self, X, mask=None):
         return super().forward(hidden_states = X, attention_mask = mask).hidden_states
 
     def extra_repr(self):

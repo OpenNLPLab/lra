@@ -20,10 +20,12 @@ class BigBirdAttention(nn.Module):
         d_model,
         n_heads,
         max_seq_len,
+        dropout=0.0,
         num_random_blocks=3,
         block_size=64
         ):
         super().__init__()
+        self.d_output = d_model
         self.embed_dim = d_model
         self.max_seqlen = max_seq_len
         self.seed = 2222
@@ -49,16 +51,22 @@ class BigBirdAttention(nn.Module):
         '''
         k = q
         v = q
+        # band_mask=None,
+        # from_mask=None,
+        # to_mask=None,
+        # from_blocked_mask=None,
+        # to_blocked_mask=None,
+        # output_attentions=None,
         # mask is None, or blocked_encoder_mask is None
-        if type(mask) == torch.Tensor:
-            blocked_encoder_mask, band_mask, from_mask, to_mask = self.create_masks_for_block_sparse_attn(
-                mask, self.block_size
-            )
-        else:
-            (blocked_encoder_mask, band_mask, from_mask, to_mask) = mask
-        from_blocked_mask = to_blocked_mask = blocked_encoder_mask
+        # if type(mask) == torch.Tensor:
+        #     blocked_encoder_mask, band_mask, from_mask, to_mask = self.create_masks_for_block_sparse_attn(
+        #         mask, self.block_size
+        #     )
+        # else:
+        #     (blocked_encoder_mask, band_mask, from_mask, to_mask) = mask
+        from_blocked_mask = to_blocked_mask = blocked_encoder_mask =None
         output_attentions=None
-
+        import pdb;pdb.set_trace()
         # batch_size, nb_heads, seq_len, dim_head = q.shape
         batch_size, seq_len, dim_head = q.shape
 
@@ -72,9 +80,9 @@ class BigBirdAttention(nn.Module):
             q,
             k,
             v,
-            band_mask,
-            from_mask,
-            to_mask,
+            None,
+            None,
+            None,
             from_blocked_mask,
             to_blocked_mask,
             self.num_attention_heads,

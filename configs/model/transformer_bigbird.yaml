@@ -1,7 +1,7 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: ls_attn
+  - _name_: bigbird_attn
     n_heads: 8
     max_seq_len: 4096
   - _name_: ff
