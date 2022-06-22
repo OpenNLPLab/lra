@@ -21,6 +21,8 @@ performer_heads: 0
 performer_approx_attn_dim: 0
 use_softmax: true
 act_fun: 1+elu
+cosformer_heads: 0 
+cosformer_max_length: 0
 
 residual: R
 dropout: 0.1

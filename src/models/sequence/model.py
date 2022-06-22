@@ -50,7 +50,9 @@ class SequenceModel(SequenceModule):
         performer_heads=8,
         performer_approx_attn_dim=32,
         use_softmax=False,
-        act_fun="elu"
+        act_fun="elu",
+        cosformer_heads=8,
+        cosformer_max_length=512,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -108,6 +110,13 @@ class SequenceModel(SequenceModule):
                     _layer['dropout'] = dropout
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
+        elif layer[0]['_name_'] == 'cosformer_attn':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
         else:
             # Some special arguments are passed into each layer
             for _layer in layer:
@@ -157,15 +166,16 @@ class SequenceModel(SequenceModule):
 
         # Track norms
         if self.track_norms: output_norms = [torch.mean(inputs.detach() ** 2)]
-
         # Apply layers
         outputs = inputs
         prev_states = [None] * len(self.layers) if state is None else state
         next_states = []
+        import pdb;pdb.set_trace()
         for layer, prev_state in zip(self.layers, prev_states):
             outputs, state = layer(outputs, *args, state=prev_state, **kwargs) # TODO handle state
             next_states.append(state)
             if self.track_norms: output_norms.append(torch.mean(outputs.detach() ** 2))
+        import pdb;pdb.set_trace()
         outputs = self.norm(outputs)
 
         if self.transposed: outputs = rearrange(outputs, 'b d l -> b l d')

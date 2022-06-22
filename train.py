@@ -192,6 +192,7 @@ class SequenceLightningModule(pl.LightningModule):
         # TODO gpu memory tracker
         # self.gpu_tracker.track()
         x, *w = self.encoder(x, *z)
+        import pdb;pdb.set_trace()
         x, state = self.model(x, *w, state=self._state)
         self._state = state
         x, *w = self.decoder(x, state, *z)
