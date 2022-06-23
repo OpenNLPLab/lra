@@ -64,7 +64,7 @@ class MultiheadCosformerAttention_(nn.Module):
         self.k_proj = nn.Linear(self.kdim, d_model, bias=bias)
         self.v_proj = nn.Linear(self.vdim, d_model, bias=bias)
         self.q_proj = nn.Linear(d_model, d_model, bias=bias)
-
+        self.weight_index = self.get_index(max_l)
 
         # add begin
         self.use_relu = use_relu
@@ -74,7 +74,7 @@ class MultiheadCosformerAttention_(nn.Module):
         self.has_out = has_out
         self.causal = causal
         self.resi = resi
-        self.weight_index = self.get_alpha_beta(self.max_l)
+        # self.weight_index = self.get_alpha_beta(self.max_l)
         self.add_zero_attn = add_zero_attn
 
         print(n_heads)
@@ -230,11 +230,11 @@ class MultiheadCosformerAttention_(nn.Module):
 
 
         m = max(src_len, tgt_len)
-        weight_index = self.get_index(m).to(q)
-        qsin = torch.sin(weight_index[:, :tgt_len, :] / m)
-        ksin = torch.sin(weight_index[:, :src_len, :] / m)
-        qcos = torch.cos(weight_index[:, :tgt_len, :] / m)
-        kcos = torch.cos(weight_index[:, :src_len, :] / m)
+        # weight_index = self.get_index(m).to(q)
+        qsin = torch.sin(self.weight_index[:, :tgt_len, :] / m)
+        ksin = torch.sin(self.weight_index[:, :src_len, :] / m)
+        qcos = torch.cos(self.weight_index[:, :tgt_len, :] / m)
+        kcos = torch.cos(self.weight_index[:, :src_len, :] / m)
         # N * b, L, e1
         q_sin = q * qsin
         q_cos = q * qcos
