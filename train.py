@@ -55,7 +55,7 @@ class SequenceLightningModule(pl.LightningModule):
         self._has_on_post_move_to_device = False
 
         # TODO memory tracker
-        # arch = config['experiement']
+        # arch = config['model']['layer'][0]['_name_']
         # seq_len = config['dataset']['l_max']
         # frame = inspect.currentframe()          # define a frame to track
         # self.gpu_tracker = MemTracker(frame, arch, seq_len)         # define a GPU tracker

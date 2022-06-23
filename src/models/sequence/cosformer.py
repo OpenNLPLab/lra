@@ -26,8 +26,6 @@ class MultiheadCosformerAttention_(nn.Module):
         add_zero_attn=False,
         self_attention=False,
         encoder_decoder_attention=False,
-        q_noise=0.0,
-        qn_block_size=8,
         # add
         index=0,
         use_relu=True,
@@ -37,7 +35,6 @@ class MultiheadCosformerAttention_(nn.Module):
         has_out=False,
         causal=False,
         resi=False,
-        prior=False,
     ):
         # add
         self.d_output = d_model

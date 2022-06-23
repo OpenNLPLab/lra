@@ -20,7 +20,6 @@ class LinformerAttention(nn.Module):
         self.head_dim = int(d_model/n_heads)
         self.linformer_k = 128
         self.seq_len = max_seq_len
-        self.device = 'cuda'
 
         # add
         self.k_proj = nn.Linear(d_model, d_model)
@@ -28,7 +27,7 @@ class LinformerAttention(nn.Module):
         self.q_proj = nn.Linear(d_model, d_model)
 
         # TODO modified into the upper two lines for run_norm
-        self.E = nn.Parameter(torch.Tensor(self.num_head, self.linformer_k, self.seq_len)).to(self.device)
+        self.E = nn.Parameter(torch.Tensor(self.num_head, self.linformer_k, self.seq_len))
         torch.nn.init.normal_(self.E, std = 0.02)
 
 
@@ -47,19 +46,16 @@ class LinformerAttention(nn.Module):
         K = self.split_heads(self.k_proj(x))
         V = self.split_heads(self.v_proj(x))
         b, h, l, d = Q.shape
-        
-        # if l < self.seq_len:
-        #     Q = F.pad(Q, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
-        #     K = F.pad(K, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
-        #     V = F.pad(V, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
+
+        if l < self.seq_len:
+            Q = F.pad(Q, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
+            K = F.pad(K, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
+            V = F.pad(V, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
         
         mask = torch.ones(b, l).to(Q)
         # import pdb;pdb.set_trace()
-        try:
-            K = torch.matmul(self.E, K * mask[:, None, :, None])
-            V = torch.matmul(self.E, V * mask[:, None, :, None])
-        except:
-            pass
+        K = torch.matmul(self.E, K )
+        V = torch.matmul(self.E, V )
 
         dot = torch.matmul(Q, torch.transpose(K, -2, -1))
         dot = dot / math.sqrt(self.head_dim)
@@ -68,6 +64,7 @@ class LinformerAttention(nn.Module):
 
         X = torch.matmul(attn, V)
         attn_out = self.combine_heads(X)
+        attn_out = attn_out[:, :l, ...]
         return attn_out, None
 
     def extra_repr(self):
