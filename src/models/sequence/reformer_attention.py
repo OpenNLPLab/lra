@@ -27,4 +27,6 @@ class LSHAttention(LSHSelfAttention):
     def forward(self, X, mask=None, state=None):
         b,l,d = X.shape
         X = F.pad(X, (0, 0, 0, self.max_position_embeddings-l, 0, 0))
-        return super().forward(hidden_states = X, attention_mask = mask).hidden_states , None
+        output = super().forward(hidden_states = X, attention_mask = mask).hidden_states
+        output = output[:,:l,:]
+        return output, None

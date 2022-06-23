@@ -1,7 +1,7 @@
 export HYDRA_FULL_ERROR=1
 
 TASK='imdb'
-ARCH='nystorm'
+ARCH='reformer'
 BS=20
 N_LAYERS=6
 D_MODEL=128
@@ -36,10 +36,10 @@ COSFORMER_MAX_LENGTH=0
 LINFORMER_MAX_SEQ_LEN=5000
 
 # reformer args
-REFORMER_MAX_SEQ_LEN=1024
+REFORMER_MAX_SEQ_LEN=2048
 
 # nystorm args
-NYSTORM_MAX_SEQ_LEN=1024
+NYSTORM_MAX_SEQ_LEN=2048
 
 cards=1
 
@@ -63,7 +63,7 @@ cards=1
 
 python -m train wandb=null experiment=trans-${ARCH}-lra-${TASK} \
 trainer.gpus=$cards \
-loader.batch_size=${BS} model.n_layers=${N_LAYERS} model.d_model=${D_MODEL} model.norm=${NORM} model.prenorm=true dataset.l_max=${NYSTORM_MAX_SEQ_LEN} \
+loader.batch_size=${BS} model.n_layers=${N_LAYERS} model.d_model=${D_MODEL} model.norm=${NORM} model.prenorm=true dataset.l_max=${REFORMER_MAX_SEQ_LEN} \
 model.flash_max_position_embed=${FLASH_MAX_POSITION_EMBED} model.flash_s=${FLASH_S} \
 model.flash_linear_max_position_embeddings=${FLASH_LINEAR_MAX_POSITION_EMBEDDINGS} model.flash_linear_s=${FLASH_LINEAR_S} \
 model.lg_local_heads=${LG_LOCAL_HEADS} model.lg_linear_heads=${LG_LINEAR_HEADS} model.lg_local_chunk_size=${LG_LOCAL_CHUNK_SIZE} \
@@ -72,7 +72,7 @@ model.performer_heads=${PERFORMER_HEADS} model.performer_approx_attn_dim=${PERFO
 model.cosformer_heads=${COSFORMER_HEADS} model.cosformer_max_length=${COSFORMER_MAX_LENGTH} \
 model.linformer_max_seq_len=${LINFORMER_MAX_SEQ_LEN} \
 model.reformer_max_seq_len=${REFORMER_MAX_SEQ_LEN} \
-model.nystorm_max_seq_len=${NYSTORM_MAX_SEQ_LEN} \
-model.use_softmax=${USE_SOFTMAX} model.act_fun=${ACT_FUN} trainer.max_epochs=5|tee debug/${ARCH}_${NYSTORM_MAX_SEQ_LEN}.log
+model.use_softmax=${USE_SOFTMAX} model.act_fun=${ACT_FUN} trainer.max_epochs=5|tee debug/${ARCH}_${REFORMER_MAX_SEQ_LEN}.log
 
+# model.nystorm_max_seq_len=${NYSTORM_MAX_SEQ_LEN} \
 
