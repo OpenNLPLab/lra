@@ -80,6 +80,7 @@ layer = {
     "bigbird_attn":"src.models.sequence.bigbird_attention.BigBirdAttention",
     "linformer_attn":"src.models.sequence.linformer_attention.LinformerAttention",
     "reformer_attn":"src.models.sequence.reformer_attention.LSHAttention",
+    "nystorm_attn":"src.models.sequence.nystorm_attention.NystromAttention",
     "conv1d": "src.models.sequence.conv1d.Conv1d",
     "attsimp": "src.models.sequence.mha.AttentionSimple",
     "performer": "src.models.sequence.attention.linear.Performer",
