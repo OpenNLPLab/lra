@@ -2,6 +2,7 @@ export HYDRA_FULL_ERROR=1
 
 TASK='imdb'
 ARCH='reformer'
+ARCH='cosformer'
 BS=20
 N_LAYERS=6
 D_MODEL=128
@@ -29,8 +30,8 @@ USE_SOFTMAX=0
 ACT_FUN=0
 
 # cosformer args
-COSFORMER_HEADS=0
-COSFORMER_MAX_LENGTH=0
+COSFORMER_HEADS=2
+COSFORMER_MAX_LENGTH=1000
 
 # linformer args
 LINFORMER_MAX_SEQ_LEN=5000
@@ -71,7 +72,7 @@ model.ls_attn_heads=${LS_ATTN_HEADS} model.ls_attn_window_size=${LS_ATTN_WINDOW_
 model.performer_heads=${PERFORMER_HEADS} model.performer_approx_attn_dim=${PERFORMER_APPROX_ATTN_DIM} \
 model.cosformer_heads=${COSFORMER_HEADS} model.cosformer_max_length=${COSFORMER_MAX_LENGTH} \
 model.linformer_max_seq_len=${LINFORMER_MAX_SEQ_LEN} \
-model.reformer_max_seq_len=${REFORMER_MAX_SEQ_LEN} \
+# model.reformer_max_seq_len=${REFORMER_MAX_SEQ_LEN} \
 model.use_softmax=${USE_SOFTMAX} model.act_fun=${ACT_FUN} trainer.max_epochs=5|tee debug/${ARCH}_${REFORMER_MAX_SEQ_LEN}.log
 
 # model.nystorm_max_seq_len=${NYSTORM_MAX_SEQ_LEN} \

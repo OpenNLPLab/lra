@@ -209,23 +209,43 @@ class MultiheadCosformerAttention_(nn.Module):
         # (N * h, S, d)
         v = v.contiguous().view(-1, bsz * num_heads, head_dim).transpose(0, 1)
         
-        # cos transform
-        m = max(src_len, tgt_len)
-        # get index and send to cuda
-        weight_index = self.get_index(m).to(q)
-        # (N * h, L, 2 * d)
-        q_ = torch.cat([q * torch.sin(weight_index[:, :tgt_len, :] / m), q * torch.cos(weight_index[:, :tgt_len, :] / m)], dim=-1)
-        # (N * h, S, 2 * d)
-        k_ = torch.cat([k * torch.sin(weight_index[:, :src_len, :] / m), k * torch.cos(weight_index[:, :src_len, :] / m)], dim=-1)
+        # # cos transform
+        # m = max(src_len, tgt_len)
+        # # get index and send to cuda
+        # weight_index = self.get_index(m).to(q)
+        # # (N * h, L, 2 * d)
+        # q_ = torch.cat([q * torch.sin(weight_index[:, :tgt_len, :] / m), q * torch.cos(weight_index[:, :tgt_len, :] / m)], dim=-1)
+        # # (N * h, S, 2 * d)
+        # k_ = torch.cat([k * torch.sin(weight_index[:, :src_len, :] / m), k * torch.cos(weight_index[:, :src_len, :] / m)], dim=-1)
 
-        # (N * b, e1, e2)
-        # (N * h, L, 2 * d) (N * h, L, d) -> (N * h, 2 * d, d)
-        kv_ = torch.einsum('nld,nlm->ndm', k_, v)
-        # (N * h, L, 2 * d) (N * h, 2 * d) -> (N * h, L)
-        z_ = 1 / torch.clamp_min(torch.einsum('nld,nd->nl', q_, torch.sum(k_, axis=1)), eps)
-        # (N * h, L, 2 * d) (N * h, d, 2 * d) (N * h, L) -> (N * h, L, d)
-        attn_output = torch.einsum('nld,ndm,nl->nlm', q_, kv_, z_)
-        # (N * h, L, d) -> (L, N * h, d) -> (L, N, E)
+        # # (N * b, e1, e2)
+        # # (N * h, L, 2 * d) (N * h, L, d) -> (N * h, 2 * d, d)
+        # kv_ = torch.einsum('nld,nlm->ndm', k_, v)
+        # # (N * h, L, 2 * d) (N * h, 2 * d) -> (N * h, L)
+        # z_ = 1 / torch.clamp_min(torch.einsum('nld,nd->nl', q_, torch.sum(k_, axis=1)), eps)
+        # # (N * h, L, 2 * d) (N * h, d, 2 * d) (N * h, L) -> (N * h, L, d)
+        # attn_output = torch.einsum('nld,ndm,nl->nlm', q_, kv_, z_)
+        # # (N * h, L, d) -> (L, N * h, d) -> (L, N, E)
+        # attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, -1)
+
+
+        m = max(src_len, tgt_len)
+        weight_index = self.get_index(m).to(q)
+        qsin = torch.sin(weight_index[:, :tgt_len, :] / m)
+        ksin = torch.sin(weight_index[:, :src_len, :] / m)
+        qcos = torch.cos(weight_index[:, :tgt_len, :] / m)
+        kcos = torch.cos(weight_index[:, :src_len, :] / m)
+        # N * b, L, e1
+        q_sin = q * qsin
+        q_cos = q * qcos
+        # N * b, S, e2
+        k_sin = k * ksin
+        k_cos = k * kcos
+        kv_cos = torch.einsum('btk,btd->bkd', k_cos, v)
+        kv_sin = torch.einsum('btk,btd->bkd', k_sin, v)
+        z_cos_sin = 1 / torch.clamp_min(torch.einsum('btk,bd->bt', q_cos, torch.sum(k_cos, axis=1)) + torch.einsum('btk,bd->bt', q_sin, torch.sum(k_sin, axis=1)), eps)
+        attn_output = torch.einsum('btk,bkd,bt->btd', q_cos, kv_cos, z_cos_sin) + \
+                        torch.einsum('btk,bkd,bt->btd', q_sin, kv_sin, z_cos_sin)
         attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, -1)
 
         attn_output = self.out_proj(attn_output)
