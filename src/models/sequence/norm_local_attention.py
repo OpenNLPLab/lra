@@ -236,8 +236,6 @@ class NormLocalAttention(nn.Module):
     def forward(
         self,
         query,
-        # key: Optional[Tensor],
-        # value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
         need_weights: bool = True,

@@ -12,8 +12,6 @@ class LSHAttention(LSHSelfAttention):
         max_seq_len=1024):
         self.d_output = d_model
         reformer_config = ReformerConfig()
-        # reformer_config.attention_head_size = config["head_dim"]
-        # reformer_config.num_attention_heads = config["num_head"]
         reformer_config.attn_layers = ["lsh"]
         reformer_config.is_decoder = False
         reformer_config.max_position_embeddings = max_seq_len

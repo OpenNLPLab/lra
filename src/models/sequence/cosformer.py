@@ -95,19 +95,6 @@ class MultiheadCosformerAttention_(nn.Module):
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
 
-    # def reset_parameters(self):
-    #     if self.qkv_same_dim:
-    #         # Empirically observed the convergence to be much better with
-    #         # the scaled initialization
-    #         nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
-    #     else:
-    #         nn.init.xavier_uniform_(self.v_proj.weight)
-
-    #     if self.has_out:
-    #         nn.init.xavier_uniform_(self.out_proj.weight)
-    #         if self.out_proj.bias is not None:
-    #             nn.init.constant_(self.out_proj.bias, 0.0)
-
     def get_alpha_beta(self, max_l):
         a = np.pi / 2
         index = a * torch.arange(1, max_l + 1).reshape(1, -1, 1, 1)
@@ -137,8 +124,6 @@ class MultiheadCosformerAttention_(nn.Module):
     def forward(
         self,
         query,
-        # key: Optional[Tensor],
-        # value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
         need_weights: bool = True,

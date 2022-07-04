@@ -160,8 +160,6 @@ class MultiheadPerformerAttention(nn.Module):
     def forward(
         self,
         query,
-        # key: Optional[Tensor],
-        # value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
         need_weights: bool = True,
@@ -171,11 +169,7 @@ class MultiheadPerformerAttention(nn.Module):
         need_head_weights: bool = False,
         state = None,
     ) -> Tuple[Tensor, Optional[Tensor]]:
-        # attn_weights = None
-        # l, b, e -> b l e
-        # query = query.transpose(0, 1)
-        # key = key.transpose(0, 1)
-        # value = value.transpose(0, 1)
+
         key = query
         value = query
 
@@ -186,8 +180,7 @@ class MultiheadPerformerAttention(nn.Module):
         q = rearrange(q, 'b n (h d) -> b h n d', h=self.num_heads)
         k = rearrange(k, 'b n (h d) -> b h n d', h=self.num_heads)
         v = rearrange(v, 'b n (h d) -> b h n d', h=self.num_heads)
-        # print("========================")
-        # print(q.shape)
+
 
         if self.training:
             projection_matrix = create_proj_matrix(
@@ -195,7 +188,6 @@ class MultiheadPerformerAttention(nn.Module):
         else:
             projection_matrix = self.eval_proj
         q_prime, k_prime = self.q_k_projection(q, k, projection_matrix)
-        # print(q_prime.shape)
 
         eps = 1e-2
         if self.causal:
@@ -213,9 +205,7 @@ class MultiheadPerformerAttention(nn.Module):
             qkv = torch.einsum('...nm,...md->...nd', q_prime, kv)
             normalizer = torch.einsum('...nm,...m->...n', q_prime, k_prime.sum(dim=-2))
             output = qkv / normalizer.unsqueeze(-1).clamp(min=eps)
-            # print(output.shape)
 
-        # attn_output = output.contiguous().view(B, N, self.num_heads, self.head_dim)
         attn_output = rearrange(output, 'b h n d -> b n (h d)', h=self.num_heads)
         attn_output = self.out_proj(attn_output)
         return attn_output, None

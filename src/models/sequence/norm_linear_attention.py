@@ -95,9 +95,6 @@ class NormLinearAttention(nn.Module):
         self.qkv_same_dim = self.kdim == d_model and self.vdim == d_model
 
         self.num_heads = n_heads
-        # self.dropout_module = FairseqDropout(
-        #     dropout, module_name=self.__class__.__name__
-        # )
 
         self.head_dim = d_model // n_heads
         assert (
@@ -243,8 +240,6 @@ class NormLinearAttention(nn.Module):
     def forward(
         self,
         query,
-        # key: Optional[Tensor],
-        # value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
         need_weights: bool = True,

@@ -18,10 +18,7 @@ class NystromAttention(nn.Module):
 
         self.num_landmarks = 128
         self.seq_len = max_seq_len
-        
-        # if "inv_coeff_init_option" in config:
-        #     self.init_option = config["inv_init_coeff_option"]
-        # else:
+
         self.init_option = "original"
 
         # add
@@ -30,12 +27,6 @@ class NystromAttention(nn.Module):
         self.q_proj = nn.Linear(d_model, d_model)
 
         self.use_conv = False
-        # if self.use_conv:
-        #     self.conv = nn.Conv2d(
-        #         in_channels = self.num_head, out_channels = self.num_head,
-        #         kernel_size = (config["conv_kernel_size"], 1), padding = (config["conv_kernel_size"] // 2, 0),
-        #         bias = False,
-        #         groups = self.num_head)
     def combine_heads(self, X):
         X = X.transpose(1, 2)
         X = X.reshape(X.size(0), X.size(1), self.num_head * self.head_dim)
