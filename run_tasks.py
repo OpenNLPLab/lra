@@ -51,11 +51,11 @@ tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 # archs_tmp = ["lg"]
 tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 archs_tmp = ["lg", "flash","flash_linear","ls"]
-tasks_tmp = ["cifar","aan", "listops","pathfinder"]
+tasks_tmp = ["aan"]
 archs_tmp = ["cosformer"]
 for j, task in enumerate(tasks_tmp):
     for i, arch in enumerate(archs_tmp):
-        for norm in ['batch','layer']:
+        for norm in ['batch']:
             if "lg" in arch:
                 tmp = [(True, "1+elu"), (False, "elu")]
             else:

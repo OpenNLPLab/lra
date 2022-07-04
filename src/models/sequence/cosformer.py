@@ -1,7 +1,8 @@
 
 import math 
 import numpy as np 
-from typing import Dict, Optional, Tuple  
+from typing import Dict, Optional, Tuple
+from src.models.nn.components import Normalization 
 import torch 
 import torch.nn.functional as F 
 from torch import Tensor, nn 
@@ -35,6 +36,7 @@ class MultiheadCosformerAttention_(nn.Module):
         has_out=False,
         causal=False,
         resi=False,
+        norm_type="batch",
     ):
         # add
         self.d_output = d_model
@@ -80,7 +82,7 @@ class MultiheadCosformerAttention_(nn.Module):
         print(n_heads)
         print(self.resi)
 
-
+        self.layer_norm = Normalization(d_model, _name_=norm_type)
         self.out_proj = nn.Linear(d_model, d_model, bias=bias)
 
         # self.reset_parameters()
@@ -248,6 +250,7 @@ class MultiheadCosformerAttention_(nn.Module):
         #                 torch.einsum('btk,bkd,bt->btd', q_sin, kv_sin, z_cos_sin)
         # attn_output = attn_output.transpose(0, 1).contiguous().view(tgt_len, bsz, -1)
 
+        # attn_output = self.layer_norm(attn_output)
         attn_output = self.out_proj(attn_output)
         attn_output = rearrange(attn_output, 'l n e -> n l e')
 

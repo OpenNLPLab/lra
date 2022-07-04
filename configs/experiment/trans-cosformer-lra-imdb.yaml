@@ -19,11 +19,12 @@ dataset:
   level: char
 
 optimizer:
-  lr: 0.001
+  lr: 0.0001
   weight_decay: 0.0
 
 scheduler:
   num_training_steps: 50000
+  num_warmup_steps: 80
 
 trainer:
   max_epochs: 32
