@@ -3,19 +3,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class GLU(nn.Module):
-    def __init__(self, d_model, act_fun, fina_act="None", dropout=0.0):
+    def __init__(self, d1, d2, act_fun, fina_act="None", dropout=0.0, bias=True):
         super().__init__()
-        self.d_output = d_model
-        d_model1 = d_model
-        # d_model2 = int(8/3*d_model1)
-        d_model2 = int(4/3*d_model1)
-        self.l1 = nn.Linear(d_model1, d_model2)
-        self.l2 = nn.Linear(d_model1, d_model2)
-        self.l3 = nn.Linear(d_model2, d_model1)
-        print("act_fun")
+        self.l1 = nn.Linear(d1, d2, bias=bias)
+        self.l2 = nn.Linear(d1, d2, bias=bias)
+        self.l3 = nn.Linear(d2, d1, bias=bias)
         self.act_fun = self.get_act_fun(act_fun)
-        print("final act_fun")
+        self.p = dropout
+        if self.p > 0.0:
+            self.dropout = nn.Dropout(p=dropout)
         self.fina_act = self.get_act_fun(fina_act)
+
+        print(f"act_fun {act_fun}")
+        print(f"dropout {self.p}")
+        print(f"final {fina_act}")
 
     def get_act_fun(self, act_fun):
         print(act_fun)
@@ -26,7 +27,7 @@ class GLU(nn.Module):
         elif act_fun == "elu":
             return F.elu
         elif act_fun == "sigmoid":
-            return F.sigmoid
+            return torch.sigmoid
         elif act_fun == "exp":
             return torch.exp
         elif act_fun == "leak":
@@ -44,12 +45,14 @@ class GLU(nn.Module):
         else:
             return lambda x: x
 
-    def forward(self, x, state=None):
+    def forward(self, x):
         o1 = self.l1(x)
         weight = self.act_fun(o1)
+        if self.p > 0.0:
+            weight = self.dropout(weight)
         o2 = self.l2(x)
         output = weight * o2
         output = self.l3(output)
         output = self.fina_act(output)
 
-        return output, None
+        return output

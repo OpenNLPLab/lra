@@ -56,6 +56,15 @@ class SequenceModel(SequenceModule):
         linformer_max_seq_len=1024,
         reformer_max_seq_len=1024,
         nystorm_max_seq_len=1024,
+        tno_head=3,
+        tno_dpb_embdding=0,
+        tno_dpb_act='silu',
+        tno_glu_act='silu',
+        tno_glu_dim=192,
+        tno_max_l=100,
+        tno_expand_ratio=3,
+        tno_depth=12,
+        tno_type=4,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -142,6 +151,20 @@ class SequenceModel(SequenceModule):
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
         elif layer[0]['_name_'] == 'nystorm_attn':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
+        elif layer[0]['_name_'] == 'tno':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
+        elif layer[0]['_name_'] == 'tno_v2':
             for _layer in layer:
                 # If layers don't specify dropout, add it
                 if _layer.get('dropout', None) is None:

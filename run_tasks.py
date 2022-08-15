@@ -51,7 +51,7 @@ tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 # archs_tmp = ["lg"]
 tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 archs_tmp = ["lg", "flash","flash_linear","ls"]
-tasks_tmp = ["aan"]
+tasks_tmp = ["listops"]
 archs_tmp = ["cosformer"]
 for j, task in enumerate(tasks_tmp):
     for i, arch in enumerate(archs_tmp):
