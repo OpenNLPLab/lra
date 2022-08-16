@@ -4,10 +4,6 @@ from typing import Dict, Optional, Tuple
 
 import torch
 import torch.nn.functional as F
-from fairseq import utils
-from fairseq.incremental_decoding_utils import with_incremental_state
-from fairseq.modules.fairseq_dropout import FairseqDropout
-from fairseq.modules.quant_noise import quant_noise
 from torch import Tensor, nn
 from torch.nn import Parameter
 from torch.nn import Dropout
@@ -20,7 +16,7 @@ class TNO(nn.Module):
     def __init__(
         self,
         d_model,
-        num_heads,
+        n_heads,
         dropout=0.0,
         bias=True,
         # add
@@ -36,7 +32,7 @@ class TNO(nn.Module):
         # Toeplizt
         use_exp=False,
         use_neg_exp=False, 
-        max_l=512,
+        tno_max_l=512,
         use_decay=False,
         use_multi_decay=False,
         dpb_embedding=512,
@@ -58,9 +54,10 @@ class TNO(nn.Module):
         self.index = index
 
         super().__init__()
+        self.d_output = d_model
         self.embed_dim = d_model
-        self.num_heads = num_heads
-        self.head_dim = d_model // num_heads
+        self.num_heads = n_heads
+        self.head_dim = d_model // n_heads
         
         self.expand_ratio = expand_ratio
         self.resi_param = resi_param
@@ -72,7 +69,7 @@ class TNO(nn.Module):
         d1 = int(self.expand_ratio * d_model)
         d1 = (d1 // self.num_heads) * self.num_heads
         d2 = d_model
-        self.head_dim = d1 // num_heads
+        self.head_dim = d1 // n_heads
         # d^2
         self.v_proj = nn.Linear(d_model, d1, bias=bias)
         # d^2
@@ -86,7 +83,7 @@ class TNO(nn.Module):
         print(f"causal {self.causal}")
         
         # toep
-        self.max_l = max_l
+        self.max_l = tno_max_l
         self.use_exp = use_exp
         self.use_neg_exp = use_neg_exp
         self.use_decay = use_decay
@@ -244,5 +241,5 @@ class TNO(nn.Module):
             
         output = self.o(output) + shortcut
         
-        return output
+        return output, None
 

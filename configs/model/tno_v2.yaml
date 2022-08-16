@@ -2,20 +2,15 @@
 _name_: model
 layer:
   - _name_: tno_v2
-    eps: 1e-5
     n_heads: ${model.tno_head}
-    n_layers: ${model.tno_depth}
     tno_max_l: ${model.tno_max_l}
     tno_type: ${model.tno_type}
 
 
-tno_v2_dim: 192
 tno_head: 3
-tno_depth: 12
 tno_max_l: 100
 tno_type: 4
 
-tno_dim: 0
 flash_s: 0
 flash_max_position_embed: 0
 flash_linear_s: 0

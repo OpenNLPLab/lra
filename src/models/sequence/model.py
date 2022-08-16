@@ -63,7 +63,6 @@ class SequenceModel(SequenceModule):
         tno_glu_dim=192,
         tno_max_l=100,
         tno_expand_ratio=3,
-        tno_depth=12,
         tno_type=4,
     ):
         super().__init__()
