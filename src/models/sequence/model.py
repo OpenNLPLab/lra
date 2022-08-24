@@ -180,6 +180,7 @@ class SequenceModel(SequenceModule):
                 _layer['transposed'] = transposed
             layers = layer * n_layers
         
+        import pdb;pdb.set_trace()
         # Instantiate layers
         _layers = []
         d = d_model

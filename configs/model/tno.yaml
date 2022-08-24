@@ -5,9 +5,13 @@ layer:
     n_heads: ${model.tno_head}
     tno_max_l: ${model.tno_max_l}
     tno_type: ${model.tno_type}
+    expand_ratio: 2
+  - _name_: glu
+    act_fun: swish
+    d2: 2*${model.d_model}
 
 
-tno_head: 3
+tno_head: 1
 tno_max_l: 1024
 tno_type: 4
 
