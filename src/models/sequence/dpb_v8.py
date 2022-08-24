@@ -26,25 +26,24 @@ class SimpleRMSNorm(nn.Module):
 
         return x_normed
 
-class DynamicPosBiasV4(nn.Module):
-    def __init__(self, dim, outdim, residual, act="relu", bias=True):
+class DynamicPosBiasV8(nn.Module):
+    def __init__(self, dim, outdim, residual, act="relu", bias=True, layers=3):
         super().__init__()
         self.residual = residual
         self.outdim = outdim
         self.pos_dim = dim
         self.act = act
         self.pos_proj = nn.Linear(1, self.pos_dim, bias=bias)
-        self.pos1 = nn.Sequential(
-            SimpleRMSNorm(self.pos_dim),
-            self.get_act(),
-            nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
-        )
-        self.pos2 = nn.Sequential(
-            SimpleRMSNorm(self.pos_dim),
-            self.get_act(),
-            nn.Linear(self.pos_dim, self.pos_dim, bias=bias)
-        )
-        self.pos3 = nn.Sequential(
+        self.layers = nn.ModuleList([])
+        for i in range(layers):
+            self.layers.append(
+                nn.Sequential(
+                    SimpleRMSNorm(self.pos_dim),
+                    self.get_act(),
+                    nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
+                )
+            )
+        self.out = nn.Sequential(
             SimpleRMSNorm(self.pos_dim),
             self.get_act(),
             nn.Linear(self.pos_dim, self.outdim, bias=bias)
@@ -57,11 +56,13 @@ class DynamicPosBiasV4(nn.Module):
             return nn.ReLU(inplace=True)
 
     def forward(self, biases):
+        x = self.pos_proj(biases)
         if self.residual:
-            pos = self.pos_proj(biases) # 2Wh-1 * 2Ww-1, heads
-            pos = pos + self.pos1(pos)
-            pos = pos + self.pos2(pos)
-            pos = self.pos3(pos)
+            for m in self.layers:
+                x = m(x) + x
         else:
-            pos = self.pos3(self.pos2(self.pos1(self.pos_proj(biases))))
-        return pos
+            for m in self.layers:
+                x = m(x)
+        x = self.out(x)
+
+        return x
