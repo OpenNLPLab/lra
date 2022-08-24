@@ -8,7 +8,7 @@ layer:
 
 
 tno_head: 3
-tno_max_l: 100
+tno_max_l: 1024
 tno_type: 4
 
 flash_s: 0

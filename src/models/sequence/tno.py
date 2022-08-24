@@ -41,6 +41,7 @@ class TNO(nn.Module):
         normalize=False,
         par_type=1,
         dpb_type=1,
+        dpb_layers=3,
         residual=False,
         l=1, 
         transform_type=1,
@@ -100,6 +101,7 @@ class TNO(nn.Module):
         self.gamma = gamma
         self.bias = bias
         self.tno_type = tno_type
+        self.dpb_layers = dpb_layers
         self.toep = DynamicToepliztMultiheadV4(
             h=self.num_heads, 
             n=self.max_l, 
@@ -115,12 +117,12 @@ class TNO(nn.Module):
             par_type=self.par_type,
             residual=self.residual,
             dpb_type=self.dpb_type,
+            layers=self.dpb_layers,
             l=self.l,
             transform_type=self.transform_type,
             gamma=self.gamma,
             bias=self.bias,
         )
-            
         print(f"self.num_heads {self.num_heads}")
         print(f"self.max_l {self.max_l}")
         print(f"self.use_exp {self.use_exp}")
@@ -139,6 +141,7 @@ class TNO(nn.Module):
         print(f"self.gamma {self.gamma}")
         print(f"bias {bias}")
         print(f"tno_type {tno_type}")
+        print(f"dpb_layers {dpb_layers}")
         
         
         # norm

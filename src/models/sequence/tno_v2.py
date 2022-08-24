@@ -37,7 +37,7 @@ class TNOV2(nn.Module):
         use_multi_decay=False,
         dpb_embedding=512,
         dpb_act="relu",
-        dpb_use_pad=True,
+        dpb_use_pad=False,
         normalize=False,
         par_type=1,
         dpb_type=1,
