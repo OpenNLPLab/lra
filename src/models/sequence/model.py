@@ -200,8 +200,8 @@ class SequenceModel(SequenceModule):
             if norm is None:
                 self.norm = None
             elif isinstance(norm, str):
-                self.norm = Normalization(self.d_output, transposed=self.transposed, _name_=norm)
-                # self.norm = SimpleRMSNorm(self.d_output)
+                # self.norm = Normalization(self.d_output, transposed=self.transposed, _name_=norm)
+                self.norm = SimpleRMSNorm(self.d_output)
             else:
                 self.norm = Normalization(self.d_output, transposed=self.transposed, **norm)
                 # self.norm = SimpleRMSNorm(self.d_output)

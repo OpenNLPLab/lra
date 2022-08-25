@@ -5,7 +5,7 @@ ARCH=tno
 BS=16
 N_LAYERS=2
 D_MODEL=64
-NORM=layer
+NORM=batch
 EXPAND_RATIO_TNO=1
 EXPAND_RATIO_GLU=1
 
@@ -26,3 +26,6 @@ model.expand_ratio_tno=${EXPAND_RATIO_TNO} model.expand_ratio_glu=${EXPAND_RATIO
 # python -m train wandb=null experiment=${ARCH}-lra-${TASK} \
 # trainer.gpus=$cards \
 # loader.batch_size=${BS} model.n_layers=${N_LAYERS} model.d_model=${D_MODEL} model.norm=${NORM} model.prenorm=true train.seed=2222
+
+# S4 
+# python -m train wandb=null experiment=${ARCH}-lra-${TASK}

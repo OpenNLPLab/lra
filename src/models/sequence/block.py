@@ -53,8 +53,8 @@ class SequenceResidualBlock(SequenceModule):
         if norm is None:
             self.norm = None
         elif isinstance(norm, str):
-            self.norm = Normalization(d_norm, transposed=self.transposed, _name_=norm)
-            # self.norm = SimpleRMSNorm(d_norm)
+            # self.norm = Normalization(d_norm, transposed=self.transposed, _name_=norm)
+            self.norm = SimpleRMSNorm(d_norm)
         else:
             self.norm = Normalization(d_norm, transposed=self.transposed, **norm)
 
