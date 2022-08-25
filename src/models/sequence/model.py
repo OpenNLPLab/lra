@@ -62,8 +62,13 @@ class SequenceModel(SequenceModule):
         tno_glu_act='silu',
         tno_glu_dim=192,
         tno_max_l=100,
-        tno_expand_ratio=3,
+        tno_expand_ratio=2,
         tno_type=4,
+        tno_use_decay=False,
+        tno_gamma=0.999,
+        tno_dpb_dim=64,
+        expand_ratio_tno=2,
+        expand_ratio_glu=2,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -180,7 +185,6 @@ class SequenceModel(SequenceModule):
                 _layer['transposed'] = transposed
             layers = layer * n_layers
         
-        import pdb;pdb.set_trace()
         # Instantiate layers
         _layers = []
         d = d_model

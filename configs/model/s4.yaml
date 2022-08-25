@@ -5,7 +5,7 @@ _name_: model
 prenorm: False
 transposed: True
 n_layers: 4
-d_model: 256
+d_model: 64
 residual: R
 pool:
   _name_: sample

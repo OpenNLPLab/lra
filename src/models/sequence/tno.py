@@ -23,7 +23,7 @@ class TNO(nn.Module):
         index=0,
         act_fun="silu",
         causal=False,
-        expand_ratio=2,
+        tno_expand_ratio=2,
         shrink_ratio=1,
         resi_param=False,
         # norm
@@ -60,13 +60,12 @@ class TNO(nn.Module):
         self.num_heads = n_heads
         self.head_dim = d_model // n_heads
         
-        self.expand_ratio = expand_ratio
+        self.expand_ratio = tno_expand_ratio
         self.resi_param = resi_param
         print(f"self.expand_ratio {self.expand_ratio}")
         print(f"self.resi_param {self.resi_param}")
         if self.resi_param:
             self.d = nn.Parameter(torch.randn(self.embed_dim))
-            
         d1 = int(self.expand_ratio * d_model)
         d1 = (d1 // self.num_heads) * self.num_heads
         d2 = d_model

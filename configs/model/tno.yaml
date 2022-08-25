@@ -5,15 +5,23 @@ layer:
     n_heads: ${model.tno_head}
     tno_max_l: ${model.tno_max_l}
     tno_type: ${model.tno_type}
-    expand_ratio: 2
+    tno_expand_ratio: ${model.expand_ratio_tno}
+    use_decay: ${model.tno_use_decay}
+    gamma: ${model.tno_gamma}
+    dpb_embedding: ${model.tno_dpb_dim}
   - _name_: glu
     act_fun: swish
-    d2: 2*${model.d_model}
+    glu_expand_ratio: ${model.expand_ratio_glu}
 
 
 tno_head: 1
 tno_max_l: 1024
 tno_type: 4
+tno_use_decay: False
+tno_gamma: 0.999
+tno_dpb_dim: 16 #min(d_model//4, 64)
+expand_ratio_tno: 2
+expand_ratio_glu: 2
 
 flash_s: 0
 flash_max_position_embed: 0
