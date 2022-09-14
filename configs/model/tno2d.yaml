@@ -1,7 +1,7 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: tno
+  - _name_: tno2d
     n_heads: ${model.tno_head}
     tno_max_l: ${model.tno_max_l}
     tno_type: ${model.tno_type}
@@ -9,6 +9,8 @@ layer:
     use_decay: ${model.tno_use_decay}
     gamma: ${model.tno_gamma}
     dpb_embedding: ${model.tno_dpb_dim}
+    tno_H: 128
+    tno_W: 128
   - _name_: glu
     act_fun: swish
     glu_expand_ratio: ${model.expand_ratio_glu}

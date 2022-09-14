@@ -34,7 +34,7 @@ COSFORMER_MAX_LENGTH=${22}
 
 cards=${23}
 
-spring.submit arun --gpu \
+spring.submit run --gpu \
 -n$cards \
 --ntasks-per-node $cards \
 --cpus-per-task 5 \

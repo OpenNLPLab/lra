@@ -18,7 +18,7 @@ dataset:
   grayscale: true
 
 loader:
-  batch_size: 50
+  batch_size: 256
 
 optimizer:
   lr: 0.01

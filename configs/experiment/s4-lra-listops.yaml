@@ -6,12 +6,12 @@ defaults:
 
 model:
   dropout: 0.
-  n_layers: 8
-  d_model: 128
+  n_layers: 6
+  d_model: 64
   prenorm: false
   norm: batch
   layer:
-    d_state: 64
+    d_state: 8
     lr: 0.001
     lr_dt: 0.01
     dt_min: 0.001
@@ -25,7 +25,7 @@ decoder:
   mode: pool
 
 loader:
-  batch_size: 50
+  batch_size: 16
 
 optimizer:
   lr: 0.01

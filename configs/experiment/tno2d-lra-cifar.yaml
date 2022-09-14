@@ -1,33 +1,30 @@
 # @package _global_
 defaults:
-  - /pipeline: imdb
-  - /model: tno
+  - /pipeline: cifar
+  - /model: tno2d
   - override /scheduler: cosine_warmup
 
-decoder:
-  mode: pool
-
 model:
-  dropout: 0.0
+  dropout: 0.2
   n_layers: 4
   d_model: 64
   prenorm: true
-  norm: batch
+  norm: layer
 
 dataset:
-  l_max: 4096
-  level: char
+  grayscale: true
+
 
 optimizer:
-  lr: 0.01
+  lr: 0.004
   weight_decay: 0.05
+
+trainer:
+  max_epochs: 200
 
 scheduler:
   num_training_steps: 50000
-  num_warmup_steps: 80
-
-trainer:
-  max_epochs: 32
+  num_warmup_steps: 175
 
 train:
   seed: 2222

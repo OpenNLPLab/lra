@@ -35,17 +35,23 @@ class DynamicPosBiasV4(nn.Module):
         self.act = act
         self.pos_proj = nn.Linear(1, self.pos_dim, bias=bias)
         self.pos1 = nn.Sequential(
-            SimpleRMSNorm(self.pos_dim),
+            # SimpleRMSNorm(self.pos_dim),
+            # nn.LayerNorm(self.pos_dim),
+            # nn.BatchNorm1d(self.pos_dim),
             self.get_act(),
             nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
         )
         self.pos2 = nn.Sequential(
-            SimpleRMSNorm(self.pos_dim),
+            # SimpleRMSNorm(self.pos_dim),
+            # nn.LayerNorm(self.pos_dim),
+            # nn.BatchNorm1d(self.pos_dim),
             self.get_act(),
             nn.Linear(self.pos_dim, self.pos_dim, bias=bias)
         )
         self.pos3 = nn.Sequential(
-            SimpleRMSNorm(self.pos_dim),
+            # SimpleRMSNorm(self.pos_dim),
+            nn.LayerNorm(self.pos_dim),
+            # nn.BatchNorm1d(self.pos_dim),
             self.get_act(),
             nn.Linear(self.pos_dim, self.outdim, bias=bias)
         )

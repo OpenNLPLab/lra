@@ -838,7 +838,6 @@ class IMDB(SequenceDataset):
         if cache_dir is not None:
             if cache_dir.is_dir():
                 return self._load_from_cache(cache_dir)
-
         dataset = load_dataset(self._name_, cache_dir=self.data_dir)
         dataset = DatasetDict(train=dataset["train"], test=dataset["test"])
         if self.level == "word":

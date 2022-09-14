@@ -35,7 +35,6 @@ class SequenceLightningModule(pl.LightningModule):
         super().__init__()
         # Passing in config expands it one level, so can access by self.hparams.train instead of self.hparams.config.train
         self.save_hyperparameters(config, logger=False)
-
         self.dataset = SequenceDataset.registry[self.hparams.dataset._name_](
             **{
                 # Arguments for configuring dataloader when using TBPTT
@@ -46,7 +45,6 @@ class SequenceLightningModule(pl.LightningModule):
                 **self.hparams.dataset, 
             }
         )
-
         # Check hparams
         self._check_config()
 
@@ -453,7 +451,7 @@ class SequenceLightningModule(pl.LightningModule):
     def test_dataloader(self):
         test_loader_names, test_loaders = self._eval_dataloaders()
         self.test_loader_names = ["final/" + name for name in test_loader_names]
-        test_loaders = self.dataset.train_dataloader(**self.hparams.loader)
+        # test_loaders = self.dataset.train_dataloader(**self.hparams.loader)
         return test_loaders
 
 

@@ -6,7 +6,7 @@ class GLU(nn.Module):
     def __init__(self, d1, glu_expand_ratio=2, act_fun='None', fina_act="None", dropout=0.0, bias=True):
         super().__init__()
         
-        d2 = d1*glu_expand_ratio
+        d2 = int(d1*glu_expand_ratio)
         self.d_output = d1
         self.l1 = nn.Linear(d1, d2, bias=bias)
         self.l2 = nn.Linear(d1, d2, bias=bias)

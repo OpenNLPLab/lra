@@ -28,7 +28,7 @@ class TNO(nn.Module):
         resi_param=False,
         # norm
         use_norm=False,
-        norm_type="simplermsnorm",
+        norm_type="layernorm",
         # Toeplizt
         use_exp=False,
         use_neg_exp=False, 
@@ -187,6 +187,7 @@ class TNO(nn.Module):
         else:
             print("here! layer norm")
             return nn.LayerNorm(d_model)
+            # return nn.BatchNorm1d(d_model)
 
     def get_act_fun(self, act_fun):
         print(act_fun)
@@ -221,7 +222,6 @@ class TNO(nn.Module):
     def forward(self, x, state = None):
         # x: b, h * w, d
         num_heads = self.num_heads
-        
         if self.token_shift_type == 1:
             x = self.token_shift(x)
         elif self.token_shift_type == 2:

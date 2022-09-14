@@ -168,6 +168,13 @@ class SequenceModel(SequenceModule):
                     _layer['dropout'] = dropout
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
+        elif layer[0]['_name_'] == 'tno2d':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
         elif layer[0]['_name_'] == 'tno_v2':
             for _layer in layer:
                 # If layers don't specify dropout, add it
@@ -200,8 +207,8 @@ class SequenceModel(SequenceModule):
             if norm is None:
                 self.norm = None
             elif isinstance(norm, str):
-                # self.norm = Normalization(self.d_output, transposed=self.transposed, _name_=norm)
-                self.norm = SimpleRMSNorm(self.d_output)
+                self.norm = Normalization(self.d_output, transposed=self.transposed, _name_=norm)
+                # self.norm = SimpleRMSNorm(self.d_output)
             else:
                 self.norm = Normalization(self.d_output, transposed=self.transposed, **norm)
                 # self.norm = SimpleRMSNorm(self.d_output)
