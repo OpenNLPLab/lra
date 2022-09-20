@@ -19,8 +19,8 @@ tno_dpb_dim = min(d_model//4, 64)
 norm = 'batch'
 expand_ratio_tno = 1
 expand_ratio_glu = 1.5
-tno_use_decay = False
-tno_gamma = [0.95]
+tno_use_decay = True
+tno_gamma = [0.95,0.9]
 opt_wd = [0.0]
 lr={'cifar':[0.00725], 'imdb':[0.0005], 'listops':[0.004], 'pathfinder':[0.0004], 'pathfinderx':[0.0004],'aan':[0.001]}
 lr={'cifar':[0.00725], 'imdb':[0.001], 'listops':[0.001], 'pathfinder':[0.0004], 'pathfinderx':[0.001],'aan':[0.0005]}
@@ -79,8 +79,8 @@ for i, task in enumerate(tasks):
         seq_len = 1024
         if not tno_use_decay:
             lr_one = lr[task][0]
-            for i in range(40):
-                lr_one = round(lr_one + 0.000025,6)
+            for i in range(1):
+                # lr_one = round(lr_one + 0.000025,6)
                 print("pathfinder lr: ",lr_one)
                 time.sleep(2)
                 pid = os.fork()
@@ -102,7 +102,7 @@ for i, task in enumerate(tasks):
             lr_one = lr[task][0]
             for i in range(1):
                 # lr_one = round(lr_one + 0.00025,5)
-                print("pathfinder lr: ",lr_one)
+                print("pathfinderx lr: ",lr_one)
                 time.sleep(1)
                 pid = os.fork()
                 if pid == 0:

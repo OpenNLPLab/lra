@@ -41,7 +41,7 @@ def parse(file, arch, task, job_id, arr):
     except:
         print(res["job_id"])
     
-path = "/mnt/cache/hanxiaodong/lra/log/pathfinder"
+path = "/mnt/lustre/share_data/hanxiaodong/lra_log/log/pathfinderx"
 
 arr = ["arch", "task", "val/accuracy", "test/accuracy", "Total params", "norm", "expand_ratio_tno", "expand_ratio_glu", "tno_use_decay", "tno_gamma", "total_batch_size", "gpus", "batch_size", "d_model", "n_layers", "lr", "weight_decay", "num_warmup_steps", "num_training_steps", "job_id", "tno_type"]
 col = arr[0]

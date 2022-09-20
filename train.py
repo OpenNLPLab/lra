@@ -193,6 +193,10 @@ class SequenceLightningModule(pl.LightningModule):
         x, state = self.model(x, *w, state=self._state)
         self._state = state
         x, *w = self.decoder(x, state, *z)
+        torch.cuda.memory_allocated()
+        used = torch.cuda.max_memory_allocated() /1024/1024/1024
+        print(used)
+        torch.cuda.memory_reserved()
         # self.gpu_tracker.track()
         return x, y, *w
 
