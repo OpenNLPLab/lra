@@ -10,9 +10,9 @@ data.tar.gz
 outputs/
 debug/
 
-data
-arun_log
-arun_log-bk
+data/
+arun_log/
+arun_log-bk/
 
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
