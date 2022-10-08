@@ -123,6 +123,7 @@ dmypy.json
 .pyre/
 
 # script
+kill-job.sh
 run_s4.sh
 run_task.sh
 run_tno.sh
