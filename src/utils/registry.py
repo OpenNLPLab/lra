@@ -84,6 +84,8 @@ layer = {
     "tno_v2":"src.models.sequence.tno_v2.TNOV2",
     "tno":"src.models.sequence.tno.TNO",
     "tno2d":"src.models.sequence.tno2d.TNO",
+    "fnet":"src.models.sequence.fnet.FNetFairseqLayer",
+    "synthesizer":"src.models.sequence.synthesizer.SynthesizerDense",
     "conv1d": "src.models.sequence.conv1d.Conv1d",
     "attsimp": "src.models.sequence.mha.AttentionSimple",
     "performer": "src.models.sequence.attention.linear.Performer",

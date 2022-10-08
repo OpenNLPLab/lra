@@ -26,6 +26,7 @@ ls_attn_max_seq_len: 0
 use_softmax: true
 act_fun: 1+elu
 linformer_max_seq_len: 0
+reformer_max_seq_len: 0
 
 residual: R
 prenorm: true

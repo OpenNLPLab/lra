@@ -34,15 +34,15 @@ COSFORMER_MAX_LENGTH=${22}
 
 cards=${23}
 
-spring.submit run --gpu \
--n$cards \
---ntasks-per-node $cards \
---cpus-per-task 5 \
---partition MMG \
---quotatype spot \
---job-name=${TASK}_${ARCH} \
-"python -m train wandb=null experiment=trans-${ARCH}-lra-${TASK} \
-trainer.gpus=$cards \
+# spring.submit run --gpu \
+# -n$cards \
+# --ntasks-per-node $cards \
+# --cpus-per-task 5 \
+# --partition MMG \
+# --quotatype spot \
+# --job-name=${TASK}_${ARCH} \
+python -m train wandb=null experiment=trans-${ARCH}-lra-${TASK} \
+trainer.gpus=1 \
 loader.batch_size=${BS} model.n_layers=${N_LAYERS} model.d_model=${D_MODEL} model.norm=${NORM} model.prenorm=true \
 model.flash_max_position_embed=${FLASH_MAX_POSITION_EMBED} model.flash_s=${FLASH_S} \
 model.flash_linear_max_position_embeddings=${FLASH_LINEAR_MAX_POSITION_EMBEDDINGS} model.flash_linear_s=${FLASH_LINEAR_S} \
@@ -50,4 +50,4 @@ model.lg_local_heads=${LG_LOCAL_HEADS} model.lg_linear_heads=${LG_LINEAR_HEADS} 
 model.ls_attn_heads=${LS_ATTN_HEADS} model.ls_attn_window_size=${LS_ATTN_WINDOW_SIZE} model.ls_attn_max_seq_len=${LS_ATTN_MAX_SEQ_LEN} \
 model.performer_heads=${PERFORMER_HEADS} model.performer_approx_attn_dim=${PERFORMER_APPROX_ATTN_DIM} \
 model.cosformer_heads=${COSFORMER_HEADS} model.cosformer_max_length=${COSFORMER_MAX_LENGTH} \
-model.use_softmax=${USE_SOFTMAX} model.act_fun=${ACT_FUN} train.seed=2222"
+model.use_softmax=${USE_SOFTMAX} model.act_fun=${ACT_FUN} train.seed=2222

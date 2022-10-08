@@ -72,6 +72,65 @@ class DynamicToepliztMultiheadV4(nn.Module):
         self.act_type = act_type
         self.act_fun = self.get_act_fun(self.act_type)
 
+        # ##### for inference
+        # # shape of x: b, h, n, e
+        # n = 2048
+        # # a0, a1, ... , a(n-1), a0, a(-(n-1)), ... , a(-1)
+        # ##### coef
+        # # 1, d, 1 -> h, 1, d
+        # zero = self.dpb_transform(self.get_zero())
+        # if self.use_pad:
+        #     l1 = min(n - 1, self.n - 1)
+        #     l2 = max(0, n - 1 - l1)
+        #     # n, d, 1 -> h, n, d
+        #     pos_dpb = self.dpb_transform(self.get_pos(l1))
+        #     neg_index = self.get_neg(l1)
+        #     if self.causal:
+        #         neg_dpb = neg_index
+        #     else:
+        #         neg_dpb = self.dpb_transform(neg_index)
+        #     # padding to seq len
+        #     pos = torch.cat([pos_dpb, torch.ones(self.h, l2, self.dim) * self.zero_value], dim=-2)
+        #     neg = torch.cat([torch.ones(self.h, l2, self.dim) * self.zero_value, neg_dpb], dim=-2)
+        # else:
+        #     pos = self.dpb_transform(self.get_pos(n - 1))
+        #     neg_index = self.get_neg(n - 1)
+        #     if self.causal:
+        #         neg = neg_index
+        #     else:
+        #         neg = self.dpb_transform(neg_index)
+
+        # if self.use_exp and self.use_neg_exp:
+        #     zero = -torch.exp(zero)
+        #     pos = -torch.exp(pos)
+        #     if not self.causal:
+        #         neg = -torch.exp(neg)
+
+        # if self.use_decay or self.use_multi_decay:
+        #     coef = torch.arange(1, n).reshape(1, -1, 1).to(x)
+        #     if self.use_decay:
+        #         gamma = self.gamma
+        #     else:
+        #         gamma = torch.sigmoid(self.gamma)
+        #         gamma = self.lambda_ + (1 - self.lambda_) * gamma
+        #     if self.use_exp:
+        #         gamma = torch.log(gamma) * coef
+        #         pos = gamma + pos
+        #         neg = torch.flip(gamma, dims=[1]) + neg
+        #     else:
+        #         gamma = gamma ** coef
+        #         pos = gamma * pos
+        #         neg = torch.flip(gamma, dims=[1]) * neg
+        # if self.use_exp:
+        #     a = torch.exp(torch.clamp(torch.cat([zero, pos, zero, neg], dim=1), max=30, min=-60))
+        # else:
+        #     a = torch.cat([zero, pos, zero, neg], dim=1)
+        #     a = self.act_fun(a)
+        # self.a = nn.Parameter(a, requires_grad=False)
+
+        # self.forward = self.inference
+        ##### for inference
+
     def get_act_fun(self, act_fun):
         print(act_fun)
         if act_fun == "gelu":
@@ -141,6 +200,20 @@ class DynamicToepliztMultiheadV4(nn.Module):
 
         return res
     
+    def inference(self, x, dim=-2, normalize=False):
+        n = x.shape[dim]
+        # a: h, n, d
+        # x: ..., h, n, d
+        output = self.compute(x, self.a, dim, n)
+
+        if normalize:
+            size = list(x.shape[:-1]) + [1]
+            ones = torch.ones(size).to(x)
+            denorm = self.compute(ones, self.a, dim, n)
+            output = output / denorm
+
+        return output
+
     def forward_causal(self, x, dim=-2, normalize=False):
         # shape of x: b, h, n, e
         n = x.shape[dim]
@@ -198,7 +271,7 @@ class DynamicToepliztMultiheadV4(nn.Module):
         # res = torch.einsum('...nme,...me->...ne', matrix, x)
         # print(torch.norm(res - output))
         ##### for test
-        
+
     def forward_non_causal(self, x, dim=-2, normalize=False):
         # shape of x: b, h, n, e
         n = x.shape[dim]

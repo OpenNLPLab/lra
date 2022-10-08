@@ -5,11 +5,11 @@ layer:
     n_heads: 8
     max_seq_len: ${model.nystorm_max_seq_len}
   - _name_: ff
-    expand: 2
+    expand: 3
     dropout: null
     transposed: False
 
-nystorm_max_seq_len: 1000
+nystorm_max_seq_len: 2048
 
 reformer_max_seq_len: 0
 linformer_max_seq_len: 0

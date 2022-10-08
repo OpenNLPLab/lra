@@ -1,3 +1,4 @@
+from symbol import parameters
 from typing import List, Optional, Callable
 import numpy as np
 import torch
@@ -80,7 +81,9 @@ class SequenceLightningModule(pl.LightningModule):
         
         # Instantiate model
         self.model = utils.instantiate(registry.model, self.hparams.model)
-
+        # parameters = filter(lambda p: p.requires_grad, self.model.parameters())
+        # parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
+        # print('Trainable Parameters: %.3fM' % parameters)
         print(self.model)
         # Instantiate the task
         if "task" not in self.hparams:  # TODO maybe don't need this?
@@ -193,10 +196,10 @@ class SequenceLightningModule(pl.LightningModule):
         x, state = self.model(x, *w, state=self._state)
         self._state = state
         x, *w = self.decoder(x, state, *z)
-        torch.cuda.memory_allocated()
-        used = torch.cuda.max_memory_allocated() /1024/1024/1024
-        print(used)
-        torch.cuda.memory_reserved()
+        # torch.cuda.memory_allocated()
+        # used = torch.cuda.max_memory_allocated() /1024/1024/1024
+        # print(used)
+        # torch.cuda.memory_reserved()
         # self.gpu_tracker.track()
         return x, y, *w
 
@@ -455,7 +458,6 @@ class SequenceLightningModule(pl.LightningModule):
     def test_dataloader(self):
         test_loader_names, test_loaders = self._eval_dataloaders()
         self.test_loader_names = ["final/" + name for name in test_loader_names]
-        # test_loaders = self.dataset.train_dataloader(**self.hparams.loader)
         return test_loaders
 
 
@@ -561,8 +563,6 @@ def benchmark_step(config):
 
 @hydra.main(config_path="configs", config_name="config.yaml")
 def main(config: OmegaConf):
-    # import pdb
-    # pdb.set_trace()
     # Process config:
     # - register evaluation resolver
     # - filter out keys used only for interpolation

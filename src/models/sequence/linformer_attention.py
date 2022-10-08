@@ -53,7 +53,6 @@ class LinformerAttention(nn.Module):
             V = F.pad(V, (0, 0, 0, self.seq_len-l, 0, 0, 0, 0))
         
         mask = torch.ones(b, l).to(Q)
-        # import pdb;pdb.set_trace()
         K = torch.matmul(self.E, K )
         V = torch.matmul(self.E, V )
 

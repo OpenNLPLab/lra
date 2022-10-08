@@ -13,8 +13,10 @@ layer:
     act_fun: ${model.act_fun}
     norm_type: ${model.norm}
     use_orpe: true
-  - _name_: glu
-    act_fun: swish
+  - _name_: ff
+    expand: 1
+    dropout: null
+    transposed: False
 
 lg_local_heads: 8
 lg_local_chunk_size: 64
@@ -34,6 +36,7 @@ performer_approx_attn_dim: 0
 cosformer_heads: 0 
 cosformer_max_length: 0
 linformer_max_seq_len: 0
+reformer_max_seq_len: 0
 
 residual: R
 dropout: 0.1

@@ -1,26 +1,43 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: performer_attn
-    n_heads: ${model.performer_heads}
-    approx_attn_dim: ${model.performer_approx_attn_dim}
-  - _name_: ff
-    expand: 2
-    dropout: null
-    transposed: False
+  - _name_: fnet
+    max_pos_embeddings: ${model.fnet_max_position_embeddings}
+    expand_ratio: ${model.fnet_expand_ratio}
+  - _name_: glu
+    act_fun: swish
+    glu_expand_ratio: ${model.fnet_expand_ratio}
 
-performer_heads: 8
-performer_approx_attn_dim: 32
+  # - _name_: ff
+  #   expand: 2
+  #   dropout: null
+  #   transposed: False
+
+fnet_max_position_embeddings: 2048
+fnet_expand_ratio: 2
+
+synthesizer_max_seq_len: 1024
+tno_head: 1
+tno_max_l: 1024
+tno_type: 4
+tno_use_decay: False
+tno_gamma: 0.999
+tno_dpb_dim: 16 #min(d_model//4, 64)
+expand_ratio_tno: 2
+expand_ratio_glu: 2
+
+flash_s: 0
+flash_max_position_embed: 0
 flash_linear_s: 0
 flash_linear_max_position_embeddings: 0
-flash_max_position_embed: 0
-flash_s: 0
 lg_local_heads: 0
 lg_linear_heads: 0
 lg_local_chunk_size: 0
 ls_attn_heads: 0
 ls_attn_window_size: 0
 ls_attn_max_seq_len: 0
+performer_heads: 0
+performer_approx_attn_dim: 0
 use_softmax: true
 act_fun: 1+elu
 cosformer_heads: 0 
@@ -28,9 +45,7 @@ cosformer_max_length: 0
 linformer_max_seq_len: 0
 reformer_max_seq_len: 0
 
-
 residual: R
-prenorm: true
 dropout: 0.1
 encoder:
   _name_: position

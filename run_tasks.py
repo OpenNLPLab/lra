@@ -17,7 +17,7 @@ flash_args={'cifar':[1024,64],"imdb":[4096,64],"listops":[2048,64],"pathfinder":
 flash_linear_args={'cifar':[1024,64],"imdb":[4096,64],"listops":[2048,64],"pathfinder":[1024,64],"aan":[4000,64]}
 ls_args={'cifar':[2,8,1024],"imdb":[2,8,4096],"listops":[2,8,2048],"pathfinder":[2,8,1024],"aan":[2,8,4000]}
 lg_args=[2,2,64]
-cosformer_args={'cifar':[8,1024],"imdb":[8,4096],"listops":[8,2048],"pathfinder":[8,1024],"aan":[8,4000]}  # heads, max_length
+cosformer_args={'cifar':[8,1024],"imdb":[8,2048],"listops":[8,2048],"pathfinder":[8,1024],"aan":[8,4000]}  # heads, max_length
 # n_layers, d_model
 arch_args={'cifar':
                 {"s4":{"flash":[11,512],"flash_linear":[11,512],"lg":[6,512],"ls":[6,512]},
@@ -32,7 +32,7 @@ arch_args={'cifar':
                 # "lra":{"flash":[6,128],"flash_linear":[6,128],"lg":[6,128],"ls":[6,128]}},
                 "lra":{"flash":[2,64],"flash_linear":[2,64],"lg":[2,64],"ls":[2,64],"cosformer":[2,64]}},
             'imdb':
-                {"s4":{"flash":[5,64],"flash_linear":[5,64],"lg":[4,64],"ls":[4,64]},
+                {"s4":{"flash":[5,64],"flash_linear":[5,64],"lg":[4,64],"ls":[4,64],"cosformer":[12,256]},
                 # "lra":{"flash":[11,512],"flash_linear":[11,512],"lg":[6,512],"ls":[6,512]}},
                 "lra":{"flash":[2,64],"flash_linear":[2,64],"lg":[2,64],"ls":[2,64],"cosformer":[2,64]}},
             'aan':
@@ -51,8 +51,8 @@ tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 # archs_tmp = ["lg"]
 tasks_tmp = ["imdb","cifar", "listops","pathfinder"]
 archs_tmp = ["lg", "flash","flash_linear","ls"]
-tasks_tmp = ["pathfinder"]
-archs_tmp = ["ls"]
+tasks_tmp = ["imdb"]
+archs_tmp = ["cosformer"]
 for j, task in enumerate(tasks_tmp):
     for i, arch in enumerate(archs_tmp):
         for norm in ['batch']:
@@ -64,27 +64,27 @@ for j, task in enumerate(tasks_tmp):
             print(task, arch, tmp)
             for use_softmax, act_fun in tmp:
                 print(use_softmax, act_fun)
-                time.sleep(10)
+                time.sleep(1)
                 pid = os.fork()
                 if pid == 0:
                     name = f"{arch}_{task}"
                     print(name)
                     # TODO check imdb task
                     if task == 'imdb':
-                        seq_len = 4096
+                        seq_len = 2048
                         lg_args=[2,2,64]
                         args=flash_args[task]
                         if arch == 'flash':
-                            os.system(f'sh run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2')
+                            os.system(f'sh run_task.sh {task} {arch} {20} {arch_args[task]["s4"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} {flash_args[task][0]} {flash_args[task][1]} 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2')
                         if arch == 'flash_linear':
-                            os.system(f'sh run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0 0 0 0 0 2')
+                            os.system(f'sh run_task.sh {task} {arch} {20} {arch_args[task]["s4"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 {flash_linear_args[task][0]} {flash_linear_args[task][1]} 0 0 0 0 0 0 0 0 0 0 0 0 2')
                         if arch == 'lg':
                             # os.system(f'sh run_task.sh {task} {arch} {5} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 8')
-                            os.system(f'sh run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 {use_softmax} {act_fun} 0 0 2')
+                            os.system(f'sh run_task.sh {task} {arch} {20} {arch_args[task]["s4"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 {lg_args[0]} {lg_args[1]} {lg_args[2]} 0 0 0 0 0 {use_softmax} {act_fun} 0 0 2')
                         if arch == 'ls':
-                            os.system(f'sh run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0 0 0 0 0 2')
+                            os.system(f'sh run_task.sh {task} {arch} {20} {arch_args[task]["s4"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 {ls_args[task][0]} {ls_args[task][1]} {ls_args[task][2]} 0 0 0 0 0 0 2')
                         if arch == 'cosformer':
-                            os.system(f'sh run_task.sh {task} {arch} {16} {arch_args[task]["lra"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 0 0 0 0 0 0 0 {cosformer_args[task][0]} {cosformer_args[task][1]} 2')
+                            os.system(f'sh run_task.sh {task} {arch} {20} {arch_args[task]["s4"][arch][0]} {arch_args[task]["lra"][arch][1]} {norm} 0 0 0 0 0 0 0 0 0 0 0 0 0 0 {cosformer_args[task][0]} {cosformer_args[task][1]} 2')
                         sys.exit(0)
                     # TODO check cifar task
                     if task == 'cifar':
