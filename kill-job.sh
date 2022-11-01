@@ -2,7 +2,7 @@ task=MNLI
 task=muti_tno_g
 
 # RTE MRPC CoLA STS-B SST-2 QNLI MNLI QQP
-for task in aan_tno_1_; do
+for task in pathfinder; do
     echo $task
     sentence=`spring.submit task -a  | grep $task`
 
