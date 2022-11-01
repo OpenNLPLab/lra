@@ -86,7 +86,6 @@ class BigBirdAttention(nn.Module):
             (blocked_encoder_mask, band_mask, from_mask, to_mask) = mask
         from_blocked_mask = to_blocked_mask = blocked_encoder_mask
         output_attentions=None
-        # import pdb;pdb.set_trace()
         batch_size, nb_heads, seq_len, dim_head = q.shape
 
         to_seq_length = from_seq_length = seq_len

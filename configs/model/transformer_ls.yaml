@@ -7,13 +7,13 @@ layer:
     num_landmarks: 32
     window_size: ${model.ls_attn_window_size}
   - _name_: ff
-    expand: 2
+    expand: 1
     dropout: null
     transposed: False
 
 ls_attn_heads: 8
 ls_attn_window_size: 8
-ls_attn_max_seq_len: 4000
+ls_attn_max_seq_len: 2048
 
 flash_linear_s: 0
 flash_linear_max_position_embeddings: 0
@@ -29,6 +29,7 @@ act_fun: 1+elu
 cosformer_heads: 0 
 cosformer_max_length: 0
 linformer_max_seq_len: 0
+reformer_max_seq_len: 0
 
 residual: R
 dropout: 0.1

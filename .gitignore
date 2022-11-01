@@ -10,9 +10,9 @@ data.tar.gz
 outputs/
 debug/
 
-data
-arun_log
-arun_log-bk
+data/
+arun_log/
+arun_log-bk/
 
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
@@ -121,5 +121,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# script
+kill-job.sh
+run_s4.sh
+run_task.sh
+run_tno.sh
+debug-run.sh
+get_lra_res.py
+speed_plot.py
 
 # End of https://www.gitignore.io/api/python

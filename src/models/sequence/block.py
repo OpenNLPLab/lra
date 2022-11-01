@@ -32,7 +32,6 @@ class SequenceResidualBlock(SequenceModule):
             pool=None,
         ):
         super().__init__()
-
         self.i_layer = i_layer
         self.d_input = d_input
         self.layer = utils.instantiate(registry.layer, layer, d_input)

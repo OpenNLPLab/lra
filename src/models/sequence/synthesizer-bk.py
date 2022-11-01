@@ -7,53 +7,11 @@ import torch.nn.functional as F
 from torch import Tensor, nn
 from torch.nn import Parameter
 from torch.nn import Dropout
-from einops import rearrange
 import sys
-# from fast_transformers.causal_product import causal_dot_product
-# N, L, H, E, batch, length, head, dim
+from .synthesizer import SynthesizerDense, SynthesizerRandom
+from einops import rearrange
 
-# https://github.com/JunnYu/FLASHQuad_pytorch/blob/main/flash/gau.py
-
-def rope(x, dim):
-    """RoPE position embedding."""
-    shape = x.shape
-    if isinstance(dim, int):
-        dim = [dim]
-    spatial_shape = [shape[i] for i in dim]
-    total_len = 1
-    for i in spatial_shape:
-        total_len *= i
-    position = torch.reshape(
-        torch.arange(total_len, dtype=x.dtype,
-                     device=x.device), spatial_shape
-    )
-    for i in range(dim[-1] + 1, len(shape) - 1, 1):
-        position = position.unsqueeze(-1)
-    half_size = shape[-1] // 2
-    freq_seq = -torch.arange(half_size, dtype=x.dtype, device=x.device) / float(
-        half_size
-    )
-    inv_freq = 10000 ** freq_seq
-    sinusoid = torch.einsum("...,d->...d", position, inv_freq)
-    sin = sinusoid.sin()
-    cos = sinusoid.cos()
-    x1, x2 = torch.chunk(x, 2, dim=-1)
-
-    return torch.cat([x1 * cos - x2 * sin, x2 * cos + x1 * sin], dim=-1)
-
-class ScaleNorm(nn.Module):
-    def __init__(self, eps=1e-5):
-        super().__init__()
-        self.eps = eps
-        self.scala = nn.Parameter(torch.ones(1))
-
-    def forward(self, x):
-        mean_square = (x ** 2).mean(dim=-1, keepdim=True)
-        x = x * torch.rsqrt(mean_square + self.eps) * self.scala
-        return x
-
-# Flash attention
-class FlashAttention(nn.Module):
+class Synthesizer(nn.Module):
     """Multi-headed attention.
 
     See "Attention Is All You Need" for more details.
@@ -62,6 +20,7 @@ class FlashAttention(nn.Module):
     def __init__(
         self,
         d_model,
+        n_heads,
         kdim=None,
         vdim=None,
         dropout=0.0,
@@ -73,85 +32,53 @@ class FlashAttention(nn.Module):
         q_noise=0.0,
         qn_block_size=8,
         # add
-        s=128,
-        norm_type="layer_norm",
-        eps=1e-5,
-        max_position_embeddings=2048,
-        expansion_factor=2,
+        index=0,
+        synthesizer_type="dense",
+        max_seq_len=512,
+        causal=False,
     ):
+        # add
+        self.index = index
+
         super().__init__()
-        self.s = s
-        # self.e = int(embed_dim * expansion_factor)
-        # self.uv = nn.Linear(expansion_factor, 2 * self.e + self.s)
         self.d_output = d_model
         self.embed_dim = d_model
-        self.e = int(self.embed_dim * expansion_factor)
-        self.u_proj = nn.Linear(d_model, self.e)
-        self.v_proj = nn.Linear(d_model, self.e)
-        self.base_proj = nn.Linear(d_model, self.s)
-        self.q_weight = nn.Parameter(torch.randn(1, self.s))
-        self.q_bias = nn.Parameter(torch.zeros(1, self.s))
-        self.k_weight = nn.Parameter(torch.randn(1, self.s))
-        self.k_bias = nn.Parameter(torch.zeros(1, self.s))
-        self.o = nn.Linear(self.e, self.embed_dim)
+        self.kdim = kdim if kdim is not None else d_model
+        self.vdim = vdim if vdim is not None else d_model
+        self.qkv_same_dim = self.kdim == d_model and self.vdim == d_model
+
+        self.num_heads = n_heads
+
+        self.self_attention = self_attention
+        self.encoder_decoder_attention = encoder_decoder_attention
+
+        assert not self.self_attention or self.qkv_same_dim, (
+            "Self-attention requires query, key and " "value to be of the same size"
+        )
         
-        self.norm = nn.LayerNorm(self.embed_dim, eps=eps) if norm_type == "layer_norm" else ScaleNorm(eps=eps)
-        self.w = nn.Parameter(torch.randn(2 * max_position_embeddings - 1))
-        self.a = nn.Parameter(torch.randn(1, self.s))
-        self.b = nn.Parameter(torch.randn(1, self.s))
-        self.act_fn = F.silu
-        self.max_position_embeddings = max_position_embeddings
-
-        nn.init.normal_(self.q_weight, std=0.02)
-        nn.init.normal_(self.k_weight, std=0.02)
-        nn.init.normal_(self.w, std=0.02)
-        nn.init.normal_(self.a, std=0.02)
-        nn.init.normal_(self.b, std=0.02)
-
-        print("flash attention")
-        print(f"s {self.s}")
-        print(f"norm_type {norm_type}")
-        print(f"eps {eps}")
-        print(f"max_position_embeddings {max_position_embeddings}")
-        print(f"expansion_factor {expansion_factor}")
+        print(f"synthesizer_type {synthesizer_type}")
+        print(f"max_seq_len {max_seq_len}")
+        print(f"causal {causal}")
+        if synthesizer_type == "dense":
+            self.synthesizer = SynthesizerDense(
+                dim=d_model, 
+                max_seq_len=max_seq_len,
+                causal=causal,
+            )
+        else:
+            self.synthesizer = SynthesizerRandom(
+                max_seq_len=max_seq_len,
+                causal=causal,
+            )
 
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
 
-    def reset_parameters(self):
-        if self.qkv_same_dim:
-            # Empirically observed the convergence to be much better with
-            # the scaled initialization
-            nn.init.xavier_uniform_(self.v_proj.weight, gain=1 / math.sqrt(2))
-        else:
-            nn.init.xavier_uniform_(self.v_proj.weight)
-
-        if self.has_out:
-            nn.init.xavier_uniform_(self.out_proj.weight)
-            if self.out_proj.bias is not None:
-                nn.init.constant_(self.out_proj.bias, 0.0)
-
-    def rel_pos_bias(self, seq_len):
-        """Relative position bias."""
-        if seq_len <= self.max_position_embeddings:
-            # Construct Toeplitz matrix directly when the sequence length is less than 512
-            t = F.pad(self.w[: 2 * seq_len - 1], [0, seq_len]).repeat(seq_len)
-            t = t[..., :-seq_len].reshape(-1, seq_len, 3 * seq_len - 2)
-            r = (2 * seq_len - 1) // 2
-            t = t[..., r:-r]
-        else:
-            # Construct Toeplitz matrix using RoPE when the sequence length is over 512.
-            a = rope(self.a.repeat(seq_len, 1), dim=0)
-            b = rope(self.b.repeat(seq_len, 1), dim=0)
-            t = torch.einsum("mk,nk ->mn", a, b)
-
-        return t
-
     def forward(
         self,
         query,
-        # key: Optional[Tensor],
-        # value: Optional[Tensor],
+        key: Optional[Tensor],
+        value: Optional[Tensor],
         key_padding_mask: Optional[Tensor] = None,
         incremental_state: Optional[Dict[str, Dict[str, Optional[Tensor]]]] = None,
         need_weights: bool = True,
@@ -178,8 +105,6 @@ class FlashAttention(nn.Module):
                 weights for each head. Implies *need_weights*. Default:
                 return the average attention weights over all heads.
         """
-        key = query
-        value = query
         if need_head_weights:
             need_weights = True
 
@@ -193,35 +118,11 @@ class FlashAttention(nn.Module):
         - value: :math:`(S, N, E)` where S is the source sequence length, N is the batch size, E is
           the embedding dimension.
         '''
-        bsz, tgt_len, embed_dim = query.size()
-        # bsz, tgt_len, embed_dim
-
-        shortcut, x = query, self.norm(query)
-        # bsz, tgt_len, e
-        u = self.act_fn(self.u_proj(x))
-        # bsz, tgt_len, e
-        v = self.act_fn(self.v_proj(x))
-        # bsz, tgt_len, s
-        base = self.act_fn(self.base_proj(x))
-        # base = base * weight + bias
-        q_base = base * self.q_weight + self.q_bias
-        k_base = base * self.k_weight + self.k_bias
-        # base = torch.einsum("...r,hr->...hr", base, self.weight) + self.bias
-        q = rope(q_base, dim=1)
-        k = rope(k_base, dim=1)
-        # bsz, tgt_len, tgt_len
-        qk = torch.bmm(q, k.transpose(1, 2))
-        bias = self.rel_pos_bias(self.max_position_embeddings)[:, :tgt_len, :tgt_len]
-        kernel = torch.square(torch.relu(qk / self.max_position_embeddings + bias))
-        if attn_mask is not None:
-            kernel = kernel.masked_fill(attn_mask==float("-inf"), 0)
-
-        x = u * torch.bmm(kernel, v)
-        x = self.o(x)
-        output = x
-        output = output.contiguous()
+        output = self.synthesizer(query, mask=attn_mask)
+        # output = output.transpose(0, 1)
+        
         return output, None
-
+    
     @staticmethod
     def _append_prev_key_padding_mask(
         key_padding_mask: Optional[Tensor],

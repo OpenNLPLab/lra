@@ -69,6 +69,9 @@ class SequenceModel(SequenceModule):
         tno_dpb_dim=64,
         expand_ratio_tno=2,
         expand_ratio_glu=2,
+        synthesizer_max_seq_len=2048,
+        fnet_max_position_embeddings=1024,
+        fnet_expand_ratio=2,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -182,6 +185,20 @@ class SequenceModel(SequenceModule):
                     _layer['dropout'] = dropout
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
+        elif layer[0]['_name_'] == 'fnet':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
+        elif layer[0]['_name_'] == 'synthesizer':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
         else:
             # Some special arguments are passed into each layer
             for _layer in layer:
@@ -235,12 +252,10 @@ class SequenceModel(SequenceModule):
         outputs = inputs
         prev_states = [None] * len(self.layers) if state is None else state
         next_states = []
-        # import pdb;pdb.set_trace()
         for layer, prev_state in zip(self.layers, prev_states):
             outputs, state = layer(outputs, *args, state=prev_state, **kwargs) # TODO handle state
             next_states.append(state)
             if self.track_norms: output_norms.append(torch.mean(outputs.detach() ** 2))
-        # import pdb;pdb.set_trace()
         outputs = self.norm(outputs)
 
         if self.transposed: outputs = rearrange(outputs, 'b d l -> b l d')
