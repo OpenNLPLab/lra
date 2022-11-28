@@ -1,16 +1,17 @@
 import math
-import numpy as np
+import sys
 from typing import Dict, Optional, Tuple
 
+import numpy as np
 import torch
 import torch.nn.functional as F
+from einops import rearrange
 from torch import Tensor, nn
-from torch.nn import Parameter
-from torch.nn import Dropout
-import sys
+from torch.nn import Dropout, Parameter
+
 from .dpb_v4 import SimpleRMSNorm
 from .dynamic_toeplitz_encoding_multihead_v4 import DynamicToepliztMultiheadV4
-from einops import rearrange
+
 
 class TNO(nn.Module):
     def __init__(
@@ -218,6 +219,33 @@ class TNO(nn.Module):
         else:
             return lambda x: x
 
+    # # 1D
+    # def forward(self, x, state = None):
+    #     # x: b, h * w, d
+    #     num_heads = self.num_heads
+    #     if self.token_shift_type == 1:
+    #         x = self.token_shift(x)
+    #     elif self.token_shift_type == 2:
+    #         q1 = self.token_shift(x)
+    #         x = self.coef * q1 + (1 - self.coef) * x
+
+    #     shortcut, x = x, self.pre_norm(x)
+    #     if self.resi_param:
+    #         shortcut = shortcut * self.d
+    #     u = self.act(self.u_proj(x))
+    #     v = self.act(self.v_proj(x))
+    #     # reshape
+    #     v = rearrange(v, 'b n (h d) -> b h n d', h=num_heads)
+    #     output = self.toep(v, dim=-2, normalize=self.normalize)
+    #     output = rearrange(output, 'b h n d -> b n (h d)')
+    #     output = u * output
+    #     if self.use_norm:
+    #         output = self.norm(output)
+            
+    #     output = self.o(output) + shortcut
+        
+    #     return output, None
+    
     # 1D
     def forward(self, x, state = None):
         # x: b, h * w, d
@@ -228,9 +256,6 @@ class TNO(nn.Module):
             q1 = self.token_shift(x)
             x = self.coef * q1 + (1 - self.coef) * x
 
-        shortcut, x = x, self.pre_norm(x)
-        if self.resi_param:
-            shortcut = shortcut * self.d
         u = self.act(self.u_proj(x))
         v = self.act(self.v_proj(x))
         # reshape
@@ -241,7 +266,7 @@ class TNO(nn.Module):
         if self.use_norm:
             output = self.norm(output)
             
-        output = self.o(output) + shortcut
+        output = self.o(output)
         
         return output, None
 

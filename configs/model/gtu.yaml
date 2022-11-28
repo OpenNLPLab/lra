@@ -1,0 +1,51 @@
+# _target_: models.sequence.SequenceModel
+_name_: model
+layer:
+  - _name_: gtu
+    num_heads: ${model.gtu_head}
+    expand_ratio: ${model.gtu_expand_ratio}
+    gamma: ${model.gtu_gamma}
+    rpe_embedding: ${model.gtu_rpe_dim}
+  - _name_: glu
+    act_fun: swish
+    glu_expand_ratio: ${model.expand_ratio_glu}
+
+  # - _name_: ff
+  #   expand: 2
+  #   dropout: null
+  #   transposed: False
+
+
+gtu_head: 1
+gtu_gamma: 0.999
+gtu_rpe_dim: 16 #min(d_model//4, 64)
+gtu_expand_ratio: 2
+expand_ratio_glu: 2
+
+flash_s: 0
+flash_max_position_embed: 0
+flash_linear_s: 0
+flash_linear_max_position_embeddings: 0
+lg_local_heads: 0
+lg_linear_heads: 0
+lg_local_chunk_size: 0
+ls_attn_heads: 0
+ls_attn_window_size: 0
+ls_attn_max_seq_len: 0
+performer_heads: 0
+performer_approx_attn_dim: 0
+use_softmax: true
+act_fun: 1+elu
+cosformer_heads: 0 
+cosformer_max_length: 0
+linformer_max_seq_len: 0
+
+residual: R
+dropout: 0.1
+encoder:
+  _name_: position
+  dropout: 0.1
+# init:
+#   init: normal  # Parameter initializer to use
+#   init_range: 0.1  # Parameters initialized by U(-init_range, init_range)
+#   init_std: 0.02  # Parameters initialized by N(0, init_std)

@@ -89,7 +89,8 @@ layer = {
     "conv1d": "src.models.sequence.conv1d.Conv1d",
     "attsimp": "src.models.sequence.mha.AttentionSimple",
     "performer": "src.models.sequence.attention.linear.Performer",
-    "s4_2dconv": "src.models.sequence.ss.s4_2dconv.S42DConv"
+    "s4_2dconv": "src.models.sequence.ss.s4_2dconv.S42DConv",
+    "gtu":"src.models.sequence.gtu.Gtu",
     # 'packedrnn': 'models.sequence.rnns.packedrnn.PackedRNN',
 }
 

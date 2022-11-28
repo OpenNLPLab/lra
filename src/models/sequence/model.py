@@ -9,15 +9,14 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 from omegaconf import DictConfig
-
-from src.utils.config import to_list, to_dict
+from src.models.nn.components import Normalization
+from src.models.nn.initialization import weights_init
+from src.models.sequence.base import SequenceModule
 # from src.models.sequence.rnns import rnn # [21-09-13] I get a baffling error where hydra claims circular import if I _remove_ this line. This import doesn't even appear to be used at all in this file
 from src.models.sequence.block import SequenceResidualBlock
-from src.models.sequence.base import SequenceModule
-from src.models.nn.components import Normalization
 from src.models.sequence.utils import SimpleRMSNorm
-from src.models.nn.initialization import weights_init
-from src.tasks import encoders, decoders
+from src.tasks import decoders, encoders
+from src.utils.config import to_dict, to_list
 
 
 class SequenceModel(SequenceModule):
@@ -72,6 +71,11 @@ class SequenceModel(SequenceModule):
         synthesizer_max_seq_len=2048,
         fnet_max_position_embeddings=1024,
         fnet_expand_ratio=2,
+        # gtu
+        gtu_head=1,
+        gtu_rpe_dim=0,
+        gtu_expand_ratio=2,
+        gtu_gamma=0.999,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -179,6 +183,13 @@ class SequenceModel(SequenceModule):
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
         elif layer[0]['_name_'] == 'tno_v2':
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get('dropout', None) is None:
+                    _layer['dropout'] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
+        elif layer[0]['_name_'] == 'gtu':
             for _layer in layer:
                 # If layers don't specify dropout, add it
                 if _layer.get('dropout', None) is None:

@@ -119,5 +119,4 @@ dependencies:
     - xxhash==3.0.0
     - yarl==1.8.1
     - zipp==3.8.1
-prefix: /mnt/cache/hanxiaodong/.conda/envs/lra
 

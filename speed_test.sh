@@ -1,4 +1,5 @@
-export HYDRA_FULL_ERROR=1
+export HYDRA_FULL_ERROR=1\
+export DATA_PATH=/mnt/lustre/share_data/hanxiaodong/lra_data/data
 
 TASK=imdb
 ARCH=trans-nystorm
