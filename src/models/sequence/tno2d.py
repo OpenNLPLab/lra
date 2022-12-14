@@ -1,16 +1,17 @@
 import math
-import numpy as np
+import sys
 from typing import Dict, Optional, Tuple
 
+import numpy as np
 import torch
 import torch.nn.functional as F
+from einops import rearrange
 from torch import Tensor, nn
-from torch.nn import Parameter
-from torch.nn import Dropout
-import sys
+from torch.nn import Dropout, Parameter
+
 from .dpb_v4 import SimpleRMSNorm
 from .dynamic_toeplitz_encoding_multihead_v4 import DynamicToepliztMultiheadV4
-from einops import rearrange
+
 
 class TNO(nn.Module):
     def __init__(
@@ -57,6 +58,10 @@ class TNO(nn.Module):
         self.index = index
 
         super().__init__()
+        print(f"drop {dropout}")
+        self.p = dropout
+        if self.p > 0:
+            self.dropout = nn.Dropout(p=dropout)
         self.H = tno_H
         self.W = tno_W
         self.d_output = d_model
@@ -376,10 +381,44 @@ class TNO(nn.Module):
         return output, None
 
     # (row, col) + (col, row)
+    # def forward4(self, x, state = None):
+    #     # x: b, h * w, d
+    #     H = self.H
+    #     W = self.W
+    #     num_heads = self.num_heads
+        
+    #     if self.token_shift_type == 1:
+    #         x = self.token_shift(x)
+    #     elif self.token_shift_type == 2:
+    #         q1 = self.token_shift(x)
+    #         x = self.coef * q1 + (1 - self.coef) * x
+
+    #     shortcut, x = x, self.pre_norm(x)
+    #     if self.resi_param:
+    #         shortcut = shortcut * self.d
+    #     u = self.act(self.u_proj(x))
+    #     v = self.act(self.v_proj(x))
+    #     # reshape
+    #     v = rearrange(v, 'b (H W) (h d) -> b h H W d', h=num_heads, H=H, W=W)
+    #     o1 = self.toep1(v, dim=-2, normalize=self.normalize)
+    #     o1 = self.toep2(o1, dim=-3, normalize=self.normalize)
+    #     o2 = self.toep2(v, dim=-3, normalize=self.normalize)
+    #     o2 = self.toep1(o2, dim=-2, normalize=self.normalize)
+    #     output = o1 + o2
+    #     output = rearrange(output, 'b h H W d -> b (H W) (h d)')
+    #     output = u * output
+    #     if self.use_norm:
+    #         output = self.norm(output)
+            
+    #     output = self.o(output) + shortcut
+        
+    #     return output, None
+    
     def forward4(self, x, state = None):
         # x: b, h * w, d
-        H = self.H
-        W = self.W
+        n = x.shape[1]
+        H = int(np.sqrt(n))
+        W = n //  H
         num_heads = self.num_heads
         
         if self.token_shift_type == 1:
@@ -388,9 +427,6 @@ class TNO(nn.Module):
             q1 = self.token_shift(x)
             x = self.coef * q1 + (1 - self.coef) * x
 
-        shortcut, x = x, self.pre_norm(x)
-        if self.resi_param:
-            shortcut = shortcut * self.d
         u = self.act(self.u_proj(x))
         v = self.act(self.v_proj(x))
         # reshape
@@ -401,11 +437,14 @@ class TNO(nn.Module):
         o2 = self.toep1(o2, dim=-2, normalize=self.normalize)
         output = o1 + o2
         output = rearrange(output, 'b h H W d -> b (H W) (h d)')
+        # dropout
+        if self.p > 0:
+            output = self.dropout(output)
         output = u * output
         if self.use_norm:
             output = self.norm(output)
             
-        output = self.o(output) + shortcut
+        output = self.o(output)
         
         return output, None
     
@@ -440,10 +479,39 @@ class TNO(nn.Module):
         return output, None
 
     # col + row
+    # def forward6(self, x, state = None):
+    #     # x: b, h * w, d
+    #     H = self.H
+    #     W = self.W
+    #     num_heads = self.num_heads
+        
+    #     if self.token_shift_type == 1:
+    #         x = self.token_shift(x)
+    #     elif self.token_shift_type == 2:
+    #         q1 = self.token_shift(x)
+    #         x = self.coef * q1 + (1 - self.coef) * x
+
+    #     shortcut, x = x, self.pre_norm(x)
+    #     if self.resi_param:
+    #         shortcut = shortcut * self.d
+    #     u = self.act(self.u_proj(x))
+    #     v = self.act(self.v_proj(x))
+    #     # reshape
+    #     v = rearrange(v, 'b (H W) (h d) -> b h H W d', h=num_heads, H=H, W=W)
+    #     output = self.toep2(v, dim=-3, normalize=self.normalize) + self.toep1(v, dim=-2, normalize=self.normalize)
+    #     output = rearrange(output, 'b h H W d -> b (H W) (h d)')
+    #     output = u * output
+    #     if self.use_norm:
+    #         output = self.norm(output)
+            
+    #     output = self.o(output) + shortcut
+        
+    #     return output, None
     def forward6(self, x, state = None):
         # x: b, h * w, d
-        H = self.H
-        W = self.W
+        n = x.shape[1]
+        H = int(np.sqrt(n))
+        W = n //  H
         num_heads = self.num_heads
         
         if self.token_shift_type == 1:
@@ -452,9 +520,6 @@ class TNO(nn.Module):
             q1 = self.token_shift(x)
             x = self.coef * q1 + (1 - self.coef) * x
 
-        shortcut, x = x, self.pre_norm(x)
-        if self.resi_param:
-            shortcut = shortcut * self.d
         u = self.act(self.u_proj(x))
         v = self.act(self.v_proj(x))
         # reshape
@@ -465,6 +530,6 @@ class TNO(nn.Module):
         if self.use_norm:
             output = self.norm(output)
             
-        output = self.o(output) + shortcut
+        output = self.o(output)
         
         return output, None

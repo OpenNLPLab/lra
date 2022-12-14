@@ -9,6 +9,8 @@ layer:
     use_decay: ${model.tno_use_decay}
     gamma: ${model.tno_gamma}
     dpb_embedding: ${model.tno_dpb_dim}
+    dpb_type: ${model.dpb_type}
+    dpb_layers: ${model.dpb_layers}
   - _name_: glu
     act_fun: swish
     glu_expand_ratio: ${model.expand_ratio_glu}
@@ -27,6 +29,8 @@ tno_gamma: 0.999
 tno_dpb_dim: 16 #min(d_model//4, 64)
 expand_ratio_tno: 2
 expand_ratio_glu: 2
+dpb_type: 4
+dpb_layers: 1
 
 flash_s: 0
 flash_max_position_embed: 0

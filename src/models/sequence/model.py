@@ -71,6 +71,8 @@ class SequenceModel(SequenceModule):
         synthesizer_max_seq_len=2048,
         fnet_max_position_embeddings=1024,
         fnet_expand_ratio=2,
+        dpb_type=1,
+        dpb_layers=3,
         # gtu
         gtu_head=1,
         gtu_rpe_dim=0,

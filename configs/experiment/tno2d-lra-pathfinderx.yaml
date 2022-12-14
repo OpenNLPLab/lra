@@ -26,7 +26,7 @@ optimizer:
   weight_decay: 0.0
 
 trainer:
-  max_epochs: 200
+  max_epochs: 100 #200
 
 train:
   seed: 2222

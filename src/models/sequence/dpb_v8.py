@@ -3,6 +3,7 @@
 import torch
 import torch.nn as nn
 
+
 class SimpleRMSNorm(nn.Module):
     def __init__(self, d, p=-1., eps=1e-8, bias=False):
         """
@@ -27,7 +28,15 @@ class SimpleRMSNorm(nn.Module):
         return x_normed
 
 class DynamicPosBiasV8(nn.Module):
-    def __init__(self, dim, outdim, residual, act="relu", bias=True, layers=3):
+    def __init__(
+        self, 
+        dim, 
+        outdim, 
+        residual, 
+        act="relu", 
+        bias=True, 
+        layers=3,
+    ):
         super().__init__()
         self.residual = residual
         self.outdim = outdim
@@ -45,6 +54,7 @@ class DynamicPosBiasV8(nn.Module):
             )
         self.out = nn.Sequential(
             SimpleRMSNorm(self.pos_dim),
+            # nn.SyncBatchNorm(self.pos_dim),
             self.get_act(),
             nn.Linear(self.pos_dim, self.outdim, bias=bias)
         )

@@ -1,13 +1,14 @@
 """ Utility nn components, in particular handling activations, initializations, and normalization layers """
 
-from functools import partial
 import math
+from functools import partial
+
 import torch
 import torch.nn as nn
 from einops import rearrange
 from opt_einsum import contract
-
 from src.models.nn.exprnn.orthogonal import modrelu
+
 
 def Activation(activation=None, size=None, dim=-1):
     if activation in [ None, 'id', 'identity', 'linear' ]:
@@ -166,6 +167,11 @@ class Normalization(nn.Module):
         elif _name_ == 'none':
             self.channel = True
             self.norm = nn.Identity()
+        elif _name_ == "synbatch":
+            self.channel = False
+            norm_args = {'affine': True, 'track_running_stats': True}
+            norm_args.update(kwargs)
+            self.norm = nn.SyncBatchNorm(d, **norm_args)
         else: raise NotImplementedError
 
     def forward(self, x):
