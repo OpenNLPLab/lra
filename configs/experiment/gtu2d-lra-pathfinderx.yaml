@@ -1,0 +1,33 @@
+# @package _global_
+defaults:
+  - /pipeline: pathx
+  - /model: gtu2d
+  - override /scheduler: cosine_warmup
+
+scheduler:
+  num_training_steps: 50000 # 200 epochs
+  num_warmup_steps: 312 # 1 epoch
+
+model:
+  dropout: 0.0
+  n_layers: 4
+  prenorm: true
+  d_model: 128
+  norm: batch
+
+decoder:
+  mode: last
+
+loader:
+  batch_size: 64
+
+optimizer:
+  lr: 0.0002
+  weight_decay: 0.0
+
+trainer:
+  max_epochs: 200
+
+train:
+  seed: 2222
+  interval: step

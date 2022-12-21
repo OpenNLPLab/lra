@@ -1,0 +1,27 @@
+# @package _global_
+defaults:
+  - /pipeline: aan
+  - /model: transnormer
+  - override /scheduler: cosine_warmup
+
+scheduler:
+  num_training_steps: 50000 # 20 epochs
+  num_warmup_steps: 800 # 1 epoch
+
+model:
+  dropout: 0.0
+  n_layers: 4
+  prenorm: true
+  d_model: 128
+  norm: layer
+
+optimizer:
+  lr: 0.001
+  weight_decay: 0.00
+
+trainer:
+  max_epochs: 20
+
+train:
+  seed: 2222
+  interval: step

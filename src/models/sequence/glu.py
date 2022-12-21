@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .utils import logging_info
 
 class GLU(nn.Module):
     def __init__(self, d1, glu_expand_ratio=2, act_fun='None', fina_act="None", dropout=0.0, bias=True):
@@ -17,12 +18,12 @@ class GLU(nn.Module):
             self.dropout = nn.Dropout(p=dropout)
         self.fina_act = self.get_act_fun(fina_act)
 
-        print(f"act_fun {act_fun}")
-        print(f"dropout {self.p}")
-        print(f"final {fina_act}")
+        logging_info(f"act_fun {act_fun}")
+        logging_info(f"dropout {self.p}")
+        logging_info(f"final {fina_act}")
 
     def get_act_fun(self, act_fun):
-        print(act_fun)
+        logging_info(act_fun)
         if act_fun == "gelu":
             return F.gelu
         elif act_fun == "relu":

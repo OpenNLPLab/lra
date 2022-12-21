@@ -14,23 +14,22 @@ from src.models.nn.components import Normalization
 from src.models.sequence import SequenceModule
 from src.models.sequence.pool import registry as pool_registry
 from src.models.nn.residual import registry as residual_registry
-from src.models.sequence.utils import SimpleRMSNorm
 import src.utils.registry as registry
 from einops import rearrange
 
 
 class SequenceResidualBlock(SequenceModule):
     def __init__(
-            self,
-            d_input,
-            i_layer=None, # Only needs to be passed into certain residuals like Decay
-            prenorm=True,
-            dropout=0.0,
-            layer=None, # Config for black box module
-            residual=None, # Config for residual function
-            norm=None, # Config for normalization layer
-            pool=None,
-        ):
+        self,
+        d_input,
+        i_layer=None,  # Only needs to be passed into certain residuals like Decay
+        prenorm=True,
+        dropout=0.0,
+        layer=None,  # Config for black box module
+        residual=None,  # Config for residual function
+        norm=None,  # Config for normalization layer
+        pool=None,
+    ):
         super().__init__()
         self.i_layer = i_layer
         self.d_input = d_input
@@ -43,7 +42,9 @@ class SequenceResidualBlock(SequenceModule):
             self.residual = None
             self.d_residual = self.layer.d_output
         else:
-            self.residual = utils.instantiate(residual_registry, residual, i_layer, d_input, self.layer.d_output)
+            self.residual = utils.instantiate(
+                residual_registry, residual, i_layer, d_input, self.layer.d_output
+            )
             self.d_residual = self.residual.d_output
 
         # Normalization
@@ -53,21 +54,21 @@ class SequenceResidualBlock(SequenceModule):
             self.norm = None
         elif isinstance(norm, str):
             self.norm = Normalization(d_norm, transposed=self.transposed, _name_=norm)
-            # self.norm = SimpleRMSNorm(d_norm)
         else:
             self.norm = Normalization(d_norm, transposed=self.transposed, **norm)
 
         # Pool
-        self.pool = utils.instantiate(pool_registry, pool, self.d_residual, transposed=self.transposed)
+        self.pool = utils.instantiate(
+            pool_registry, pool, self.d_residual, transposed=self.transposed
+        )
 
         # Dropout
         drop_cls = nn.Dropout2d if self.transposed else nn.Dropout
         self.drop = drop_cls(dropout) if dropout > 0.0 else nn.Identity()
 
-
     @property
     def transposed(self):
-        return getattr(self.layer, 'transposed', False)
+        return getattr(self.layer, "transposed", False)
 
     @property
     def d_output(self):
@@ -88,43 +89,55 @@ class SequenceResidualBlock(SequenceModule):
         # x: (bs, l, e)
         y = x
         # Pre-norm
-        if self.norm is not None and self.prenorm: y = self.norm(y)
+        if self.norm is not None and self.prenorm:
+            y = self.norm(y)
         # Black box module
         y, state = self.layer(y, *args, state=state, **kwargs)
         # Residual
         # if y.shape[0] != x.shape[0]: x = rearrange(x, 'b l e -> l b e')
-        if self.residual is not None: x = self.residual(x, self.drop(y), self.transposed)
+        if self.residual is not None:
+            x = self.residual(x, self.drop(y), self.transposed)
 
         # Post-norm
-        if self.norm is not None and not self.prenorm: x = self.norm(x)
+        if self.norm is not None and not self.prenorm:
+            x = self.norm(x)
 
         # Pool
         # x = pool.downpool(x, self.pool, self.expand, self.transposed)
-        if self.pool is not None: x = self.pool(x)
+        if self.pool is not None:
+            x = self.pool(x)
         return x, state
 
-    def step(self, x, state, *args, **kwargs): # TODO needs fix for transpose logic
+    def step(self, x, state, *args, **kwargs):  # TODO needs fix for transpose logic
         y = x
 
         # Pre-norm
         if self.norm is not None and self.prenorm:
-            if self.transposed: y = y.unsqueeze(-1)
-            y = self.norm(y) # TODO transpose seems wrong
-            if self.transposed: y = y.squeeze(-1)
+            if self.transposed:
+                y = y.unsqueeze(-1)
+            y = self.norm(y)  # TODO transpose seems wrong
+            if self.transposed:
+                y = y.squeeze(-1)
 
         # Black box module
         y, state = self.layer.step(y, state, *args, **kwargs)
 
         # Residual
-        if self.residual is not None: x = self.residual(x, y, transposed=False) # TODO this would not work with concat
+        if self.residual is not None:
+            x = self.residual(
+                x, y, transposed=False
+            )  # TODO this would not work with concat
 
         # Post-norm
         if self.norm is not None and not self.prenorm:
-            if self.transposed: y = y.unsqueeze(-1)
-            x = self.norm(x)#.step(x)
-            if self.transposed: y = y.squeeze(-1)
+            if self.transposed:
+                y = y.unsqueeze(-1)
+            x = self.norm(x)  # .step(x)
+            if self.transposed:
+                y = y.squeeze(-1)
 
         # Pool
-        if self.pool is not None: x = self.pool(x)
+        if self.pool is not None:
+            x = self.pool(x)
 
         return x, state

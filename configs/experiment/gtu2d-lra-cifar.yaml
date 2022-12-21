@@ -1,0 +1,30 @@
+# @package _global_
+defaults:
+  - /pipeline: cifar
+  - /model: gtu2d
+  - override /scheduler: cosine_warmup
+
+model:
+  dropout: 0.2
+  n_layers: 4
+  d_model: 64
+  prenorm: true
+  norm: layer
+
+dataset:
+  grayscale: true
+
+
+optimizer:
+  lr: 0.004
+  weight_decay: 0.05
+
+trainer:
+  max_epochs: 200
+
+scheduler:
+  num_training_steps: 50000
+  num_warmup_steps: 175
+
+train:
+  seed: 2222

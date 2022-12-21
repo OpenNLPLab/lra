@@ -1,3 +1,10 @@
+# LRA
+
+## Build environment
+```
+ conda env create --file environment.yaml
+```
+
 # 1986/1024 environment
 
 ## v2:

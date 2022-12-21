@@ -1,7 +1,7 @@
 # _target_: models.sequence.SequenceModel
 _name_: model
 layer:
-  - _name_: gtu
+  - _name_: gtu2d
     n_heads: ${model.gtu_head}
     expand_ratio: ${model.expand_ratio_gtu}
     use_decay: ${model.gtu_use_decay}
