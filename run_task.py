@@ -251,7 +251,7 @@ tasks = ["cifar"]
 # tasks = ["pathfinderx"]
 
 archs = ["tno"]
-archs = ["tno2d"]
+# archs = ["tno2d"]
 # archs = ["transnormer"]
 archs = ["gtu"]
 # archs = ["gtu2d"]

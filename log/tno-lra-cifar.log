@@ -1,236 +1,238 @@
 CONFIG
 ├── train
-│   └── seed: 2222                                                                             
-│       interval: step                                                                         
-│       monitor: val/accuracy                                                                  
-│       mode: max                                                                              
-│       ema: 0.0                                                                               
-│       test: true                                                                             
-│       debug: false                                                                           
-│       ignore_warnings: false                                                                 
-│       state:                                                                                 
-│         mode: null                                                                           
-│         chunk_len: null                                                                      
-│         overlap_len: null                                                                    
-│         n_context: 0                                                                         
-│         n_context_eval: 0                                                                    
-│       sweep: null                                                                            
-│       group: null                                                                            
-│       benchmark_step: false                                                                  
-│       benchmark_step_k: 1                                                                    
-│       benchmark_step_T: 1                                                                    
-│       checkpoint_path: null                                                                  
-│       visualizer: filters                                                                    
-│       disable_dataset: false                                                                 
-│                                                                                              
+│   └── seed: 2222                                                                                                      
+│       interval: step                                                                                                  
+│       monitor: val/accuracy                                                                                           
+│       mode: max                                                                                                       
+│       ema: 0.0                                                                                                        
+│       test: true                                                                                                      
+│       debug: false                                                                                                    
+│       ignore_warnings: false                                                                                          
+│       state:                                                                                                          
+│         mode: null                                                                                                    
+│         chunk_len: null                                                                                               
+│         overlap_len: null                                                                                             
+│         n_context: 0                                                                                                  
+│         n_context_eval: 0                                                                                             
+│       sweep: null                                                                                                     
+│       group: null                                                                                                     
+│       benchmark_step: false                                                                                           
+│       benchmark_step_k: 1                                                                                             
+│       benchmark_step_T: 1                                                                                             
+│       checkpoint_path: null                                                                                           
+│       visualizer: filters                                                                                             
+│       disable_dataset: false                                                                                          
+│                                                                                                                       
 ├── wandb
-│   └── None                                                                                   
+│   └── None                                                                                                            
 ├── trainer
-│   └── gpus: 1                                                                                
-│       accumulate_grad_batches: 1                                                             
-│       max_epochs: 200                                                                        
-│       gradient_clip_val: 0.0                                                                 
-│       log_every_n_steps: 10                                                                  
-│       limit_train_batches: 1.0                                                               
-│       limit_val_batches: 1.0                                                                 
-│       weights_summary: top                                                                   
-│       progress_bar_refresh_rate: 1                                                           
-│       track_grad_norm: -1                                                                    
-│       resume_from_checkpoint: null                                                           
-│                                                                                              
+│   └── gpus: 1                                                                                                         
+│       accumulate_grad_batches: 1                                                                                      
+│       max_epochs: 200                                                                                                 
+│       gradient_clip_val: 0.0                                                                                          
+│       log_every_n_steps: 10                                                                                           
+│       limit_train_batches: 1.0                                                                                        
+│       limit_val_batches: 1.0                                                                                          
+│       weights_summary: top                                                                                            
+│       progress_bar_refresh_rate: 1                                                                                    
+│       track_grad_norm: -1                                                                                             
+│       resume_from_checkpoint: null                                                                                    
+│                                                                                                                       
 ├── loader
-│   └── batch_size: 16                                                                         
-│       num_workers: 4                                                                         
-│       pin_memory: true                                                                       
-│       drop_last: true                                                                        
-│       train_resolution: 1                                                                    
-│       eval_resolutions:                                                                      
-│       - 1                                                                                    
-│                                                                                              
+│   └── batch_size: 16                                                                                                  
+│       num_workers: 4                                                                                                  
+│       pin_memory: true                                                                                                
+│       drop_last: true                                                                                                 
+│       train_resolution: 1                                                                                             
+│       eval_resolutions:                                                                                               
+│       - 1                                                                                                             
+│                                                                                                                       
 ├── dataset
-│   └── _name_: cifar                                                                          
-│       permute: null                                                                          
-│       grayscale: true                                                                        
-│       tokenize: false                                                                        
-│       augment: false                                                                         
-│       cutout: false                                                                          
-│       random_erasing: false                                                                  
-│       val_split: 0.1                                                                         
-│       seed: 42                                                                               
-│                                                                                              
+│   └── _name_: cifar                                                                                                   
+│       permute: null                                                                                                   
+│       grayscale: true                                                                                                 
+│       tokenize: false                                                                                                 
+│       augment: false                                                                                                  
+│       cutout: false                                                                                                   
+│       random_erasing: false                                                                                           
+│       val_split: 0.1                                                                                                  
+│       seed: 42                                                                                                        
+│                                                                                                                       
 ├── task
-│   └── _name_: base                                                                           
-│       loss: cross_entropy                                                                    
-│       metrics:                                                                               
-│       - accuracy                                                                             
-│       torchmetrics: null                                                                     
-│                                                                                              
+│   └── _name_: base                                                                                                    
+│       loss: cross_entropy                                                                                             
+│       metrics:                                                                                                        
+│       - accuracy                                                                                                      
+│       torchmetrics: null                                                                                              
+│                                                                                                                       
 ├── optimizer
-│   └── _name_: adamw                                                                          
-│       lr: 0.007                                                                              
-│       weight_decay: 0.001                                                                    
-│                                                                                              
+│   └── _name_: adamw                                                                                                   
+│       lr: 0.007                                                                                                       
+│       weight_decay: 0.001                                                                                             
+│                                                                                                                       
 ├── scheduler
-│   └── _name_: cosine_warmup                                                                  
-│       num_warmup_steps: 30000                                                                
-│       num_training_steps: 50000                                                              
-│                                                                                              
+│   └── _name_: cosine_warmup                                                                                           
+│       num_warmup_steps: 30000                                                                                         
+│       num_training_steps: 50000                                                                                       
+│                                                                                                                       
 ├── encoder
-│   └── linear                                                                                 
+│   └── linear                                                                                                          
 ├── decoder
-│   └── _name_: sequence                                                                       
-│       mode: pool                                                                             
-│                                                                                              
+│   └── _name_: sequence                                                                                                
+│       mode: pool                                                                                                      
+│                                                                                                                       
 ├── model
-│   └── _name_: model                                                                          
-│       layer:                                                                                 
-│       - _name_: tno                                                                          
-│         n_heads: 1                                                                           
-│         tno_max_l: 1024                                                                      
-│         tno_type: 4                                                                          
-│         tno_expand_ratio: 2                                                                  
-│         use_decay: true                                                                      
-│         gamma: 0.7                                                                           
-│         dpb_embedding: 16                                                                    
-│         dpb_type: 1                                                                          
-│         dpb_layers: 0                                                                        
-│       - _name_: glu                                                                          
-│         act_fun: swish                                                                       
-│         glu_expand_ratio: 3                                                                  
-│       tno_head: 1                                                                            
-│       tno_max_l: 1024                                                                        
-│       tno_type: 4                                                                            
-│       tno_use_decay: true                                                                    
-│       tno_gamma: 0.7                                                                         
-│       tno_dpb_dim: 16                                                                        
-│       expand_ratio_tno: 2                                                                    
-│       expand_ratio_glu: 3                                                                    
-│       dpb_type: 1                                                                            
-│       dpb_layers: 0                                                                          
-│       flash_s: 0                                                                             
-│       flash_max_position_embed: 0                                                            
-│       flash_linear_s: 0                                                                      
-│       flash_linear_max_position_embeddings: 0                                                
-│       lg_local_heads: 0                                                                      
-│       lg_linear_heads: 0                                                                     
-│       lg_local_chunk_size: 0                                                                 
-│       ls_attn_heads: 0                                                                       
-│       ls_attn_window_size: 0                                                                 
-│       ls_attn_max_seq_len: 0                                                                 
-│       performer_heads: 0                                                                     
-│       performer_approx_attn_dim: 0                                                           
-│       use_softmax: true                                                                      
-│       act_fun: 1+elu                                                                         
-│       cosformer_heads: 0                                                                     
-│       cosformer_max_length: 0                                                                
-│       linformer_max_seq_len: 0                                                               
-│       residual: R                                                                            
-│       dropout: 0.1                                                                           
-│       encoder:                                                                               
-│         _name_: position                                                                     
-│         dropout: 0.1                                                                         
-│       n_layers: 2                                                                            
-│       d_model: 32                                                                            
-│       prenorm: true                                                                          
-│       norm: batch                                                                            
-│                                                                                              
+│   └── _name_: model                                                                                                   
+│       layer:                                                                                                          
+│       - _name_: tno                                                                                                   
+│         n_heads: 1                                                                                                    
+│         tno_max_l: 1024                                                                                               
+│         tno_type: 4                                                                                                   
+│         tno_expand_ratio: 2                                                                                           
+│         use_decay: true                                                                                               
+│         gamma: 0.7                                                                                                    
+│         dpb_embedding: 16                                                                                             
+│         dpb_type: 1                                                                                                   
+│         dpb_layers: 0                                                                                                 
+│       - _name_: glu                                                                                                   
+│         act_fun: swish                                                                                                
+│         glu_expand_ratio: 3                                                                                           
+│       tno_head: 1                                                                                                     
+│       tno_max_l: 1024                                                                                                 
+│       tno_type: 4                                                                                                     
+│       tno_use_decay: true                                                                                             
+│       tno_gamma: 0.7                                                                                                  
+│       tno_dpb_dim: 16                                                                                                 
+│       expand_ratio_tno: 2                                                                                             
+│       expand_ratio_glu: 3                                                                                             
+│       dpb_type: 1                                                                                                     
+│       dpb_layers: 0                                                                                                   
+│       flash_s: 0                                                                                                      
+│       flash_max_position_embed: 0                                                                                     
+│       flash_linear_s: 0                                                                                               
+│       flash_linear_max_position_embeddings: 0                                                                         
+│       lg_local_heads: 0                                                                                               
+│       lg_linear_heads: 0                                                                                              
+│       lg_local_chunk_size: 0                                                                                          
+│       ls_attn_heads: 0                                                                                                
+│       ls_attn_window_size: 0                                                                                          
+│       ls_attn_max_seq_len: 0                                                                                          
+│       performer_heads: 0                                                                                              
+│       performer_approx_attn_dim: 0                                                                                    
+│       use_softmax: true                                                                                               
+│       act_fun: 1+elu                                                                                                  
+│       cosformer_heads: 0                                                                                              
+│       cosformer_max_length: 0                                                                                         
+│       linformer_max_seq_len: 0                                                                                        
+│       residual: R                                                                                                     
+│       dropout: 0.1                                                                                                    
+│       encoder:                                                                                                        
+│         _name_: position                                                                                              
+│         dropout: 0.1                                                                                                  
+│       n_layers: 2                                                                                                     
+│       d_model: 32                                                                                                     
+│       prenorm: true                                                                                                   
+│       norm: batch                                                                                                     
+│                                                                                                                       
 └── callbacks
-    └── learning_rate_monitor:                                                                 
-          logging_interval: step                                                               
-        timer:                                                                                 
-          step: true                                                                           
-          inter_step: false                                                                    
-          epoch: true                                                                          
-          val: true                                                                            
-        params:                                                                                
-          total: true                                                                          
-          trainable: true                                                                      
-          fixed: true                                                                          
-        model_checkpoint:                                                                      
-          monitor: val/accuracy                                                                
-          mode: max                                                                            
-          save_top_k: 1                                                                        
-          save_last: true                                                                      
-          dirpath: checkpoints/                                                                
-          filename: val/accuracy                                                               
-          auto_insert_metric_name: false                                                       
-          verbose: true                                                                        
-                                                                                               
+    └── learning_rate_monitor:                                                                                          
+          logging_interval: step                                                                                        
+        timer:                                                                                                          
+          step: true                                                                                                    
+          inter_step: false                                                                                             
+          epoch: true                                                                                                   
+          val: true                                                                                                     
+        params:                                                                                                         
+          total: true                                                                                                   
+          trainable: true                                                                                               
+          fixed: true                                                                                                   
+        model_checkpoint:                                                                                               
+          monitor: val/accuracy                                                                                         
+          mode: max                                                                                                     
+          save_top_k: 1                                                                                                 
+          save_last: true                                                                                               
+          dirpath: checkpoints/                                                                                         
+          filename: val/accuracy                                                                                        
+          auto_insert_metric_name: false                                                                                
+          verbose: true                                                                                                 
+                                                                                                                        
 Global seed set to 2222
-[2022-12-21 17:05:42,997][__main__][INFO] - Instantiating callback <src.callbacks.timer.Timer>
-[2022-12-21 17:05:42,999][__main__][INFO] - Instantiating callback <src.callbacks.params.ParamsLog>
-[2022-12-21 17:05:42,999][__main__][INFO] - Instantiating callback <pytorch_lightning.callbacks.ModelCheckpoint>
+[2022-12-21 23:05:37,319][__main__][INFO] - Instantiating callback <src.callbacks.timer.Timer>
+[2022-12-21 23:05:37,320][__main__][INFO] - Instantiating callback <src.callbacks.params.ParamsLog>
+[2022-12-21 23:05:37,320][__main__][INFO] - Instantiating callback <pytorch_lightning.callbacks.ModelCheckpoint>
 GPU available: True, used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
-LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 Files already downloaded and verified
-self.expand_ratio 2
-self.resi_param False
-silu
-act_fun silu
-causal False
-none
-self.num_heads 1
-self.max_l 1024
-self.use_exp False
-self.use_neg_exp False
-self.use_decay True
-self.use_multi_decay False
-self.dpb_embedding 16
-self.dpb_act relu
-self.dpb_use_pad True
-self.normalize False
-self.par_type 1
-self.dpb_type 1
-self.residual False
-self.l 1
-self.transform_type 1
-self.gamma 0.7
-bias True
-tno_type 4
-dpb_layers 0
-use_norm False
-norm_type layernorm
-self.token_shift_type -1
-swish
-None
-act_fun swish
-dropout 0.1
-final None
-self.expand_ratio 2
-self.resi_param False
-silu
-act_fun silu
-causal False
-none
-self.num_heads 1
-self.max_l 1024
-self.use_exp False
-self.use_neg_exp False
-self.use_decay True
-self.use_multi_decay False
-self.dpb_embedding 16
-self.dpb_act relu
-self.dpb_use_pad True
-self.normalize False
-self.par_type 1
-self.dpb_type 1
-self.residual False
-self.l 1
-self.transform_type 1
-self.gamma 0.7
-bias True
-tno_type 4
-dpb_layers 0
-use_norm False
-norm_type layernorm
-self.token_shift_type -1
-swish
-None
-act_fun swish
-dropout 0.1
-final None
+[2022-12-21 23:05:38,300][print_config][INFO] - self.expand_ratio 2
+[2022-12-21 23:05:38,300][print_config][INFO] - self.resi_param False
+[2022-12-21 23:05:38,301][print_config][INFO] - silu
+[2022-12-21 23:05:38,301][print_config][INFO] - act_fun silu
+[2022-12-21 23:05:38,301][print_config][INFO] - causal False
+[2022-12-21 23:05:38,302][print_config][INFO] - none
+[2022-12-21 23:05:38,302][print_config][INFO] - self.num_heads 1
+[2022-12-21 23:05:38,302][print_config][INFO] - self.max_l 1024
+[2022-12-21 23:05:38,302][print_config][INFO] - self.use_exp False
+[2022-12-21 23:05:38,302][print_config][INFO] - self.use_neg_exp False
+[2022-12-21 23:05:38,302][print_config][INFO] - self.use_decay True
+[2022-12-21 23:05:38,302][print_config][INFO] - self.use_multi_decay False
+[2022-12-21 23:05:38,302][print_config][INFO] - self.dpb_embedding 16
+[2022-12-21 23:05:38,302][print_config][INFO] - self.dpb_act relu
+[2022-12-21 23:05:38,302][print_config][INFO] - self.dpb_use_pad True
+[2022-12-21 23:05:38,302][print_config][INFO] - self.normalize False
+[2022-12-21 23:05:38,302][print_config][INFO] - self.par_type 1
+[2022-12-21 23:05:38,303][print_config][INFO] - self.dpb_type 1
+[2022-12-21 23:05:38,303][print_config][INFO] - self.residual False
+[2022-12-21 23:05:38,303][print_config][INFO] - self.l 1
+[2022-12-21 23:05:38,303][print_config][INFO] - self.transform_type 1
+[2022-12-21 23:05:38,303][print_config][INFO] - self.gamma 0.7
+[2022-12-21 23:05:38,303][print_config][INFO] - bias True
+[2022-12-21 23:05:38,303][print_config][INFO] - tno_type 4
+[2022-12-21 23:05:38,303][print_config][INFO] - dpb_layers 0
+[2022-12-21 23:05:38,303][print_config][INFO] - here! layer norm
+[2022-12-21 23:05:38,303][print_config][INFO] - use_norm False
+[2022-12-21 23:05:38,303][print_config][INFO] - norm_type layernorm
+[2022-12-21 23:05:38,303][print_config][INFO] - self.token_shift_type -1
+[2022-12-21 23:05:38,305][print_config][INFO] - swish
+[2022-12-21 23:05:38,305][print_config][INFO] - None
+[2022-12-21 23:05:38,305][print_config][INFO] - act_fun swish
+[2022-12-21 23:05:38,306][print_config][INFO] - dropout 0.1
+[2022-12-21 23:05:38,306][print_config][INFO] - final None
+[2022-12-21 23:05:38,307][print_config][INFO] - self.expand_ratio 2
+[2022-12-21 23:05:38,307][print_config][INFO] - self.resi_param False
+[2022-12-21 23:05:38,307][print_config][INFO] - silu
+[2022-12-21 23:05:38,307][print_config][INFO] - act_fun silu
+[2022-12-21 23:05:38,307][print_config][INFO] - causal False
+[2022-12-21 23:05:38,308][print_config][INFO] - none
+[2022-12-21 23:05:38,309][print_config][INFO] - self.num_heads 1
+[2022-12-21 23:05:38,309][print_config][INFO] - self.max_l 1024
+[2022-12-21 23:05:38,309][print_config][INFO] - self.use_exp False
+[2022-12-21 23:05:38,309][print_config][INFO] - self.use_neg_exp False
+[2022-12-21 23:05:38,309][print_config][INFO] - self.use_decay True
+[2022-12-21 23:05:38,309][print_config][INFO] - self.use_multi_decay False
+[2022-12-21 23:05:38,309][print_config][INFO] - self.dpb_embedding 16
+[2022-12-21 23:05:38,309][print_config][INFO] - self.dpb_act relu
+[2022-12-21 23:05:38,309][print_config][INFO] - self.dpb_use_pad True
+[2022-12-21 23:05:38,309][print_config][INFO] - self.normalize False
+[2022-12-21 23:05:38,309][print_config][INFO] - self.par_type 1
+[2022-12-21 23:05:38,309][print_config][INFO] - self.dpb_type 1
+[2022-12-21 23:05:38,309][print_config][INFO] - self.residual False
+[2022-12-21 23:05:38,309][print_config][INFO] - self.l 1
+[2022-12-21 23:05:38,309][print_config][INFO] - self.transform_type 1
+[2022-12-21 23:05:38,309][print_config][INFO] - self.gamma 0.7
+[2022-12-21 23:05:38,310][print_config][INFO] - bias True
+[2022-12-21 23:05:38,310][print_config][INFO] - tno_type 4
+[2022-12-21 23:05:38,310][print_config][INFO] - dpb_layers 0
+[2022-12-21 23:05:38,310][print_config][INFO] - here! layer norm
+[2022-12-21 23:05:38,310][print_config][INFO] - use_norm False
+[2022-12-21 23:05:38,310][print_config][INFO] - norm_type layernorm
+[2022-12-21 23:05:38,310][print_config][INFO] - self.token_shift_type -1
+[2022-12-21 23:05:38,312][print_config][INFO] - swish
+[2022-12-21 23:05:38,312][print_config][INFO] - None
+[2022-12-21 23:05:38,312][print_config][INFO] - act_fun swish
+[2022-12-21 23:05:38,313][print_config][INFO] - dropout 0.1
+[2022-12-21 23:05:38,313][print_config][INFO] - final None
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
 SequenceModel(
   (drop): Identity()
   (layers): ModuleList(
@@ -257,6 +259,7 @@ SequenceModel(
             )
           )
         )
+        (pre_norm): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
       )
       (residual): Residual()
       (norm): Normalization(
@@ -300,6 +303,7 @@ SequenceModel(
             )
           )
         )
+        (pre_norm): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
       )
       (residual): Residual()
       (norm): Normalization(
@@ -325,97 +329,553 @@ SequenceModel(
     (norm): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
   )
 )
-[2022-12-21 17:05:48,635][__main__][INFO] - Optimizer group 0 | 60 tensors
+[2022-12-21 23:05:40,944][__main__][INFO] - Optimizer group 0 | 64 tensors
 
   | Name    | Type            | Params
 --------------------------------------------
-0 | model   | SequenceModel   | 35.3 K
+0 | model   | SequenceModel   | 35.5 K
 1 | encoder | Sequential      | 64    
 2 | decoder | SequenceDecoder | 330   
 --------------------------------------------
-35.6 K    Trainable params
+35.7 K    Trainable params
 128       Non-trainable params
-35.7 K    Total params
+35.9 K    Total params
 0.143     Total estimated model params size (MB)
-Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0%|          | 0/4 [00:00<?, ?it/s]Validation sanity check:  25%|██▌       | 1/4 [00:00<00:01,  2.68it/s]Validation sanity check:  75%|███████▌  | 3/4 [00:00<00:00,  4.95it/s]                                                                      Global seed set to 2222
-Training: 0it [00:00, ?it/s]Training:   0%|          | 0/3749 [00:00<?, ?it/s]Epoch 0:   0%|          | 0/3749 [00:00<?, ?it/s] Error executing job with overrides: ['wandb=null', 'experiment=tno-lra-cifar', 'trainer.gpus=1', 'loader.batch_size=16', 'loader.num_workers=4', 'scheduler.num_warmup_steps=30000', 'optimizer.lr=0.007', 'optimizer.weight_decay=0.001', 'model.n_layers=2', 'model.d_model=32', 'model.norm=batch', 'model.prenorm=True', 'train.seed=2222', 'model.tno_dpb_dim=16', 'model.expand_ratio_tno=2', 'model.expand_ratio_glu=3', 'model.tno_use_decay=True', 'model.tno_gamma=0.7', 'model.dropout=0.1', 'model.dpb_type=1', 'model.dpb_layers=0']
-Traceback (most recent call last):
-  File "/data/qinzhen/code/lra/train.py", line 585, in <module>
-    main()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/main.py", line 90, in decorated_main
-    _run_hydra(
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/_internal/utils.py", line 389, in _run_hydra
-    _run_app(
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/_internal/utils.py", line 452, in _run_app
-    run_and_report(
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/_internal/utils.py", line 216, in run_and_report
-    raise ex
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/_internal/utils.py", line 213, in run_and_report
-    return func()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/_internal/utils.py", line 453, in <lambda>
-    lambda: hydra.run(
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/_internal/hydra.py", line 132, in run
-    _ = ret.return_value
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/core/utils.py", line 260, in return_value
-    raise self._return_value
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/hydra/core/utils.py", line 186, in run_job
-    ret.return_value = task_function(task_cfg)
-  File "/data/qinzhen/code/lra/train.py", line 581, in main
-    train(config)
-  File "/data/qinzhen/code/lra/train.py", line 516, in train
-    trainer.fit(model)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 740, in fit
-    self._call_and_handle_interrupt(
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 685, in _call_and_handle_interrupt
-    return trainer_fn(*args, **kwargs)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 777, in _fit_impl
-    self._run(model, ckpt_path=ckpt_path)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1199, in _run
-    self._dispatch()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1279, in _dispatch
-    self.training_type_plugin.start_training(self)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py", line 202, in start_training
-    self._results = trainer.run_stage()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1289, in run_stage
-    return self._run_train()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py", line 1319, in _run_train
-    self.fit_loop.run()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/loops/base.py", line 145, in run
-    self.advance(*args, **kwargs)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/loops/fit_loop.py", line 234, in advance
-    self.epoch_loop.run(data_fetcher)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/loops/base.py", line 140, in run
-    self.on_run_start(*args, **kwargs)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/loops/epoch/training_epoch_loop.py", line 141, in on_run_start
-    self._dataloader_iter = _update_dataloader_iter(data_fetcher, self.batch_idx + 1)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/loops/utilities.py", line 121, in _update_dataloader_iter
-    dataloader_iter = enumerate(data_fetcher, batch_idx)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/utilities/fetching.py", line 198, in __iter__
-    self._apply_patch()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/utilities/fetching.py", line 133, in _apply_patch
-    apply_to_collections(self.loaders, self.loader_iters, (Iterator, DataLoader), _apply_patch_fn)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/utilities/fetching.py", line 181, in loader_iters
-    loader_iters = self.dataloader_iter.loader_iters
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/supporters.py", line 537, in loader_iters
-    self._loader_iters = self.create_loader_iters(self.loaders)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/trainer/supporters.py", line 577, in create_loader_iters
-    return apply_to_collection(loaders, Iterable, iter, wrong_dtype=(Sequence, Mapping))
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/pytorch_lightning/utilities/apply_func.py", line 96, in apply_to_collection
-    return function(data, *args, **kwargs)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 359, in __iter__
-    return self._get_iterator()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 305, in _get_iterator
-    return _MultiProcessingDataLoaderIter(self)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 918, in __init__
-    w.start()
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/multiprocessing/process.py", line 121, in start
-    self._popen = self._Popen(self)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/multiprocessing/context.py", line 224, in _Popen
-    return _default_context.get_context().Process._Popen(process_obj)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/multiprocessing/context.py", line 277, in _Popen
-    return Popen(process_obj)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/multiprocessing/popen_fork.py", line 19, in __init__
-    self._launch(process_obj)
-  File "/home/SENSETIME/qinzhen/anaconda3/envs/lra/lib/python3.8/multiprocessing/popen_fork.py", line 70, in _launch
-    self.pid = os.fork()
-OSError: [Errno 12] Cannot allocate memory
+Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0%|          | 0/4 [00:00<?, ?it/s]tensor(0.0634, device='cuda:0')
+tensor(0.0845, device='cuda:0')
+Validation sanity check:  25%|██▌       | 1/4 [00:00<00:00,  5.61it/s]tensor(0.0593, device='cuda:0')
+tensor(0.0732, device='cuda:0')
+tensor(0.0620, device='cuda:0')
+tensor(0.0819, device='cuda:0')
+Validation sanity check:  75%|███████▌  | 3/4 [00:00<00:00,  8.95it/s]tensor(0.0623, device='cuda:0')
+tensor(0.0811, device='cuda:0')
+                                                                      Global seed set to 2222
+Training: 0it [00:00, ?it/s]Training:   0%|          | 0/3749 [00:00<?, ?it/s]Epoch 0:   0%|          | 0/3749 [00:00<?, ?it/s] tensor(5.5879e-09, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-2.7940e-09, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 1/3749 [00:00<09:56,  6.29it/s]Epoch 0:   0%|          | 1/3749 [00:00<09:58,  6.26it/s, loss=2.29]tensor(3.7253e-09, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-7.4506e-09, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 2/3749 [00:00<05:40, 11.00it/s, loss=2.28]tensor(-1.7229e-08, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-3.7253e-09, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 3/3749 [00:00<04:12, 14.86it/s, loss=2.29]tensor(-4.8894e-08, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-6.6124e-08, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 4/3749 [00:00<03:29, 17.87it/s, loss=2.28]tensor(-9.9652e-08, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-1.5553e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 5/3749 [00:00<03:03, 20.43it/s, loss=2.29]tensor(-1.3551e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-2.4121e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 6/3749 [00:00<02:51, 21.84it/s, loss=2.29]Epoch 0:   0%|          | 6/3749 [00:00<02:51, 21.80it/s, loss=2.29]tensor(-1.2387e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-2.9616e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 7/3749 [00:00<02:39, 23.45it/s, loss=2.29]tensor(-1.7462e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-3.8999e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 8/3749 [00:00<02:30, 24.82it/s, loss=2.3] tensor(-2.3190e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-5.4156e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 9/3749 [00:00<02:24, 25.90it/s, loss=2.3]tensor(-3.5251e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-7.1386e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 10/3749 [00:00<02:18, 27.08it/s, loss=2.3]tensor(-5.1223e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-7.9535e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 11/3749 [00:00<02:14, 27.75it/s, loss=2.3]Epoch 0:   0%|          | 11/3749 [00:00<02:14, 27.72it/s, loss=2.3]tensor(-6.2445e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-9.4506e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 12/3749 [00:00<02:09, 28.88it/s, loss=2.3]tensor(-7.2282e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-1.0268e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 13/3749 [00:00<02:05, 29.72it/s, loss=2.3]tensor(-7.3330e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-1.0215e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 14/3749 [00:00<02:01, 30.67it/s, loss=2.3]tensor(-6.7800e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-8.6171e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 15/3749 [00:00<01:58, 31.48it/s, loss=2.3]tensor(-7.5018e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-7.9509e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 16/3749 [00:00<01:55, 32.21it/s, loss=2.3]Epoch 0:   0%|          | 16/3749 [00:00<01:55, 32.20it/s, loss=2.3]tensor(-9.0152e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-6.7940e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 17/3749 [00:00<01:53, 33.02it/s, loss=2.3]tensor(-9.2620e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-4.1630e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   0%|          | 18/3749 [00:00<01:50, 33.62it/s, loss=2.3]tensor(-8.4960e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-1.9954e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 19/3749 [00:00<01:51, 33.59it/s, loss=2.3]tensor(-7.9209e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.6811e-08, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 20/3749 [00:00<01:49, 34.12it/s, loss=2.3]tensor(-7.7998e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.7195e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 21/3749 [00:00<01:47, 34.78it/s, loss=2.3]Epoch 0:   1%|          | 21/3749 [00:00<01:47, 34.77it/s, loss=2.3]tensor(-8.9081e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.5041e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 22/3749 [00:00<01:45, 35.29it/s, loss=2.3]tensor(-9.3738e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.7032e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 23/3749 [00:00<01:43, 35.86it/s, loss=2.3]tensor(-1.0277e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.1963e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 24/3749 [00:00<01:42, 36.35it/s, loss=2.3]tensor(-1.0757e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.4072e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 25/3749 [00:00<01:41, 36.69it/s, loss=2.3]tensor(-9.5763e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.6121e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 26/3749 [00:00<01:40, 37.13it/s, loss=2.3]tensor(-8.2329e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9730e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 27/3749 [00:00<01:39, 37.41it/s, loss=2.3]Epoch 0:   1%|          | 27/3749 [00:00<01:39, 37.39it/s, loss=2.3]tensor(-5.8301e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.5271e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 28/3749 [00:00<01:38, 37.80it/s, loss=2.3]tensor(-4.2445e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.0150e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 29/3749 [00:00<01:37, 38.18it/s, loss=2.3]tensor(-3.3434e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.3556e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 30/3749 [00:00<01:36, 38.50it/s, loss=2.3]tensor(-2.7660e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.6266e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 31/3749 [00:00<01:35, 38.87it/s, loss=2.3]tensor(-2.3458e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.7573e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 32/3749 [00:00<01:35, 39.07it/s, loss=2.3]tensor(-7.9162e-09, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.1765e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 33/3749 [00:00<01:34, 39.45it/s, loss=2.3]Epoch 0:   1%|          | 33/3749 [00:00<01:34, 39.44it/s, loss=2.3]tensor(2.0862e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.5663e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 34/3749 [00:00<01:33, 39.74it/s, loss=2.3]tensor(5.1362e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.6790e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 35/3749 [00:00<01:32, 39.94it/s, loss=2.3]tensor(7.7626e-07, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.8731e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 36/3749 [00:00<01:32, 40.27it/s, loss=2.3]tensor(1.1316e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.0776e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 37/3749 [00:00<01:31, 40.44it/s, loss=2.3]tensor(1.3169e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.4110e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 38/3749 [00:00<01:31, 40.71it/s, loss=2.31]tensor(1.5064e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(6.0163e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 39/3749 [00:00<01:30, 40.83it/s, loss=2.31]Epoch 0:   1%|          | 39/3749 [00:00<01:30, 40.80it/s, loss=2.31]tensor(1.5744e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(6.7186e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 40/3749 [00:00<01:31, 40.75it/s, loss=2.31]tensor(1.5977e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(7.4068e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 41/3749 [00:01<01:30, 40.96it/s, loss=2.3] tensor(1.8510e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.2403e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 42/3749 [00:01<01:30, 41.09it/s, loss=2.31]tensor(2.2147e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.3020e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 43/3749 [00:01<01:29, 41.34it/s, loss=2.3] tensor(2.5164e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.0290e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 44/3749 [00:01<01:29, 41.52it/s, loss=2.3]tensor(2.9779e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.1573e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 45/3749 [00:01<01:28, 41.73it/s, loss=2.3]Epoch 0:   1%|          | 45/3749 [00:01<01:28, 41.72it/s, loss=2.3]tensor(3.1419e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.2428e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|          | 46/3749 [00:01<01:28, 41.91it/s, loss=2.3]tensor(3.2929e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.3321e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 47/3749 [00:01<01:28, 41.91it/s, loss=2.3]tensor(3.3588e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.4019e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 48/3749 [00:01<01:27, 42.13it/s, loss=2.29]tensor(3.5493e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.4707e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 49/3749 [00:01<01:27, 42.21it/s, loss=2.29]tensor(4.0685e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.5512e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 50/3749 [00:01<01:27, 42.40it/s, loss=2.3] tensor(4.6253e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.6446e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 51/3749 [00:01<01:26, 42.59it/s, loss=2.3]Epoch 0:   1%|▏         | 51/3749 [00:01<01:26, 42.57it/s, loss=2.3]tensor(5.2601e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.7487e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 52/3749 [00:01<01:26, 42.67it/s, loss=2.3]tensor(5.6275e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.7658e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 53/3749 [00:01<01:26, 42.89it/s, loss=2.3]tensor(6.1798e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.8118e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 54/3749 [00:01<01:25, 42.98it/s, loss=2.3]tensor(6.8671e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.8655e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 55/3749 [00:01<01:25, 43.11it/s, loss=2.3]tensor(7.6597e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.8604e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   1%|▏         | 56/3749 [00:01<01:25, 43.24it/s, loss=2.3]tensor(8.6678e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9056e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 57/3749 [00:01<01:25, 43.22it/s, loss=2.3]Epoch 0:   2%|▏         | 57/3749 [00:01<01:25, 43.21it/s, loss=2.3]tensor(9.4082e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9334e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 58/3749 [00:01<01:25, 43.22it/s, loss=2.3]tensor(9.7279e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9481e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 59/3749 [00:01<01:25, 43.21it/s, loss=2.31]tensor(9.9652e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9579e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 60/3749 [00:01<01:25, 43.31it/s, loss=2.3] tensor(1.0179e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0013e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 61/3749 [00:01<01:25, 43.29it/s, loss=2.3]tensor(1.0408e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0168e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 62/3749 [00:01<01:25, 43.37it/s, loss=2.3]tensor(1.0736e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0521e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 63/3749 [00:01<01:24, 43.43it/s, loss=2.3]Epoch 0:   2%|▏         | 63/3749 [00:01<01:24, 43.41it/s, loss=2.3]tensor(1.0813e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0748e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 64/3749 [00:01<01:24, 43.41it/s, loss=2.31]tensor(1.0671e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0899e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 65/3749 [00:01<01:24, 43.45it/s, loss=2.3] tensor(1.0496e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.1396e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 66/3749 [00:01<01:24, 43.49it/s, loss=2.3]tensor(9.9330e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.1371e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 67/3749 [00:01<01:24, 43.62it/s, loss=2.31]tensor(9.6438e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.1232e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 68/3749 [00:01<01:24, 43.67it/s, loss=2.31]tensor(9.4036e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0885e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 69/3749 [00:01<01:24, 43.76it/s, loss=2.31]Epoch 0:   2%|▏         | 69/3749 [00:01<01:24, 43.75it/s, loss=2.31]tensor(9.1619e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0406e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 70/3749 [00:01<01:24, 43.48it/s, loss=2.31]tensor(9.3821e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9914e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 71/3749 [00:01<01:24, 43.46it/s, loss=2.31]tensor(9.5469e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9333e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 72/3749 [00:01<01:24, 43.59it/s, loss=2.3] tensor(9.5707e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.8962e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 73/3749 [00:01<01:24, 43.61it/s, loss=2.3]tensor(9.9078e-06, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.8353e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 74/3749 [00:01<01:24, 43.71it/s, loss=2.3]tensor(1.0624e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.7790e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 75/3749 [00:01<01:23, 43.80it/s, loss=2.3]Epoch 0:   2%|▏         | 75/3749 [00:01<01:23, 43.79it/s, loss=2.3]tensor(1.1666e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.7767e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 76/3749 [00:01<01:23, 43.90it/s, loss=2.3]tensor(1.2590e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.8455e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 77/3749 [00:01<01:23, 44.02it/s, loss=2.3]tensor(1.3629e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(1.9350e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 78/3749 [00:01<01:23, 44.06it/s, loss=2.3]tensor(1.4951e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.0613e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 79/3749 [00:01<01:23, 44.18it/s, loss=2.3]tensor(1.6294e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.1580e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 80/3749 [00:01<01:23, 44.20it/s, loss=2.3]tensor(1.7209e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.2295e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 81/3749 [00:01<01:22, 44.20it/s, loss=2.3]Epoch 0:   2%|▏         | 81/3749 [00:01<01:23, 44.19it/s, loss=2.3]tensor(1.8211e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.2607e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 82/3749 [00:01<01:22, 44.21it/s, loss=2.3]tensor(1.9025e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.3159e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 83/3749 [00:01<01:22, 44.17it/s, loss=2.3]tensor(1.9536e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.3775e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 84/3749 [00:01<01:22, 44.25it/s, loss=2.3]tensor(1.9832e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.3871e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 85/3749 [00:01<01:22, 44.23it/s, loss=2.31]tensor(2.0059e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.3476e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 86/3749 [00:01<01:22, 44.29it/s, loss=2.31]tensor(2.0144e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.3384e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 87/3749 [00:01<01:22, 44.34it/s, loss=2.31]Epoch 0:   2%|▏         | 87/3749 [00:01<01:22, 44.33it/s, loss=2.31]tensor(2.0443e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.4014e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 88/3749 [00:01<01:22, 44.42it/s, loss=2.31]tensor(2.0984e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.4717e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 89/3749 [00:02<01:22, 44.46it/s, loss=2.31]tensor(2.1504e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.6125e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 90/3749 [00:02<01:22, 44.49it/s, loss=2.3] tensor(2.1882e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(2.8356e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 91/3749 [00:02<01:22, 44.52it/s, loss=2.3]tensor(2.2372e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.0240e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 92/3749 [00:02<01:22, 44.51it/s, loss=2.3]tensor(2.2991e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.2585e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   2%|▏         | 93/3749 [00:02<01:21, 44.61it/s, loss=2.3]Epoch 0:   2%|▏         | 93/3749 [00:02<01:21, 44.61it/s, loss=2.3]tensor(2.3713e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.5065e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 94/3749 [00:02<01:21, 44.62it/s, loss=2.3]tensor(2.4569e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.7653e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 95/3749 [00:02<01:21, 44.71it/s, loss=2.3]tensor(2.5547e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(3.9963e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 96/3749 [00:02<01:21, 44.78it/s, loss=2.3]tensor(2.6564e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.2525e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 97/3749 [00:02<01:21, 44.79it/s, loss=2.3]tensor(2.7888e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.5479e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 98/3749 [00:02<01:21, 44.85it/s, loss=2.3]tensor(2.8770e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.7741e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 99/3749 [00:02<01:21, 44.81it/s, loss=2.3]Epoch 0:   3%|▎         | 99/3749 [00:02<01:21, 44.81it/s, loss=2.3]tensor(2.9365e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(4.9582e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 100/3749 [00:02<01:21, 44.89it/s, loss=2.3]tensor(3.0210e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.1056e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 101/3749 [00:02<01:21, 44.90it/s, loss=2.29]tensor(3.1125e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.2688e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 102/3749 [00:02<01:21, 44.97it/s, loss=2.29]tensor(3.1933e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.4391e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 103/3749 [00:02<01:20, 45.06it/s, loss=2.29]tensor(3.2301e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.5436e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 104/3749 [00:02<01:20, 45.06it/s, loss=2.29]tensor(3.3344e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.7693e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 105/3749 [00:02<01:20, 45.14it/s, loss=2.29]Epoch 0:   3%|▎         | 105/3749 [00:02<01:20, 45.13it/s, loss=2.29]tensor(3.4540e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(5.9973e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 106/3749 [00:02<01:20, 45.18it/s, loss=2.29]tensor(3.5550e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(6.1693e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 107/3749 [00:02<01:20, 45.23it/s, loss=2.29]tensor(3.6405e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(6.3936e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 108/3749 [00:02<01:20, 45.22it/s, loss=2.29]tensor(3.7851e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(6.6827e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 109/3749 [00:02<01:20, 45.17it/s, loss=2.29]tensor(3.9039e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(6.9379e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 110/3749 [00:02<01:20, 45.12it/s, loss=2.28]tensor(4.0730e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(7.2561e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 111/3749 [00:02<01:20, 45.06it/s, loss=2.28]Epoch 0:   3%|▎         | 111/3749 [00:02<01:20, 45.05it/s, loss=2.28]tensor(4.1844e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(7.5206e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 112/3749 [00:02<01:20, 45.12it/s, loss=2.28]tensor(4.2719e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(7.7405e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 113/3749 [00:02<01:20, 45.11it/s, loss=2.28]tensor(4.3805e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(7.9820e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 114/3749 [00:02<01:20, 45.11it/s, loss=2.28]tensor(4.4709e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.1873e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 115/3749 [00:02<01:20, 45.13it/s, loss=2.29]tensor(4.5504e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.3458e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 116/3749 [00:02<01:20, 45.21it/s, loss=2.28]tensor(4.6861e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.5966e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 117/3749 [00:02<01:20, 45.29it/s, loss=2.28]Epoch 0:   3%|▎         | 117/3749 [00:02<01:20, 45.28it/s, loss=2.29]tensor(4.7912e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.7213e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 118/3749 [00:02<01:20, 45.26it/s, loss=2.29]tensor(4.8620e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.8586e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 119/3749 [00:02<01:20, 45.29it/s, loss=2.29]tensor(4.9309e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(8.9854e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 120/3749 [00:02<01:20, 45.34it/s, loss=2.29]tensor(5.0030e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.0966e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 121/3749 [00:02<01:19, 45.40it/s, loss=2.29]tensor(5.0344e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.2999e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 122/3749 [00:02<01:19, 45.47it/s, loss=2.29]tensor(5.0568e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.5000e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 123/3749 [00:02<01:19, 45.48it/s, loss=2.29]Epoch 0:   3%|▎         | 123/3749 [00:02<01:19, 45.48it/s, loss=2.29]tensor(5.0377e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.5709e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 124/3749 [00:02<01:19, 45.54it/s, loss=2.29]tensor(5.0012e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.5800e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 125/3749 [00:02<01:19, 45.56it/s, loss=2.28]tensor(5.0107e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.5849e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 126/3749 [00:02<01:19, 45.63it/s, loss=2.29]tensor(5.0350e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.6355e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 127/3749 [00:02<01:19, 45.70it/s, loss=2.29]tensor(5.1066e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.7543e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 128/3749 [00:02<01:19, 45.69it/s, loss=2.29]tensor(5.1665e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(9.9280e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 129/3749 [00:02<01:19, 45.76it/s, loss=2.29]Epoch 0:   3%|▎         | 129/3749 [00:02<01:19, 45.76it/s, loss=2.29]tensor(5.1783e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 130/3749 [00:02<01:19, 45.76it/s, loss=2.29]tensor(5.2449e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   3%|▎         | 131/3749 [00:02<01:18, 45.82it/s, loss=2.29]tensor(5.3879e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 132/3749 [00:02<01:18, 45.83it/s, loss=2.29]tensor(5.6005e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 133/3749 [00:02<01:18, 45.84it/s, loss=2.29]tensor(5.7827e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 134/3749 [00:02<01:18, 45.91it/s, loss=2.29]tensor(5.9244e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 135/3749 [00:02<01:18, 45.94it/s, loss=2.29]Epoch 0:   4%|▎         | 135/3749 [00:02<01:18, 45.93it/s, loss=2.29]tensor(6.0779e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 136/3749 [00:02<01:18, 45.99it/s, loss=2.29]tensor(6.1678e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 137/3749 [00:02<01:18, 46.04it/s, loss=2.29]tensor(6.2450e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 138/3749 [00:02<01:18, 46.01it/s, loss=2.29]tensor(6.3294e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 139/3749 [00:03<01:18, 46.06it/s, loss=2.29]tensor(6.4485e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▎         | 140/3749 [00:03<01:18, 46.09it/s, loss=2.29]tensor(6.5234e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 141/3749 [00:03<01:18, 46.12it/s, loss=2.29]Epoch 0:   4%|▍         | 141/3749 [00:03<01:18, 46.11it/s, loss=2.29]tensor(6.5662e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 142/3749 [00:03<01:18, 46.15it/s, loss=2.29]tensor(6.6781e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 143/3749 [00:03<01:18, 46.16it/s, loss=2.3] tensor(6.7777e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 144/3749 [00:03<01:18, 46.21it/s, loss=2.3]tensor(6.9890e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 145/3749 [00:03<01:17, 46.22it/s, loss=2.3]tensor(7.1559e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 146/3749 [00:03<01:17, 46.27it/s, loss=2.3]tensor(7.3274e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 147/3749 [00:03<01:17, 46.30it/s, loss=2.3]Epoch 0:   4%|▍         | 147/3749 [00:03<01:17, 46.29it/s, loss=2.3]tensor(7.5770e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 148/3749 [00:03<01:17, 46.30it/s, loss=2.3]tensor(7.8771e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 149/3749 [00:03<01:17, 46.35it/s, loss=2.3]tensor(8.1487e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 150/3749 [00:03<01:17, 46.38it/s, loss=2.3]tensor(8.3686e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 151/3749 [00:03<01:17, 46.43it/s, loss=2.3]tensor(8.5183e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 152/3749 [00:03<01:17, 46.48it/s, loss=2.3]tensor(8.6737e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 153/3749 [00:03<01:17, 46.48it/s, loss=2.3]Epoch 0:   4%|▍         | 153/3749 [00:03<01:17, 46.48it/s, loss=2.31]tensor(8.8186e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 154/3749 [00:03<01:17, 46.53it/s, loss=2.3] tensor(9.0364e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 155/3749 [00:03<01:17, 46.56it/s, loss=2.3]tensor(9.2965e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 156/3749 [00:03<01:17, 46.60it/s, loss=2.3]tensor(9.6146e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 157/3749 [00:03<01:17, 46.65it/s, loss=2.31]tensor(9.8922e-05, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 158/3749 [00:03<01:16, 46.64it/s, loss=2.31]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 159/3749 [00:03<01:16, 46.70it/s, loss=2.31]Epoch 0:   4%|▍         | 159/3749 [00:03<01:16, 46.69it/s, loss=2.3] tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 160/3749 [00:03<01:16, 46.69it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 161/3749 [00:03<01:16, 46.70it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 162/3749 [00:03<01:16, 46.69it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 163/3749 [00:03<01:16, 46.64it/s, loss=2.3] tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 164/3749 [00:03<01:16, 46.66it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 165/3749 [00:03<01:16, 46.59it/s, loss=2.3]Epoch 0:   4%|▍         | 165/3749 [00:03<01:16, 46.59it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 166/3749 [00:03<01:16, 46.62it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 167/3749 [00:03<01:16, 46.60it/s, loss=2.3] tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   4%|▍         | 168/3749 [00:03<01:16, 46.63it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 169/3749 [00:03<01:16, 46.60it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 170/3749 [00:03<01:16, 46.62it/s, loss=2.3] tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 171/3749 [00:03<01:16, 46.66it/s, loss=2.3]Epoch 0:   5%|▍         | 171/3749 [00:03<01:16, 46.65it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 172/3749 [00:03<01:16, 46.62it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 173/3749 [00:03<01:16, 46.64it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 174/3749 [00:03<01:16, 46.65it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 175/3749 [00:03<01:16, 46.70it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 176/3749 [00:03<01:16, 46.75it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 177/3749 [00:03<01:16, 46.79it/s, loss=2.29]Epoch 0:   5%|▍         | 177/3749 [00:03<01:16, 46.79it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 178/3749 [00:03<01:16, 46.82it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 179/3749 [00:03<01:16, 46.88it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 180/3749 [00:03<01:16, 46.90it/s, loss=2.3] tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 181/3749 [00:03<01:16, 46.95it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 182/3749 [00:03<01:15, 46.99it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 183/3749 [00:03<01:15, 46.99it/s, loss=2.3]Epoch 0:   5%|▍         | 183/3749 [00:03<01:15, 46.98it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 184/3749 [00:03<01:15, 46.94it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 185/3749 [00:03<01:15, 46.92it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 186/3749 [00:03<01:15, 46.96it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▍         | 187/3749 [00:03<01:15, 46.97it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 188/3749 [00:03<01:15, 47.00it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 189/3749 [00:04<01:15, 47.05it/s, loss=2.3]Epoch 0:   5%|▌         | 189/3749 [00:04<01:15, 47.05it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 190/3749 [00:04<01:15, 47.06it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 191/3749 [00:04<01:15, 47.11it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 192/3749 [00:04<01:15, 47.13it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 193/3749 [00:04<01:15, 47.18it/s, loss=2.31]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 194/3749 [00:04<01:15, 47.22it/s, loss=2.3] tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 195/3749 [00:04<01:15, 47.24it/s, loss=2.3]Epoch 0:   5%|▌         | 195/3749 [00:04<01:15, 47.24it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 196/3749 [00:04<01:15, 47.29it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 197/3749 [00:04<01:15, 47.32it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 198/3749 [00:04<01:14, 47.37it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 199/3749 [00:04<01:14, 47.40it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 200/3749 [00:04<01:14, 47.43it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 201/3749 [00:04<01:14, 47.47it/s, loss=2.3]Epoch 0:   5%|▌         | 201/3749 [00:04<01:14, 47.47it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 202/3749 [00:04<01:14, 47.51it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 203/3749 [00:04<01:14, 47.55it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 204/3749 [00:04<01:14, 47.60it/s, loss=2.3]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 205/3749 [00:04<01:14, 47.62it/s, loss=2.29]tensor(0.0001, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   5%|▌         | 206/3749 [00:04<01:14, 47.67it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0003, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 207/3749 [00:04<01:14, 47.70it/s, loss=2.29]Epoch 0:   6%|▌         | 207/3749 [00:04<01:14, 47.69it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 208/3749 [00:04<01:14, 47.74it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 209/3749 [00:04<01:14, 47.78it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 210/3749 [00:04<01:14, 47.80it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 211/3749 [00:04<01:13, 47.84it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 212/3749 [00:04<01:13, 47.87it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 213/3749 [00:04<01:13, 47.92it/s, loss=2.29]Epoch 0:   6%|▌         | 213/3749 [00:04<01:13, 47.92it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 214/3749 [00:04<01:13, 47.96it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 215/3749 [00:04<01:13, 47.95it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 216/3749 [00:04<01:13, 47.97it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 217/3749 [00:04<01:13, 47.91it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 218/3749 [00:04<01:13, 47.92it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 219/3749 [00:04<01:13, 47.87it/s, loss=2.29]Epoch 0:   6%|▌         | 219/3749 [00:04<01:13, 47.87it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 220/3749 [00:04<01:13, 47.83it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 221/3749 [00:04<01:13, 47.81it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 222/3749 [00:04<01:13, 47.82it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 223/3749 [00:04<01:13, 47.80it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0004, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 224/3749 [00:04<01:13, 47.84it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 225/3749 [00:04<01:13, 47.86it/s, loss=2.3]Epoch 0:   6%|▌         | 225/3749 [00:04<01:13, 47.85it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 226/3749 [00:04<01:13, 47.88it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 227/3749 [00:04<01:13, 47.90it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 228/3749 [00:04<01:13, 47.92it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 229/3749 [00:04<01:13, 47.96it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 230/3749 [00:04<01:13, 47.98it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 231/3749 [00:04<01:13, 48.02it/s, loss=2.29]Epoch 0:   6%|▌         | 231/3749 [00:04<01:13, 48.02it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 232/3749 [00:04<01:13, 48.06it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 233/3749 [00:04<01:13, 48.07it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▌         | 234/3749 [00:04<01:13, 48.11it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 235/3749 [00:04<01:13, 48.13it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 236/3749 [00:04<01:12, 48.17it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 237/3749 [00:04<01:12, 48.21it/s, loss=2.3]Epoch 0:   6%|▋         | 237/3749 [00:04<01:12, 48.21it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 238/3749 [00:04<01:12, 48.23it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 239/3749 [00:04<01:12, 48.26it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 240/3749 [00:04<01:12, 48.29it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 241/3749 [00:04<01:12, 48.33it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 242/3749 [00:05<01:12, 48.37it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   6%|▋         | 243/3749 [00:05<01:12, 48.38it/s, loss=2.3]Epoch 0:   6%|▋         | 243/3749 [00:05<01:12, 48.38it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 244/3749 [00:05<01:12, 48.42it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 245/3749 [00:05<01:12, 48.44it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 246/3749 [00:05<01:12, 48.48it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 247/3749 [00:05<01:12, 48.51it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 248/3749 [00:05<01:12, 48.53it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 249/3749 [00:05<01:12, 48.57it/s, loss=2.29]Epoch 0:   7%|▋         | 249/3749 [00:05<01:12, 48.56it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 250/3749 [00:05<01:12, 48.59it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 251/3749 [00:05<01:11, 48.62it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 252/3749 [00:05<01:11, 48.65it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 253/3749 [00:05<01:11, 48.67it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 254/3749 [00:05<01:11, 48.70it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 255/3749 [00:05<01:11, 48.73it/s, loss=2.3]Epoch 0:   7%|▋         | 255/3749 [00:05<01:11, 48.73it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 256/3749 [00:05<01:11, 48.76it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 257/3749 [00:05<01:11, 48.79it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 258/3749 [00:05<01:11, 48.80it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 259/3749 [00:05<01:11, 48.84it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 260/3749 [00:05<01:11, 48.86it/s, loss=2.3] tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 261/3749 [00:05<01:11, 48.88it/s, loss=2.3]Epoch 0:   7%|▋         | 261/3749 [00:05<01:11, 48.88it/s, loss=2.3]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 262/3749 [00:05<01:11, 48.85it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Epoch 0:   7%|▋         | 263/3749 [00:05<01:11, 48.84it/s, loss=2.29]tensor(0.0002, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0005, device='cuda:0', grad_fn=<MeanBackward0>)
+Files already downloaded and verified

@@ -43,14 +43,21 @@ class Tno(nn.Module):
             self.lambda_ = gamma
             self.gamma = nn.Parameter(torch.randn(h, 1, dim))
 
+        # self.rpe = Rpe(
+        #     dim=rpe_dim, 
+        #     outdim=h * dim, 
+        #     residual=residual,
+        #     act=act,
+        #     bias=bias, 
+        #     layers=layers,
+        #     norm_type=norm_type,
+        # )
         self.rpe = Rpe(
             dim=rpe_dim, 
             outdim=h * dim, 
             residual=residual,
             act=act,
             bias=bias, 
-            layers=layers,
-            norm_type=norm_type,
         )
         
         # norm

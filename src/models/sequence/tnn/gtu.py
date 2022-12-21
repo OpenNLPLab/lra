@@ -63,7 +63,6 @@ class Gtu(nn.Module):
         # norm
         self.norm_type = norm_type
         self.use_norm = use_norm
-        self.pre_norm = get_norm_fn(self.norm_type)(d2)
         
         self.par_init()
         
