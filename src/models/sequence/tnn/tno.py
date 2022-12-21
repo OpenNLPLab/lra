@@ -172,9 +172,7 @@ class Tno(nn.Module):
         # x: b, h, n, d
         # a: h, n, d
         y = torch.fft.rfft(x, 2 * n, dim=dim)
-        # v = torch.fft.rfft(a, 2 * n, dim=dim).unsqueeze(0)
-        # u = v * y
-        # output = torch.fft.irfft(u, 2 * n, dim=dim)[:, :, :n, :]
+        # ..., n, d
         if dim == -2:
             if len(y.shape) == 4:
                 v = torch.fft.rfft(a, 2 * n, dim=-2).unsqueeze(0)
