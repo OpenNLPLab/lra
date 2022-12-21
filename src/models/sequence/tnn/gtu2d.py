@@ -3,6 +3,7 @@ from einops import rearrange
 
 from .helpers import get_activation_fn
 from .tno import Tno
+from .helpers import get_norm_fn
 import numpy as np
 
 
@@ -17,7 +18,7 @@ class Gtu2d(nn.Module):
         causal=False,
         expand_ratio=3,
         use_norm=False,
-        norm_type="simplermsnorm",
+        norm_type="layernorm",
         use_decay=False,
         use_multi_decay=False,
         rpe_layers=3,
@@ -40,6 +41,7 @@ class Gtu2d(nn.Module):
         self.normalize = normalize
         d1 = int(self.expand_ratio * d_model)
         d1 = (d1 // self.n_heads) * self.n_heads
+        d2 = d_model
         self.head_dim = d1 // n_heads
         # linear projection
         self.v_proj = nn.Linear(d_model, d1, bias=bias)
@@ -82,6 +84,7 @@ class Gtu2d(nn.Module):
         # norm
         self.norm_type = norm_type
         self.use_norm = use_norm
+        self.pre_norm = get_norm_fn(self.norm_type)(d2)
         
         self.par_init()
         

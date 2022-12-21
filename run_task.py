@@ -253,7 +253,7 @@ tasks = ["cifar"]
 archs = ["tno"]
 archs = ["tno2d"]
 # archs = ["transnormer"]
-# archs = ["gtu"]
+archs = ["gtu"]
 # archs = ["gtu2d"]
 # archs = ["transformer_lg"]
 

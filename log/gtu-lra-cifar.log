@@ -1,178 +1,178 @@
 CONFIG
 ├── train
-│   └── seed: 2222                                                                             
-│       interval: step                                                                         
-│       monitor: val/accuracy                                                                  
-│       mode: max                                                                              
-│       ema: 0.0                                                                               
-│       test: true                                                                             
-│       debug: false                                                                           
-│       ignore_warnings: false                                                                 
-│       state:                                                                                 
-│         mode: null                                                                           
-│         chunk_len: null                                                                      
-│         overlap_len: null                                                                    
-│         n_context: 0                                                                         
-│         n_context_eval: 0                                                                    
-│       sweep: null                                                                            
-│       group: null                                                                            
-│       benchmark_step: false                                                                  
-│       benchmark_step_k: 1                                                                    
-│       benchmark_step_T: 1                                                                    
-│       checkpoint_path: null                                                                  
-│       visualizer: filters                                                                    
-│       disable_dataset: false                                                                 
-│                                                                                              
+│   └── seed: 2222                                                                                 
+│       interval: step                                                                             
+│       monitor: val/accuracy                                                                      
+│       mode: max                                                                                  
+│       ema: 0.0                                                                                   
+│       test: true                                                                                 
+│       debug: false                                                                               
+│       ignore_warnings: false                                                                     
+│       state:                                                                                     
+│         mode: null                                                                               
+│         chunk_len: null                                                                          
+│         overlap_len: null                                                                        
+│         n_context: 0                                                                             
+│         n_context_eval: 0                                                                        
+│       sweep: null                                                                                
+│       group: null                                                                                
+│       benchmark_step: false                                                                      
+│       benchmark_step_k: 1                                                                        
+│       benchmark_step_T: 1                                                                        
+│       checkpoint_path: null                                                                      
+│       visualizer: filters                                                                        
+│       disable_dataset: false                                                                     
+│                                                                                                  
 ├── wandb
-│   └── None                                                                                   
+│   └── None                                                                                       
 ├── trainer
-│   └── gpus: 1                                                                                
-│       accumulate_grad_batches: 1                                                             
-│       max_epochs: 200                                                                        
-│       gradient_clip_val: 0.0                                                                 
-│       log_every_n_steps: 10                                                                  
-│       limit_train_batches: 1.0                                                               
-│       limit_val_batches: 1.0                                                                 
-│       weights_summary: top                                                                   
-│       progress_bar_refresh_rate: 1                                                           
-│       track_grad_norm: -1                                                                    
-│       resume_from_checkpoint: null                                                           
-│                                                                                              
+│   └── gpus: 1                                                                                    
+│       accumulate_grad_batches: 1                                                                 
+│       max_epochs: 200                                                                            
+│       gradient_clip_val: 0.0                                                                     
+│       log_every_n_steps: 10                                                                      
+│       limit_train_batches: 1.0                                                                   
+│       limit_val_batches: 1.0                                                                     
+│       weights_summary: top                                                                       
+│       progress_bar_refresh_rate: 1                                                               
+│       track_grad_norm: -1                                                                        
+│       resume_from_checkpoint: null                                                               
+│                                                                                                  
 ├── loader
-│   └── batch_size: 16                                                                         
-│       num_workers: 4                                                                         
-│       pin_memory: true                                                                       
-│       drop_last: true                                                                        
-│       train_resolution: 1                                                                    
-│       eval_resolutions:                                                                      
-│       - 1                                                                                    
-│                                                                                              
+│   └── batch_size: 16                                                                             
+│       num_workers: 4                                                                             
+│       pin_memory: true                                                                           
+│       drop_last: true                                                                            
+│       train_resolution: 1                                                                        
+│       eval_resolutions:                                                                          
+│       - 1                                                                                        
+│                                                                                                  
 ├── dataset
-│   └── _name_: cifar                                                                          
-│       permute: null                                                                          
-│       grayscale: true                                                                        
-│       tokenize: false                                                                        
-│       augment: false                                                                         
-│       cutout: false                                                                          
-│       random_erasing: false                                                                  
-│       val_split: 0.1                                                                         
-│       seed: 42                                                                               
-│                                                                                              
+│   └── _name_: cifar                                                                              
+│       permute: null                                                                              
+│       grayscale: true                                                                            
+│       tokenize: false                                                                            
+│       augment: false                                                                             
+│       cutout: false                                                                              
+│       random_erasing: false                                                                      
+│       val_split: 0.1                                                                             
+│       seed: 42                                                                                   
+│                                                                                                  
 ├── task
-│   └── _name_: base                                                                           
-│       loss: cross_entropy                                                                    
-│       metrics:                                                                               
-│       - accuracy                                                                             
-│       torchmetrics: null                                                                     
-│                                                                                              
+│   └── _name_: base                                                                               
+│       loss: cross_entropy                                                                        
+│       metrics:                                                                                   
+│       - accuracy                                                                                 
+│       torchmetrics: null                                                                         
+│                                                                                                  
 ├── optimizer
-│   └── _name_: adamw                                                                          
-│       lr: 0.007                                                                              
-│       weight_decay: 0.001                                                                    
-│                                                                                              
+│   └── _name_: adamw                                                                              
+│       lr: 0.007                                                                                  
+│       weight_decay: 0.001                                                                        
+│                                                                                                  
 ├── scheduler
-│   └── _name_: cosine_warmup                                                                  
-│       num_warmup_steps: 30000                                                                
-│       num_training_steps: 50000                                                              
-│                                                                                              
+│   └── _name_: cosine_warmup                                                                      
+│       num_warmup_steps: 30000                                                                    
+│       num_training_steps: 50000                                                                  
+│                                                                                                  
 ├── encoder
-│   └── linear                                                                                 
+│   └── linear                                                                                     
 ├── decoder
-│   └── _name_: sequence                                                                       
-│       mode: pool                                                                             
-│                                                                                              
+│   └── _name_: sequence                                                                           
+│       mode: pool                                                                                 
+│                                                                                                  
 ├── model
-│   └── _name_: model                                                                          
-│       layer:                                                                                 
-│       - _name_: gtu                                                                          
-│         n_heads: 1                                                                           
-│         expand_ratio: 2                                                                      
-│         use_decay: true                                                                      
-│         gamma: 0.7                                                                           
-│         rpe_embedding: 16                                                                    
-│         rpe_layers: 2                                                                        
-│       - _name_: glu                                                                          
-│         act_fun: swish                                                                       
-│         glu_expand_ratio: 3                                                                  
-│       rpe_layers: 2                                                                          
-│       gtu_head: 1                                                                            
-│       gtu_use_decay: true                                                                    
-│       gtu_gamma: 0.7                                                                         
-│       gtu_rpe_dim: 16                                                                        
-│       expand_ratio_gtu: 2                                                                    
-│       expand_ratio_glu: 3                                                                    
-│       flash_s: 0                                                                             
-│       flash_max_position_embed: 0                                                            
-│       flash_linear_s: 0                                                                      
-│       flash_linear_max_position_embeddings: 0                                                
-│       lg_local_heads: 0                                                                      
-│       lg_linear_heads: 0                                                                     
-│       lg_local_chunk_size: 0                                                                 
-│       ls_attn_heads: 0                                                                       
-│       ls_attn_window_size: 0                                                                 
-│       ls_attn_max_seq_len: 0                                                                 
-│       performer_heads: 0                                                                     
-│       performer_approx_attn_dim: 0                                                           
-│       use_softmax: true                                                                      
-│       act_fun: 1+elu                                                                         
-│       cosformer_heads: 0                                                                     
-│       cosformer_max_length: 0                                                                
-│       linformer_max_seq_len: 0                                                               
-│       residual: R                                                                            
-│       dropout: 0.1                                                                           
-│       encoder:                                                                               
-│         _name_: position                                                                     
-│         dropout: 0.1                                                                         
-│       n_layers: 2                                                                            
-│       d_model: 32                                                                            
-│       prenorm: true                                                                          
-│       norm: batch                                                                            
-│                                                                                              
+│   └── _name_: model                                                                              
+│       layer:                                                                                     
+│       - _name_: gtu                                                                              
+│         n_heads: 1                                                                               
+│         expand_ratio: 2                                                                          
+│         use_decay: true                                                                          
+│         gamma: 0.7                                                                               
+│         rpe_embedding: 16                                                                        
+│         rpe_layers: 2                                                                            
+│       - _name_: glu                                                                              
+│         act_fun: swish                                                                           
+│         glu_expand_ratio: 3                                                                      
+│       rpe_layers: 2                                                                              
+│       gtu_head: 1                                                                                
+│       gtu_use_decay: true                                                                        
+│       gtu_gamma: 0.7                                                                             
+│       gtu_rpe_dim: 16                                                                            
+│       expand_ratio_gtu: 2                                                                        
+│       expand_ratio_glu: 3                                                                        
+│       flash_s: 0                                                                                 
+│       flash_max_position_embed: 0                                                                
+│       flash_linear_s: 0                                                                          
+│       flash_linear_max_position_embeddings: 0                                                    
+│       lg_local_heads: 0                                                                          
+│       lg_linear_heads: 0                                                                         
+│       lg_local_chunk_size: 0                                                                     
+│       ls_attn_heads: 0                                                                           
+│       ls_attn_window_size: 0                                                                     
+│       ls_attn_max_seq_len: 0                                                                     
+│       performer_heads: 0                                                                         
+│       performer_approx_attn_dim: 0                                                               
+│       use_softmax: true                                                                          
+│       act_fun: 1+elu                                                                             
+│       cosformer_heads: 0                                                                         
+│       cosformer_max_length: 0                                                                    
+│       linformer_max_seq_len: 0                                                                   
+│       residual: R                                                                                
+│       dropout: 0.1                                                                               
+│       encoder:                                                                                   
+│         _name_: position                                                                         
+│         dropout: 0.1                                                                             
+│       n_layers: 2                                                                                
+│       d_model: 32                                                                                
+│       prenorm: true                                                                              
+│       norm: batch                                                                                
+│                                                                                                  
 └── callbacks
-    └── learning_rate_monitor:                                                                 
-          logging_interval: step                                                               
-        timer:                                                                                 
-          step: true                                                                           
-          inter_step: false                                                                    
-          epoch: true                                                                          
-          val: true                                                                            
-        params:                                                                                
-          total: true                                                                          
-          trainable: true                                                                      
-          fixed: true                                                                          
-        model_checkpoint:                                                                      
-          monitor: val/accuracy                                                                
-          mode: max                                                                            
-          save_top_k: 1                                                                        
-          save_last: true                                                                      
-          dirpath: checkpoints/                                                                
-          filename: val/accuracy                                                               
-          auto_insert_metric_name: false                                                       
-          verbose: true                                                                        
-                                                                                               
+    └── learning_rate_monitor:                                                                     
+          logging_interval: step                                                                   
+        timer:                                                                                     
+          step: true                                                                               
+          inter_step: false                                                                        
+          epoch: true                                                                              
+          val: true                                                                                
+        params:                                                                                    
+          total: true                                                                              
+          trainable: true                                                                          
+          fixed: true                                                                              
+        model_checkpoint:                                                                          
+          monitor: val/accuracy                                                                    
+          mode: max                                                                                
+          save_top_k: 1                                                                            
+          save_last: true                                                                          
+          dirpath: checkpoints/                                                                    
+          filename: val/accuracy                                                                   
+          auto_insert_metric_name: false                                                           
+          verbose: true                                                                            
+                                                                                                   
 Global seed set to 2222
-[2022-12-21 17:09:21,076][__main__][INFO] - Instantiating callback <src.callbacks.timer.Timer>
-[2022-12-21 17:09:21,077][__main__][INFO] - Instantiating callback <src.callbacks.params.ParamsLog>
-[2022-12-21 17:09:21,078][__main__][INFO] - Instantiating callback <pytorch_lightning.callbacks.ModelCheckpoint>
+[2022-12-21 21:00:13,521][__main__][INFO] - Instantiating callback <src.callbacks.timer.Timer>
+[2022-12-21 21:00:13,522][__main__][INFO] - Instantiating callback <src.callbacks.params.ParamsLog>
+[2022-12-21 21:00:13,523][__main__][INFO] - Instantiating callback <pytorch_lightning.callbacks.ModelCheckpoint>
 GPU available: True, used: True
 TPU available: False, using: 0 TPU cores
 IPU available: False, using: 0 IPUs
 Files already downloaded and verified
-[2022-12-21 17:09:22,772][print_config][INFO] - activation: silu
-[2022-12-21 17:09:22,775][print_config][INFO] - activation: none
-swish
-None
-act_fun swish
-dropout 0.1
-final None
-[2022-12-21 17:09:22,777][print_config][INFO] - activation: silu
-[2022-12-21 17:09:22,778][print_config][INFO] - activation: none
+[2022-12-21 21:00:15,321][print_config][INFO] - activation: silu
+[2022-12-21 21:00:15,326][print_config][INFO] - activation: none
+[2022-12-21 21:00:15,328][print_config][INFO] - swish
+[2022-12-21 21:00:15,328][print_config][INFO] - None
+[2022-12-21 21:00:15,328][print_config][INFO] - act_fun swish
+[2022-12-21 21:00:15,328][print_config][INFO] - dropout 0.1
+[2022-12-21 21:00:15,328][print_config][INFO] - final None
+[2022-12-21 21:00:15,330][print_config][INFO] - activation: silu
+[2022-12-21 21:00:15,331][print_config][INFO] - activation: none
+[2022-12-21 21:00:15,333][print_config][INFO] - swish
+[2022-12-21 21:00:15,333][print_config][INFO] - None
+[2022-12-21 21:00:15,333][print_config][INFO] - act_fun swish
+[2022-12-21 21:00:15,333][print_config][INFO] - dropout 0.1
+[2022-12-21 21:00:15,333][print_config][INFO] - final None
 LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
-swish
-None
-act_fun swish
-dropout 0.1
-final None
 SequenceModel(
   (drop): Identity()
   (layers): ModuleList(
@@ -201,6 +201,7 @@ SequenceModel(
             )
           )
         )
+        (pre_norm): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
       )
       (residual): Residual()
       (norm): Normalization(
@@ -246,6 +247,7 @@ SequenceModel(
             )
           )
         )
+        (pre_norm): LayerNorm((32,), eps=1e-05, elementwise_affine=True)
       )
       (residual): Residual()
       (norm): Normalization(
@@ -271,17 +273,17 @@ SequenceModel(
     (norm): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
   )
 )
-[2022-12-21 17:09:26,930][__main__][INFO] - Optimizer group 0 | 60 tensors
+[2022-12-21 21:00:19,403][__main__][INFO] - Optimizer group 0 | 64 tensors
 
   | Name    | Type            | Params
 --------------------------------------------
-0 | model   | SequenceModel   | 35.3 K
+0 | model   | SequenceModel   | 35.5 K
 1 | encoder | Sequential      | 64    
 2 | decoder | SequenceDecoder | 330   
 --------------------------------------------
-35.6 K    Trainable params
+35.7 K    Trainable params
 128       Non-trainable params
-35.7 K    Total params
+35.9 K    Total params
 0.143     Total estimated model params size (MB)
 Validation sanity check: 0it [00:00, ?it/s]Validation sanity check:   0%|          | 0/4 [00:00<?, ?it/s]Error executing job with overrides: ['wandb=null', 'experiment=gtu-lra-cifar', 'trainer.gpus=1', 'loader.batch_size=16', 'loader.num_workers=4', 'scheduler.num_warmup_steps=30000', 'optimizer.lr=0.007', 'optimizer.weight_decay=0.001', 'model.n_layers=2', 'model.d_model=32', 'model.norm=batch', 'model.prenorm=True', 'train.seed=2222', 'model.gtu_rpe_dim=16', 'model.expand_ratio_gtu=2', 'model.expand_ratio_glu=3', 'model.gtu_use_decay=True', 'model.gtu_gamma=0.7', 'model.dropout=0.1']
 Traceback (most recent call last):

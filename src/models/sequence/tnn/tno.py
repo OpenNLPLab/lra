@@ -10,7 +10,6 @@ from einops import rearrange, repeat
 from .helpers import get_activation_fn
 from .rpe import Rpe
 
-
 class Tno(nn.Module):
     def __init__(
         self, 
@@ -53,6 +52,9 @@ class Tno(nn.Module):
             layers=layers,
             norm_type=norm_type,
         )
+        
+        # norm
+        self.norm_type = norm_type
         
         if self.causal:
             self.forward = self.forward_causal
