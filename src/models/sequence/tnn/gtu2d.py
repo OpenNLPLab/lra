@@ -86,7 +86,7 @@ class Gtu2d(nn.Module):
         self.use_norm = use_norm
         self.pre_norm = get_norm_fn(self.norm_type)(d2)
         
-        self.par_init()
+        # self.par_init()
         
     def par_init(self):
         nn.init.normal_(self.u_proj.weight, std=0.02)
