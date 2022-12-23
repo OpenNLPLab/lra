@@ -250,11 +250,11 @@ tasks = ["cifar"]
 # tasks = ["pathfinder"]
 # tasks = ["pathfinderx"]
 
-archs = ["tno"]
+# archs = ["tno"]
 # archs = ["tno2d"]
-# archs = ["transnormer"]
-archs = ["gtu"]
-archs = ["gtu2d"]
+archs = ["transnormer"]
+# archs = ["gtu"]
+# archs = ["gtu2d"]
 # archs = ["transformer_lg"]
 
 def to_iter(*args):
