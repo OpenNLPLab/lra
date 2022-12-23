@@ -254,7 +254,7 @@ archs = ["tno"]
 # archs = ["tno2d"]
 # archs = ["transnormer"]
 archs = ["gtu"]
-# archs = ["gtu2d"]
+archs = ["gtu2d"]
 # archs = ["transformer_lg"]
 
 def to_iter(*args):
