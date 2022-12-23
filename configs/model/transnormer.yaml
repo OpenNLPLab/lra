@@ -14,7 +14,7 @@ layer:
     norm_type: ${model.norm}
     use_lrpe: true
   - _name_: ff
-    expand: 1
+    expand: ${model.expand_ratio_ffn}
     dropout: null
     transposed: False
 
@@ -23,6 +23,7 @@ lg_local_chunk_size: 64
 lg_linear_heads: 8
 use_softmax: true
 act_fun: 1+elu
+expand_ratio_ffn: 1
 
 flash_linear_s: 0
 flash_linear_max_position_embeddings: 0

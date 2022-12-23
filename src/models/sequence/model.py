@@ -68,6 +68,7 @@ class SequenceModel(SequenceModule):
         tno_dpb_dim=64,
         expand_ratio_tno=2,
         expand_ratio_glu=2,
+        expand_ratio_ffn=2,
         synthesizer_max_seq_len=2048,
         fnet_max_position_embeddings=1024,
         fnet_expand_ratio=2,
