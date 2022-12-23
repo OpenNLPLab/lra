@@ -153,25 +153,25 @@ class NormLinearAttention(nn.Module):
                 householder_learned=householder_learned,
             )
 
-        print("qk_act")
+        logging_info("qk_act")
         self.act = self.get_act_fun(self.act_fun)
 
         self.out_proj = nn.Linear(d_model, d_model, bias=bias)
         self.norm_type = norm_type
         self.weight_type = weight_type
-        print(f"causal {self.causal}")
-        print(f"has_out {self.has_out}")
-        print(f"attention_use_layer_norm {self.attention_use_layer_norm}")
-        print(f"num_heads {self.num_heads}")
-        print(f"act_fun_type: {act_fun}")
-        print(f"norm_type {self.norm_type}")
-        print(f"init_type {self.init_type}")
-        print(f"use_lrpe {self.use_lrpe}")
-        print(f"use_dropout {self.use_dropout}")
-        print(f"kv_act {kv_act}")
-        print(f"self.weight_type {self.weight_type}")
-        print(f"self.use_final_dropout {self.use_final_dropout}")
-        print(f"self.final_dropout {final_dropout}")
+        logging_info(f"causal {self.causal}")
+        logging_info(f"has_out {self.has_out}")
+        logging_info(f"attention_use_layer_norm {self.attention_use_layer_norm}")
+        logging_info(f"num_heads {self.num_heads}")
+        logging_info(f"act_fun_type: {act_fun}")
+        logging_info(f"norm_type {self.norm_type}")
+        logging_info(f"init_type {self.init_type}")
+        logging_info(f"use_lrpe {self.use_lrpe}")
+        logging_info(f"use_dropout {self.use_dropout}")
+        logging_info(f"kv_act {kv_act}")
+        logging_info(f"self.weight_type {self.weight_type}")
+        logging_info(f"self.use_final_dropout {self.use_final_dropout}")
+        logging_info(f"self.final_dropout {final_dropout}")
 
         if self.init_type == "gelu":
             self.gelu_reset()
@@ -179,7 +179,7 @@ class NormLinearAttention(nn.Module):
             self.reset_parameters()
 
     def get_act_fun(self, act_fun):
-        print(act_fun)
+        logging_info(act_fun)
         if act_fun == "gelu":
             return F.gelu
         elif act_fun == "relu":
@@ -217,7 +217,7 @@ class NormLinearAttention(nn.Module):
         self.onnx_trace = True
 
     def reset_parameters(self):
-        print("normal init")
+        logging_info("normal init")
         if self.qkv_same_dim:
             # Empirically observed the convergence to be much better with
             # the scaled initialization

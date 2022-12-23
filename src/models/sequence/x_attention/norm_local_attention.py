@@ -158,21 +158,21 @@ class NormLocalAttention(nn.Module):
         self.use_final_dropout = use_final_dropout
         # chunk
         self.chunk_size = chunk_size
-        print("use relu sparse")
-        print(f"use lrpe {self.use_lrpe}")
-        print(f"num_heads {self.num_heads}")
-        print(f"add_bias_kv {add_bias_kv}")
-        print(f"act_fun {self.act_fun}")
-        print(f"negative_slope {self.negative_slope}")
-        print(f"chunk_size {self.chunk_size}")
-        print(f"causal {self.causal}")
-        print(f"self.left_window {self.left_window}")
-        print(f"self.right_window {self.right_window}")
-        print(f"self.group_type {self.group_type}")
-        print(f"self.use_softmax {self.use_softmax}")
-        print(f"self.weight_type {self.weight_type}")
-        print(f"self.use_final_dropout {self.use_final_dropout}")
-        print(f"self.final_dropout {final_dropout}")
+        logging_info("use relu sparse")
+        logging_info(f"use lrpe {self.use_lrpe}")
+        logging_info(f"num_heads {self.num_heads}")
+        logging_info(f"add_bias_kv {add_bias_kv}")
+        logging_info(f"act_fun {self.act_fun}")
+        logging_info(f"negative_slope {self.negative_slope}")
+        logging_info(f"chunk_size {self.chunk_size}")
+        logging_info(f"causal {self.causal}")
+        logging_info(f"self.left_window {self.left_window}")
+        logging_info(f"self.right_window {self.right_window}")
+        logging_info(f"self.group_type {self.group_type}")
+        logging_info(f"self.use_softmax {self.use_softmax}")
+        logging_info(f"self.weight_type {self.weight_type}")
+        logging_info(f"self.use_final_dropout {self.use_final_dropout}")
+        logging_info(f"self.final_dropout {final_dropout}")
 
     def prepare_for_onnx_export_(self):
         self.onnx_trace = True
@@ -191,7 +191,7 @@ class NormLocalAttention(nn.Module):
             nn.init.xavier_normal_(self.bias_v)
 
     def get_act_fun(self):
-        print(self.act_fun)
+        logging_info(self.act_fun)
         if self.act_fun == "gelu":
             return F.gelu
         elif self.act_fun == "relu":

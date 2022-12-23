@@ -29,7 +29,7 @@ class Lrpe(nn.Module):
 
         if self.core_matrix == 1:
             if self.theta_learned:
-                print("learn theta!")
+                logging_info("learn theta!")
                 self.theta = nn.Parameter(
                     10000
                     ** (-2 / embedding_dim * torch.arange(embedding_dim // 2)).reshape(
@@ -37,18 +37,18 @@ class Lrpe(nn.Module):
                     )
                 )
             else:
-                print(f"theta_type {self.theta_type}")
-            print("rope")
+                logging_info(f"theta_type {self.theta_type}")
+            logging_info("rope")
         elif self.core_matrix == 2:
-            print("mixed")
+            logging_info("mixed")
         elif self.core_matrix == 3:
-            print("permutation")
+            logging_info("permutation")
             permutation = self.get_permutation(max_positions, embedding_dim)
-            print(permutation.shape)
+            logging_info(permutation.shape)
             self.register_buffer("permutation", permutation)
         elif self.core_matrix == 4:
             if self.theta_learned:
-                print("learn theta!")
+                logging_info("learn theta!")
                 self.theta = nn.Parameter(
                     10000
                     ** (-2 / embedding_dim * torch.arange(embedding_dim)).reshape(
@@ -56,27 +56,27 @@ class Lrpe(nn.Module):
                     )
                 )
             else:
-                print(f"theta_type {self.theta_type}")
-            print("complex exp")
+                logging_info(f"theta_type {self.theta_type}")
+            logging_info("complex exp")
 
         if self.p_matrix == 1:
-            print("Identity")
+            logging_info("Identity")
         elif self.p_matrix == 2:
-            print("DCT")
+            logging_info("DCT")
         elif self.p_matrix == 3:
-            print("Householder")
+            logging_info("Householder")
             if self.householder_learned:
-                print("learn householder!")
+                logging_info("learn householder!")
                 self.v = nn.Parameter(torch.randn(embedding_dim))
             else:
                 v = torch.randn(embedding_dim)
                 v = v / torch.norm(v)
-                print(f"house holder norm is {torch.norm(v)}")
+                logging_info(f"house holder norm is {torch.norm(v)}")
                 self.v = nn.Parameter(v, requires_grad=False)
         elif self.p_matrix == 4:
-            print("Fourier")
+            logging_info("Fourier")
         elif self.p_matrix == 5:
-            print("odd_even")
+            logging_info("odd_even")
 
         self.p = self.get_p()
         self.core_transform = self.get_core_transform()
