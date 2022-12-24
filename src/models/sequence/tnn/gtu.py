@@ -159,7 +159,7 @@ class Gtu(nn.Module):
             self.token_shift = nn.ZeroPad2d((0, 0, 1, -1))
             self.coef = 0.5
 
-        # self.par_init()
+        self.par_init()
 
     def par_init(self):
         nn.init.normal_(self.u_proj.weight, std=0.02)
