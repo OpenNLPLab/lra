@@ -273,7 +273,7 @@ class SequenceModel(SequenceModule):
             self.apply(functools.partial(weights_init, init_cfg=init))
 
     def forward(self, inputs, *args, state=None, **kwargs):
-        """ Inputs assumed to be (batch, sequence, dim) """
+        """Inputs assumed to be (batch, sequence, dim)"""
         # Debug
         if self.verbose and not self._forward:
             print("Model: unused kwargs", kwargs)
@@ -333,7 +333,7 @@ class SequenceModel(SequenceModule):
         ]
 
     def step(self, x, state):
-        """ 
+        """
         Step one time step as a recurrent model. Intended to be used during validation.
 
         u: (B H)

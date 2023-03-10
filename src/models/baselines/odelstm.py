@@ -106,7 +106,7 @@ class ODELSTM(nn.Module):
         last_output = torch.zeros((batch_size, self.d_output), device=device)
 
         if timespans is None:
-            timespans = x.new_ones(x.shape[:-1]+(1,)) / x.shape[1]
+            timespans = x.new_ones(x.shape[:-1] + (1,)) / x.shape[1]
 
         for t in range(seq_len):
             inputs = x[:, t]

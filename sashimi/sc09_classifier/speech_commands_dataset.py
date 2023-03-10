@@ -1,5 +1,5 @@
 """Google speech commands dataset."""
-__author__ = 'Yuan Xu'
+__author__ = "Yuan Xu"
 """With modifications by Karan Goel to support training an SC09 classifier."""
 
 import os
@@ -9,9 +9,10 @@ import librosa
 
 from torch.utils.data import Dataset
 
-__all__ = [ 'CLASSES', 'SpeechCommandsDataset', 'BackgroundNoiseDataset' ]
+__all__ = ["CLASSES", "SpeechCommandsDataset", "BackgroundNoiseDataset"]
 
-CLASSES = 'zero, one, two, three, four, five, six, seven, eight, nine'.split(', ')
+CLASSES = "zero, one, two, three, four, five, six, seven, eight, nine".split(", ")
+
 
 class SpeechCommandsDataset(Dataset):
     """Google speech commands dataset. Only 'yes', 'no', 'up', 'down', 'left',
@@ -41,7 +42,7 @@ class SpeechCommandsDataset(Dataset):
 
     def __getitem__(self, index):
         path, target = self.data[index]
-        data = {'path': path, 'target': target}
+        data = {"path": path, "target": target}
 
         if self.transform is not None:
             data = self.transform(data)
@@ -63,11 +64,16 @@ class SpeechCommandsDataset(Dataset):
             weight[idx] = weight_per_class[item[1]]
         return weight
 
+
 class BackgroundNoiseDataset(Dataset):
     """Dataset for silence / background noise."""
 
     def __init__(self, folder, transform=None, sample_rate=16000, sample_length=1):
-        audio_files = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d)) and d.endswith('.wav')]
+        audio_files = [
+            d
+            for d in os.listdir(folder)
+            if os.path.isfile(os.path.join(folder, d)) and d.endswith(".wav")
+        ]
         samples = []
         for f in audio_files:
             path = os.path.join(folder, f)
@@ -77,7 +83,7 @@ class BackgroundNoiseDataset(Dataset):
         samples = np.hstack(samples)
         c = int(sample_rate * sample_length)
         r = len(samples) // c
-        self.samples = samples[:r*c].reshape(-1, c)
+        self.samples = samples[: r * c].reshape(-1, c)
         self.sample_rate = sample_rate
         self.classes = CLASSES
         self.transform = transform
@@ -87,7 +93,12 @@ class BackgroundNoiseDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, index):
-        data = {'samples': self.samples[index], 'sample_rate': self.sample_rate, 'target': 1, 'path': self.path}
+        data = {
+            "samples": self.samples[index],
+            "sample_rate": self.sample_rate,
+            "target": 1,
+            "path": self.path,
+        }
 
         if self.transform is not None:
             data = self.transform(data)

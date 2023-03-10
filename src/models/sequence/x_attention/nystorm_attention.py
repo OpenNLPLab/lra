@@ -7,7 +7,11 @@ from torch.nn import functional as F
 
 class NystromAttention(nn.Module):
     def __init__(
-        self, d_model, n_heads, max_seq_len, dropout=0,
+        self,
+        d_model,
+        n_heads,
+        max_seq_len,
+        dropout=0,
     ):
         super().__init__()
         self.d_output = d_model

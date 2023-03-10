@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 # from torch.utils.data.dataset import IterableDataset
 import numpy as np
 
@@ -8,10 +9,10 @@ from src.utils import distributed
 
 
 def np_copying_data(L, M, A, batch_shape=()):
-    seq = np.random.randint(low=1, high=A-1, size=batch_shape+(M,))
-    zeros_x = np.zeros(batch_shape+(L,))
-    markers = (A-1) * np.ones(batch_shape+(M,))
-    zeros_y = np.zeros(batch_shape+(M+L,))
+    seq = np.random.randint(low=1, high=A - 1, size=batch_shape + (M,))
+    zeros_x = np.zeros(batch_shape + (L,))
+    markers = (A - 1) * np.ones(batch_shape + (M,))
+    zeros_y = np.zeros(batch_shape + (M + L,))
 
     x_ = np.concatenate([seq, zeros_x, markers], axis=-1)
     y_ = np.concatenate([zeros_y, seq], axis=-1)
@@ -19,23 +20,21 @@ def np_copying_data(L, M, A, batch_shape=()):
     y = torch.tensor(y_, dtype=torch.int64)
     return x, y
 
+
 def torch_copying_data(L, M, A, variable=False, batch_shape=()):
-    tokens = torch.randint(low=1, high=A-1, size=batch_shape+(M,))
+    tokens = torch.randint(low=1, high=A - 1, size=batch_shape + (M,))
     # zeros_x = torch.zeros(batch_shape+(L,), dtype=torch.long)
     if variable:
         # inds = torch.randint(low=0, high=L+M, size=batch_shape+(M,))
         total_batch = np.prod(batch_shape)
-        inds = torch.stack([
-            torch.randperm(L+M)[:M]
-            for _ in range(total_batch)
-            ], 0)
-        inds = inds.reshape(batch_shape+(M,))
+        inds = torch.stack([torch.randperm(L + M)[:M] for _ in range(total_batch)], 0)
+        inds = inds.reshape(batch_shape + (M,))
         inds, _ = inds.sort()
     else:
-        inds = torch.arange(M).repeat(batch_shape+(1,))
-    zeros_x = torch.zeros(batch_shape+(M+L,), dtype=torch.long)
+        inds = torch.arange(M).repeat(batch_shape + (1,))
+    zeros_x = torch.zeros(batch_shape + (M + L,), dtype=torch.long)
     zeros_x.scatter_(-1, inds, tokens)
-    markers = (A-1) * torch.ones(batch_shape+(M,), dtype=torch.long)
+    markers = (A - 1) * torch.ones(batch_shape + (M,), dtype=torch.long)
     # zeros_y = torch.zeros(batch_shape+(M+L,), dtype=torch.long)
 
     x_ = torch.cat([zeros_x, markers], dim=-1)
@@ -46,6 +45,7 @@ def torch_copying_data(L, M, A, variable=False, batch_shape=()):
     y = y_
     # print("TYPE", x.dtype, y.dtype)
     return x, y
+
 
 class CopyingTrainDataset(torch.utils.data.IterableDataset):
     def __init__(self, L, M, A, samples_per_epoch=-1):
@@ -77,8 +77,11 @@ class CopyingEvalDataset(torch.utils.data.TensorDataset):
         self.M = M
         self.A = A
         self.samples = samples
-        all_x, all_y = torch_copying_data(self.L, self.M, self.A, batch_shape=(self.samples,))
+        all_x, all_y = torch_copying_data(
+            self.L, self.M, self.A, batch_shape=(self.samples,)
+        )
         super().__init__(all_x, all_y)
+
 
 def copying_static_dataset(L, M, A, variable, samples):
     all_x, all_y = torch_copying_data(L, M, A, variable, batch_shape=(samples,))
@@ -108,7 +111,7 @@ class CopyOrderedIterator:
         assert len(data.shape) == 1
         self.data_x = data[offset:]
         self.data_y = data[:-offset]
-        self.data = torch.stack([data_x, data_y], dim=0) # (2, L, D)
+        self.data = torch.stack([data_x, data_y], dim=0)  # (2, L, D)
 
         self.batch_size = batch_size
         self.l_max = l_max
@@ -123,7 +126,7 @@ class CopyOrderedIterator:
         self.process()
 
     def process(self):
-        """ Process the data. All logic involving sequence length and batch size should go here """
+        """Process the data. All logic involving sequence length and batch size should go here"""
         assert self.l_max % self.n_overlaps == 0
         self.l_inc = self.l_max // self.n_overlaps
 
@@ -137,16 +140,21 @@ class CopyOrderedIterator:
         self.data = self.data[: n_step * global_batch_size]
 
         # Evenly divide the data across the batches.
-        self.data = self.data.view(2, global_batch_size, -1, self.data.size(-1)).contiguous().pin_memory() # (2, global_batch_size, length)
+        self.data = (
+            self.data.view(2, global_batch_size, -1, self.data.size(-1))
+            .contiguous()
+            .pin_memory()
+        )  # (2, global_batch_size, length)
 
         # Partition data for DistributedDataParallel
-        self.data = self.data.chunk(self.world_size, dim=-3)[self.rank] # (2, batch_size, length, dim)
+        self.data = self.data.chunk(self.world_size, dim=-3)[
+            self.rank
+        ]  # (2, batch_size, length, dim)
 
         # Number of mini-batches
         # Need to subtract 1 because target is data shifted by 1
         assert self.data.size(-2) % self.l_max == 0
         self.n_batch = (self.data.size(-2)) // self.l_max
-
 
     def roll(self, seed):
         rng = torch.Generator()
@@ -158,16 +166,17 @@ class CopyOrderedIterator:
             self.data[:, i] = row
 
     def get_batch(self, i, l_max=None):
-        """ Get batch starting at token index i """
-        if l_max is None: l_max = self.l_max
-        seq_len = l_max # min(l_max, self.data.size(0) - 1 - i)
+        """Get batch starting at token index i"""
+        if l_max is None:
+            l_max = self.l_max
+        seq_len = l_max  # min(l_max, self.data.size(0) - 1 - i)
 
         end_idx = i + seq_len
         # beg_idx = max(0, i - self.ext_len)
         beg_idx = i
 
-        data = self.data[:, :, beg_idx:end_idx, :] # (2, B, L, D)
-        x, y = data # (B, L, D)
+        data = self.data[:, :, beg_idx:end_idx, :]  # (2, B, L, D)
+        x, y = data  # (B, L, D)
 
         return x, y
 
@@ -185,8 +194,7 @@ class CopyOrderedIterator:
         return self.n_batch
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     # a = torch_copying_data(20, 5, 10, batch_shape=(3,))
     # print(a)
 
@@ -201,4 +209,3 @@ if __name__ == '__main__':
     loader = torch.utils.data.DataLoader(eval_ds, batch_size=2, num_workers=2)
     for (x, y) in loader:
         print(x, y)
-

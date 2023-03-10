@@ -12,8 +12,7 @@ from torch import Tensor, nn
 
 
 class LSAttentionNonCausal(nn.Module):
-    """The long-short term attention for bidirectional language modelling
-    """
+    """The long-short term attention for bidirectional language modelling"""
 
     def __init__(
         self, d_model, n_heads, max_seq_len, dropout, num_landmarks=32, window_size=8

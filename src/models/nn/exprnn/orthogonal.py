@@ -7,7 +7,8 @@ from .parametrization import Parametrization
 
 
 class Orthogonal(Parametrization):
-    """ Class that implements optimization restricted to the Stiefel manifold """
+    """Class that implements optimization restricted to the Stiefel manifold"""
+
     def __init__(self, d_input, d_output, initializer_skew, mode, param):
         """
         mode: "static" or a tuple such that:
@@ -42,7 +43,7 @@ class Orthogonal(Parametrization):
         A = A - A.t()
         B = base.mm(self.param(A))
         if self.d_input != self.d_output:
-            B = B[:self.d_input, :self.d_output]
+            B = B[: self.d_input, : self.d_output]
         return B
 
     def project(self, base):
@@ -86,8 +87,12 @@ class OrthogonalRNN(nn.Module):
         super(OrthogonalRNN, self).__init__()
         self.d_input = d_input
         self.d_model = d_model
-        self.recurrent_kernel = Orthogonal(d_model, d_model, initializer_skew, mode, param=param)
-        self.input_kernel = nn.Linear(in_features=self.d_input, out_features=self.d_model, bias=False)
+        self.recurrent_kernel = Orthogonal(
+            d_model, d_model, initializer_skew, mode, param=param
+        )
+        self.input_kernel = nn.Linear(
+            in_features=self.d_input, out_features=self.d_model, bias=False
+        )
         self.nonlinearity = modrelu(d_model)
 
         self.reset_parameters()

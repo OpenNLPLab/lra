@@ -19,19 +19,18 @@ from torch.nn.parameter import Parameter
 
 
 class ClassificationTransformer(Module):
-
     def __init__(
-            self,
-            d_input,
-            d_output,
-            d_model: int = 512,
-            nhead: int = 8,
-            num_encoder_layers: int = 6,
-            dim_feedforward: int = 2048,
-            dropout: float = 0.1,
-            activation: str = "gelu",
-            prenorm: bool = False,
-            **kwargs,
+        self,
+        d_input,
+        d_output,
+        d_model: int = 512,
+        nhead: int = 8,
+        num_encoder_layers: int = 6,
+        dim_feedforward: int = 2048,
+        dropout: float = 0.1,
+        activation: str = "gelu",
+        prenorm: bool = False,
+        **kwargs,
     ) -> None:
         super().__init__()
 
@@ -44,10 +43,16 @@ class ClassificationTransformer(Module):
         # Create the TransformerEncoder blocks
         self.encoder = TransformerEncoder(
             TransformerEncoderLayer(
-                d_model, nhead, dim_feedforward, dropout, activation, share_qk=False, prenorm=prenorm
+                d_model,
+                nhead,
+                dim_feedforward,
+                dropout,
+                activation,
+                share_qk=False,
+                prenorm=prenorm,
             ),
             num_encoder_layers,
-            LayerNorm(d_model)
+            LayerNorm(d_model),
         )
 
         # Output projection
@@ -60,17 +65,14 @@ class ClassificationTransformer(Module):
         self.d_model = d_model
         self.nhead = nhead
 
-    def forward(
-            self,
-            src: Tensor,
-            *args,
-            **kwargs
-    ) -> Tensor:
+    def forward(self, src: Tensor, *args, **kwargs) -> Tensor:
 
         # Encode the input (B, S, C)
         x = self.input_proj(src)
         x = self.encoder.forward(x)
-        return self.output_proj(x[:, -1, :])  # uses the encoding of the last "token" to classify
+        return self.output_proj(
+            x[:, -1, :]
+        )  # uses the encoding of the last "token" to classify
 
     def _reset_parameters(self):
         r"""Initiate parameters in the transformer model."""
@@ -106,37 +108,59 @@ class Transformer(Module):
     https://github.com/pytorch/examples/tree/master/word_language_model
     """
 
-    def __init__(self, d_model: int = 512, nhead: int = 8, num_encoder_layers: int = 6,
-                 num_decoder_layers: int = 6, dim_feedforward: int = 2048, dropout: float = 0.1,
-                 activation: str = "relu", custom_encoder: Optional[Any] = None,
-                 custom_decoder: Optional[Any] = None, approx: dict = None) -> None:
+    def __init__(
+        self,
+        d_model: int = 512,
+        nhead: int = 8,
+        num_encoder_layers: int = 6,
+        num_decoder_layers: int = 6,
+        dim_feedforward: int = 2048,
+        dropout: float = 0.1,
+        activation: str = "relu",
+        custom_encoder: Optional[Any] = None,
+        custom_decoder: Optional[Any] = None,
+        approx: dict = None,
+    ) -> None:
         super(Transformer, self).__init__()
 
         if custom_encoder is not None:
             self.encoder = custom_encoder
         else:
-            encoder_layer = TransformerEncoderLayer(d_model, nhead, dim_feedforward, dropout, activation,
-                                                    share_qk=False)
+            encoder_layer = TransformerEncoderLayer(
+                d_model, nhead, dim_feedforward, dropout, activation, share_qk=False
+            )
             encoder_norm = LayerNorm(d_model)
-            self.encoder = TransformerEncoder(encoder_layer, num_encoder_layers, encoder_norm)
+            self.encoder = TransformerEncoder(
+                encoder_layer, num_encoder_layers, encoder_norm
+            )
 
         if custom_decoder is not None:
             self.decoder = custom_decoder
         else:
-            decoder_layer = TransformerDecoderLayer(d_model, nhead, dim_feedforward, dropout, activation,
-                                                    share_qk=False)
+            decoder_layer = TransformerDecoderLayer(
+                d_model, nhead, dim_feedforward, dropout, activation, share_qk=False
+            )
             decoder_norm = LayerNorm(d_model)
-            self.decoder = TransformerDecoder(decoder_layer, num_decoder_layers, decoder_norm)
+            self.decoder = TransformerDecoder(
+                decoder_layer, num_decoder_layers, decoder_norm
+            )
 
         self._reset_parameters()
 
         self.d_model = d_model
         self.nhead = nhead
 
-    def forward(self, src: Tensor, tgt: Tensor, src_mask: Optional[Tensor] = None, tgt_mask: Optional[Tensor] = None,
-                memory_mask: Optional[Tensor] = None, src_key_padding_mask: Optional[Tensor] = None,
-                tgt_key_padding_mask: Optional[Tensor] = None,
-                memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(
+        self,
+        src: Tensor,
+        tgt: Tensor,
+        src_mask: Optional[Tensor] = None,
+        tgt_mask: Optional[Tensor] = None,
+        memory_mask: Optional[Tensor] = None,
+        src_key_padding_mask: Optional[Tensor] = None,
+        tgt_key_padding_mask: Optional[Tensor] = None,
+        memory_key_padding_mask: Optional[Tensor] = None,
+    ) -> Tensor:
         r"""Take in and process masked source/target sequences.
             src: the sequence to the encoder (required).
             tgt: the sequence to the decoder (required).
@@ -178,20 +202,33 @@ class Transformer(Module):
             raise RuntimeError("the batch number of src and tgt must be equal")
 
         if src.size(2) != self.d_model or tgt.size(2) != self.d_model:
-            raise RuntimeError("the feature number of src and tgt must be equal to d_model")
+            raise RuntimeError(
+                "the feature number of src and tgt must be equal to d_model"
+            )
 
-        memory = self.encoder(src, mask=src_mask, src_key_padding_mask=src_key_padding_mask)
-        output = self.decoder(tgt, memory, tgt_mask=tgt_mask, memory_mask=memory_mask,
-                              tgt_key_padding_mask=tgt_key_padding_mask,
-                              memory_key_padding_mask=memory_key_padding_mask)
+        memory = self.encoder(
+            src, mask=src_mask, src_key_padding_mask=src_key_padding_mask
+        )
+        output = self.decoder(
+            tgt,
+            memory,
+            tgt_mask=tgt_mask,
+            memory_mask=memory_mask,
+            tgt_key_padding_mask=tgt_key_padding_mask,
+            memory_key_padding_mask=memory_key_padding_mask,
+        )
         return output
 
     def generate_square_subsequent_mask(self, sz: int) -> Tensor:
         r"""Generate a square mask for the sequence. The masked positions are filled with float('-inf').
-            Unmasked positions are filled with float(0.0).
+        Unmasked positions are filled with float(0.0).
         """
         mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
-        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+        mask = (
+            mask.float()
+            .masked_fill(mask == 0, float("-inf"))
+            .masked_fill(mask == 1, float(0.0))
+        )
         return mask
 
     def _reset_parameters(self):
@@ -214,7 +251,7 @@ class TransformerEncoder(Module):
         >>> src = torch.rand(10, 32, 512)
         >>> out = transformer_encoder(src)
     """
-    __constants__ = ['norm']
+    __constants__ = ["norm"]
 
     def __init__(self, encoder_layer, num_layers, norm=None):
         super(TransformerEncoder, self).__init__()
@@ -222,8 +259,13 @@ class TransformerEncoder(Module):
         self.num_layers = num_layers
         self.norm = norm
 
-    def forward(self, src: Tensor, mask: Optional[Tensor] = None, types: Optional[dict] = None,
-                src_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(
+        self,
+        src: Tensor,
+        mask: Optional[Tensor] = None,
+        types: Optional[dict] = None,
+        src_key_padding_mask: Optional[Tensor] = None,
+    ) -> Tensor:
         r"""Pass the input through the encoder layers in turn.
         Args:
             src: the sequence to the encoder (required).
@@ -234,7 +276,12 @@ class TransformerEncoder(Module):
         """
         output = src
         for mod in self.layers:
-            output = mod(output, types=types, src_mask=mask, src_key_padding_mask=src_key_padding_mask)
+            output = mod(
+                output,
+                types=types,
+                src_mask=mask,
+                src_key_padding_mask=src_key_padding_mask,
+            )
 
         if self.norm is not None:
             output = self.norm(output)
@@ -255,7 +302,7 @@ class TransformerDecoder(Module):
         >>> tgt = torch.rand(20, 32, 512)
         >>> out = transformer_decoder(tgt, memory)
     """
-    __constants__ = ['norm']
+    __constants__ = ["norm"]
 
     def __init__(self, decoder_layer, num_layers, norm=None):
         super(TransformerDecoder, self).__init__()
@@ -263,9 +310,16 @@ class TransformerDecoder(Module):
         self.num_layers = num_layers
         self.norm = norm
 
-    def forward(self, tgt: Tensor, memory: Tensor, types: Optional[dict] = None, tgt_mask: Optional[Tensor] = None,
-                memory_mask: Optional[Tensor] = None, tgt_key_padding_mask: Optional[Tensor] = None,
-                memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(
+        self,
+        tgt: Tensor,
+        memory: Tensor,
+        types: Optional[dict] = None,
+        tgt_mask: Optional[Tensor] = None,
+        memory_mask: Optional[Tensor] = None,
+        tgt_key_padding_mask: Optional[Tensor] = None,
+        memory_key_padding_mask: Optional[Tensor] = None,
+    ) -> Tensor:
         r"""Pass the inputs (and mask) through the decoder layer in turn.
         Args:
             tgt: the sequence to the decoder (required).
@@ -280,10 +334,15 @@ class TransformerDecoder(Module):
         output = tgt
 
         for mod in self.layers:
-            output = mod(output, memory, types=types, tgt_mask=tgt_mask,
-                         memory_mask=memory_mask,
-                         tgt_key_padding_mask=tgt_key_padding_mask,
-                         memory_key_padding_mask=memory_key_padding_mask)
+            output = mod(
+                output,
+                memory,
+                types=types,
+                tgt_mask=tgt_mask,
+                memory_mask=memory_mask,
+                tgt_key_padding_mask=tgt_key_padding_mask,
+                memory_key_padding_mask=memory_key_padding_mask,
+            )
 
         if self.norm is not None:
             output = self.norm(output)
@@ -311,17 +370,19 @@ class TransformerEncoderLayer(Module):
     """
 
     def __init__(
-            self,
-            d_model,
-            nhead,
-            dim_feedforward=2048,
-            dropout=0.1,
-            activation="relu",
-            share_qk=False,
-            prenorm=False,
+        self,
+        d_model,
+        nhead,
+        dim_feedforward=2048,
+        dropout=0.1,
+        activation="relu",
+        share_qk=False,
+        prenorm=False,
     ):
         super(TransformerEncoderLayer, self).__init__()
-        self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout, share_qk=share_qk)
+        self.self_attn = MultiheadAttention(
+            d_model, nhead, dropout=dropout, share_qk=share_qk
+        )
         # Implementation of Feedforward model
         self.linear1 = Linear(d_model, dim_feedforward)
         self.dropout = Dropout(dropout)
@@ -336,12 +397,17 @@ class TransformerEncoderLayer(Module):
         self.prenorm = prenorm
 
     def __setstate__(self, state):
-        if 'activation' not in state:
-            state['activation'] = F.relu
+        if "activation" not in state:
+            state["activation"] = F.relu
         super(TransformerEncoderLayer, self).__setstate__(state)
 
-    def forward(self, src: Tensor, types: Optional[dict] = None, src_mask: Optional[Tensor] = None,
-                src_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(
+        self,
+        src: Tensor,
+        types: Optional[dict] = None,
+        src_mask: Optional[Tensor] = None,
+        src_key_padding_mask: Optional[Tensor] = None,
+    ) -> Tensor:
         r"""Pass the input through the encoder layer.
         Args:
             src: the sequence to the encoder layer (required).
@@ -354,13 +420,25 @@ class TransformerEncoderLayer(Module):
         if self.prenorm:
             # src = self.norm1(src)
             src2 = self.norm1(src)
-            src2 = self.self_attn(src2, src2, src2, types=types, attn_mask=src_mask,
-                                  key_padding_mask=src_key_padding_mask)[0]
+            src2 = self.self_attn(
+                src2,
+                src2,
+                src2,
+                types=types,
+                attn_mask=src_mask,
+                key_padding_mask=src_key_padding_mask,
+            )[0]
             src = src + self.dropout1(src2)
         else:
             # Old code
-            src2 = self.self_attn(src, src, src, types=types, attn_mask=src_mask,
-                                  key_padding_mask=src_key_padding_mask)[0]
+            src2 = self.self_attn(
+                src,
+                src,
+                src,
+                types=types,
+                attn_mask=src_mask,
+                key_padding_mask=src_key_padding_mask,
+            )[0]
             src = src + self.dropout1(src2)
             src = self.norm1(src)
 
@@ -396,8 +474,16 @@ class TransformerDecoderLayer(Module):
         >>> out = decoder_layer(tgt, memory)
     """
 
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, activation="relu", share_qk=False,
-                 approx=None):
+    def __init__(
+        self,
+        d_model,
+        nhead,
+        dim_feedforward=2048,
+        dropout=0.1,
+        activation="relu",
+        share_qk=False,
+        approx=None,
+    ):
         super(TransformerDecoderLayer, self).__init__()
         self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
         self.multihead_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
@@ -416,14 +502,19 @@ class TransformerDecoderLayer(Module):
         self.activation = _get_activation_fn(activation)
 
     def __setstate__(self, state):
-        if 'activation' not in state:
-            state['activation'] = F.relu
+        if "activation" not in state:
+            state["activation"] = F.relu
         super(TransformerDecoderLayer, self).__setstate__(state)
 
-    def forward(self, tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor] = None,
-                memory_mask: Optional[Tensor] = None,
-                tgt_key_padding_mask: Optional[Tensor] = None,
-                memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
+    def forward(
+        self,
+        tgt: Tensor,
+        memory: Tensor,
+        tgt_mask: Optional[Tensor] = None,
+        memory_mask: Optional[Tensor] = None,
+        tgt_key_padding_mask: Optional[Tensor] = None,
+        memory_key_padding_mask: Optional[Tensor] = None,
+    ) -> Tensor:
         r"""Pass the inputs (and mask) through the decoder layer.
         Args:
             tgt: the sequence to the decoder layer (required).
@@ -435,12 +526,18 @@ class TransformerDecoderLayer(Module):
         Shape:
             see the docs in Transformer class.
         """
-        tgt2 = self.self_attn(tgt, tgt, tgt, attn_mask=tgt_mask,
-                              key_padding_mask=tgt_key_padding_mask)[0]
+        tgt2 = self.self_attn(
+            tgt, tgt, tgt, attn_mask=tgt_mask, key_padding_mask=tgt_key_padding_mask
+        )[0]
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
-        tgt2 = self.multihead_attn(tgt, memory, memory, attn_mask=memory_mask,
-                                   key_padding_mask=memory_key_padding_mask)[0]
+        tgt2 = self.multihead_attn(
+            tgt,
+            memory,
+            memory,
+            attn_mask=memory_mask,
+            key_padding_mask=memory_key_padding_mask,
+        )[0]
         tgt = tgt + self.dropout2(tgt2)
         tgt = self.norm2(tgt)
         tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))
@@ -480,8 +577,7 @@ def l1(p, q):
 def smart_sort(x, permutation):
     d1, d2 = x.size()
     ret = x[
-        torch.arange(d1).unsqueeze(1).repeat((1, d2)).flatten(),
-        permutation.flatten()
+        torch.arange(d1).unsqueeze(1).repeat((1, d2)).flatten(), permutation.flatten()
     ].view(d1, d2)
     return ret
 
@@ -491,9 +587,12 @@ def sparsify(target, params_reduction):
     N, target_l, seq_l = target_sparse.shape
     sorted_tensor, indices_tensor = torch.sort(target_sparse, dim=-1, descending=True)
     topk = int(round(seq_l * (1 - params_reduction)))
-    mask = torch.zeros_like(target_sparse, dtype=torch.bool).scatter_(-1, indices_tensor[:, :, :topk], 1)
+    mask = torch.zeros_like(target_sparse, dtype=torch.bool).scatter_(
+        -1, indices_tensor[:, :, :topk], 1
+    )
     target_sparse[~mask] = float(
-        '-inf')  # To zero out these values, we set their logit to be -inf, so that after softmax they are zero
+        "-inf"
+    )  # To zero out these values, we set their logit to be -inf, so that after softmax they are zero
     return target_sparse, mask.bool()
 
 
@@ -505,7 +604,9 @@ def low_rank(target, sparsity):
         topk = int(round(seq_l * (1 - sparsity)))
         # assert torch.dist(target_lr, torch.matmul(torch.matmul(u, torch.diag_embed(s)), v.transpose(-2, -1)))<1e-2
         s[:, topk:] = 0
-        target_lr = torch.matmul(torch.matmul(u, torch.diag_embed(s)), v.transpose(-2, -1))
+        target_lr = torch.matmul(
+            torch.matmul(u, torch.diag_embed(s)), v.transpose(-2, -1)
+        )
         return target_lr, True
     except:  # torch.svd may have convergence issues for GPU and CPU.
         return target_lr, False
@@ -519,9 +620,11 @@ def log_stats(approx, target):
     return torch.cat([sparse_l1.view(1), sparse_kl.view(1), sparse_kl_inverse.view(1)])
 
 
-def compute_single_distance(target_raw, attn_mask, params_reduction, approx_type, alpha=0.5):
+def compute_single_distance(
+    target_raw, attn_mask, params_reduction, approx_type, alpha=0.5
+):
     stats = torch.zeros([1, 3])
-    target_raw[target_raw < -1e7] = float('-inf')
+    target_raw[target_raw < -1e7] = float("-inf")
     target = F.softmax(target_raw, dim=-1)
     succeed = True
     approx_target = 0
@@ -530,7 +633,10 @@ def compute_single_distance(target_raw, attn_mask, params_reduction, approx_type
     if approx_type == "sparse":
         target_sparse, mask = sparsify(target_raw, params_reduction)
         if attn_mask is not None:
-            target_sparse.masked_fill_(attn_mask, float('-inf'), )
+            target_sparse.masked_fill_(
+                attn_mask,
+                float("-inf"),
+            )
         approx_target = torch.softmax(target_sparse, dim=-1)
         stats = log_stats(approx_target, target)
 
@@ -541,7 +647,10 @@ def compute_single_distance(target_raw, attn_mask, params_reduction, approx_type
         if succeed:
             target_lr[target_lr < 0] = 0.0
             if attn_mask is not None:
-                target_lr.masked_fill_(attn_mask, 0.0, )
+                target_lr.masked_fill_(
+                    attn_mask,
+                    0.0,
+                )
             approx_target = F.normalize(target_lr, p=1, dim=-1)
             stats = log_stats(approx_target, target)
 
@@ -558,7 +667,10 @@ def compute_single_distance(target_raw, attn_mask, params_reduction, approx_type
             target_sparse_lr[target_sparse_lr < 0] = 0.0
             target_sparse_lr += target_sparse
             if attn_mask is not None:
-                target_sparse_lr.masked_fill_(attn_mask, 0.0, )
+                target_sparse_lr.masked_fill_(
+                    attn_mask,
+                    0.0,
+                )
             approx_target = F.normalize(target_sparse_lr, p=1, dim=-1)
             stats = log_stats(approx_target, target)
     else:
@@ -567,8 +679,18 @@ def compute_single_distance(target_raw, attn_mask, params_reduction, approx_type
 
 
 class MultiheadAttention(torch.nn.Module):
-    def __init__(self, embed_dim, num_heads, dropout=0., bias=True, add_bias_kv=False, add_zero_attn=False, kdim=None,
-                 vdim=None, share_qk=False):
+    def __init__(
+        self,
+        embed_dim,
+        num_heads,
+        dropout=0.0,
+        bias=True,
+        add_bias_kv=False,
+        add_zero_attn=False,
+        kdim=None,
+        vdim=None,
+        share_qk=False,
+    ):
         super(MultiheadAttention, self).__init__()
         self.embed_dim = embed_dim
         self.kdim = kdim if kdim is not None else embed_dim
@@ -578,7 +700,9 @@ class MultiheadAttention(torch.nn.Module):
         self.num_heads = num_heads
         self.dropout = dropout
         self.head_dim = embed_dim // num_heads
-        assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
+        assert (
+            self.head_dim * num_heads == self.embed_dim
+        ), "embed_dim must be divisible by num_heads"
 
         self.bias = bias
         self.add_bias_kv = add_bias_kv
@@ -595,9 +719,9 @@ class MultiheadAttention(torch.nn.Module):
         #         self._reset_parameters()
 
         if self.bias:
-            constant_(self.q_proj_weight.bias, 0.)
-            constant_(self.v_proj_weight.bias, 0.)
-            constant_(self.out_proj.bias, 0.)
+            constant_(self.q_proj_weight.bias, 0.0)
+            constant_(self.v_proj_weight.bias, 0.0)
+            constant_(self.out_proj.bias, 0.0)
 
         if add_bias_kv:
             self.bias_k = Parameter(torch.empty(1, 1, embed_dim))
@@ -611,25 +735,42 @@ class MultiheadAttention(torch.nn.Module):
         self.add_zero_attn = add_zero_attn
 
         if share_qk:
-            self.in_proj_container = SharedQK_Proj(self.q_proj_weight, self.v_proj_weight)
+            self.in_proj_container = SharedQK_Proj(
+                self.q_proj_weight, self.v_proj_weight
+            )
         else:
-            self.in_proj_container = InProjContainer(self.q_proj_weight, self.k_proj_weight, self.v_proj_weight)
-        self.multihead_attention = MultiheadAttentionContainer(num_heads,
-                                                               self.in_proj_container,
-                                                               ScaledDotProduct(self.dropout),
-                                                               self.out_proj)
+            self.in_proj_container = InProjContainer(
+                self.q_proj_weight, self.k_proj_weight, self.v_proj_weight
+            )
+        self.multihead_attention = MultiheadAttentionContainer(
+            num_heads,
+            self.in_proj_container,
+            ScaledDotProduct(self.dropout),
+            self.out_proj,
+        )
 
-    def forward(self, query, key, value, types=None, key_padding_mask=None, need_weights=True, attn_mask=None):
+    def forward(
+        self,
+        query,
+        key,
+        value,
+        types=None,
+        key_padding_mask=None,
+        need_weights=True,
+        attn_mask=None,
+    ):
         if attn_mask is not None:
             if attn_mask.dim() == 2:
                 attn_mask = attn_mask.view(-1, attn_mask.size(0), attn_mask.size(1))
             attn_mask = attn_mask.bool()
-        return self.multihead_attention(query, key, value, types, attn_mask, self.bias_k, self.bias_v)
+        return self.multihead_attention(
+            query, key, value, types, attn_mask, self.bias_k, self.bias_v
+        )
 
 
 class MultiheadAttentionContainer(torch.nn.Module):
     def __init__(self, nhead, in_proj_container, attention_layer, out_proj):
-        r""" A multi-head attention container
+        r"""A multi-head attention container
         Args:
             nhead: the number of heads in the multiheadattention model
             in_proj_container: A container of multi-head in-projection linear layers (a.k.a nn.Linear).
@@ -658,11 +799,16 @@ class MultiheadAttentionContainer(torch.nn.Module):
         self.out_proj = out_proj
         self.attn_map = 0
 
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                types: Optional[dict] = None,
-                attn_mask: Optional[torch.Tensor] = None,
-                bias_k: Optional[torch.Tensor] = None,
-                bias_v: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch.Tensor,
+        types: Optional[dict] = None,
+        attn_mask: Optional[torch.Tensor] = None,
+        bias_k: Optional[torch.Tensor] = None,
+        bias_v: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""
         Args:
             query, key, value (Tensor): map a query and a set of key-value pairs to an output.
@@ -681,30 +827,40 @@ class MultiheadAttentionContainer(torch.nn.Module):
             where where L is the target length, S is the sequence length, H is the number of attention heads,
                 N is the batch size, and E is the embedding dimension.
         """
-        tgt_len, src_len, bsz, embed_dim = query.size(-3), key.size(-3), query.size(-2), query.size(-1)
+        tgt_len, src_len, bsz, embed_dim = (
+            query.size(-3),
+            key.size(-3),
+            query.size(-2),
+            query.size(-1),
+        )
         q, k, v = self.in_proj_container(query, key, value)
-        assert q.size(-1) % self.nhead == 0, "query's embed_dim must be divisible by the number of heads"
+        assert (
+            q.size(-1) % self.nhead == 0
+        ), "query's embed_dim must be divisible by the number of heads"
         head_dim = q.size(-1) // self.nhead
         q = q.reshape(tgt_len, bsz * self.nhead, head_dim)
 
-        assert k.size(-1) % self.nhead == 0, "key's embed_dim must be divisible by the number of heads"
+        assert (
+            k.size(-1) % self.nhead == 0
+        ), "key's embed_dim must be divisible by the number of heads"
         head_dim = k.size(-1) // self.nhead
         k = k.reshape(src_len, bsz * self.nhead, head_dim)
 
-        assert v.size(-1) % self.nhead == 0, "value's embed_dim must be divisible by the number of heads"
+        assert (
+            v.size(-1) % self.nhead == 0
+        ), "value's embed_dim must be divisible by the number of heads"
         head_dim = v.size(-1) // self.nhead
         v = v.reshape(src_len, bsz * self.nhead, head_dim)
 
-        attn_output, attn_output_weights, self.attn_map = self.attention_layer(q, k, v,
-                                                                               types=types, attn_mask=attn_mask,
-                                                                               bias_k=bias_k, bias_v=bias_v)
+        attn_output, attn_output_weights, self.attn_map = self.attention_layer(
+            q, k, v, types=types, attn_mask=attn_mask, bias_k=bias_k, bias_v=bias_v
+        )
         attn_output = attn_output.reshape(tgt_len, bsz, embed_dim)
         attn_output = self.out_proj(attn_output)
         return attn_output, attn_output_weights
 
 
 class ScaledDotProduct(torch.nn.Module):
-
     def __init__(self, dropout=0.0):
         r"""Processes a projected query and key-value pair to apply
         scaled dot product attention.
@@ -721,11 +877,16 @@ class ScaledDotProduct(torch.nn.Module):
         super(ScaledDotProduct, self).__init__()
         self.dropout = dropout
 
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                types: Optional[dict] = None,
-                attn_mask: Optional[torch.Tensor] = None,
-                bias_k: Optional[torch.Tensor] = None,
-                bias_v: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch.Tensor,
+        types: Optional[dict] = None,
+        attn_mask: Optional[torch.Tensor] = None,
+        bias_k: Optional[torch.Tensor] = None,
+        bias_v: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         r"""Uses a scaled dot product with the projected key-value pair to update
         the projected query.
         Args:
@@ -748,10 +909,16 @@ class ScaledDotProduct(torch.nn.Module):
             of attention heads, N is the batch size, and E is the embedding dimension.
         """
         if bias_k is not None and bias_v is not None:
-            assert key.size(-1) == bias_k.size(-1) and key.size(-2) == bias_k.size(-2) and bias_k.size(-3) == 1, \
-                "Shape of bias_k is not supported"
-            assert value.size(-1) == bias_v.size(-1) and value.size(-2) == bias_v.size(-2) and bias_v.size(-3) == 1, \
-                "Shape of bias_v is not supported"
+            assert (
+                key.size(-1) == bias_k.size(-1)
+                and key.size(-2) == bias_k.size(-2)
+                and bias_k.size(-3) == 1
+            ), "Shape of bias_k is not supported"
+            assert (
+                value.size(-1) == bias_v.size(-1)
+                and value.size(-2) == bias_v.size(-2)
+                and bias_v.size(-3) == 1
+            ), "Shape of bias_v is not supported"
             key = torch.cat([key, bias_k])
             value = torch.cat([value, bias_v])
             if attn_mask is not None:
@@ -759,41 +926,65 @@ class ScaledDotProduct(torch.nn.Module):
                 attn_mask = torch.nn.functional.pad(_attn_mask, (0, 1))
 
         tgt_len, head_dim = query.size(-3), query.size(-1)
-        assert query.size(-1) == key.size(-1) == value.size(-1), "The feature dim of query, key, value must be equal."
+        assert (
+            query.size(-1) == key.size(-1) == value.size(-1)
+        ), "The feature dim of query, key, value must be equal."
         assert key.size() == value.size(), "Shape of key, value must match"
         src_len = key.size(-3)
         batch_heads = max(query.size(-2), key.size(-2))
 
         # Scale query
-        query, key, value = query.transpose(-2, -3), key.transpose(-2, -3), value.transpose(-2, -3)
+        query, key, value = (
+            query.transpose(-2, -3),
+            key.transpose(-2, -3),
+            value.transpose(-2, -3),
+        )
         query = query * (float(head_dim) ** -0.5)
         if attn_mask is not None:
             if attn_mask.dim() != 3:
-                raise RuntimeError('attn_mask must be a 3D tensor.')
-            if (attn_mask.size(-1) != src_len) or (attn_mask.size(-2) != tgt_len) or \
-                    (attn_mask.size(-3) != 1 and attn_mask.size(-3) != batch_heads):
-                raise RuntimeError('The size of the attn_mask is not correct.')
+                raise RuntimeError("attn_mask must be a 3D tensor.")
+            if (
+                (attn_mask.size(-1) != src_len)
+                or (attn_mask.size(-2) != tgt_len)
+                or (attn_mask.size(-3) != 1 and attn_mask.size(-3) != batch_heads)
+            ):
+                raise RuntimeError("The size of the attn_mask is not correct.")
             if attn_mask.dtype != torch.bool:
-                raise RuntimeError('Only bool tensor is supported for attn_mask')
+                raise RuntimeError("Only bool tensor is supported for attn_mask")
 
         # Dot product of q, k
         attn_output_weights = torch.matmul(query, key.transpose(-2, -1))
         if attn_mask is not None:
-            attn_output_weights.masked_fill_(attn_mask, -1e8, )
+            attn_output_weights.masked_fill_(
+                attn_mask,
+                -1e8,
+            )
         attn_map = {}
-        attn_map['attn'] = attn_output_weights
-        attn_map['stat'] = None
-        attn_map['succeed'] = None
+        attn_map["attn"] = attn_output_weights
+        attn_map["stat"] = None
+        attn_map["succeed"] = None
 
         # approx attn weights
         if (types is not None) and (not self.training):
-            attn_output_weights, attn_map['stat'], attn_map['succeed'] = compute_single_distance \
-                (attn_map['attn'], attn_mask, types['params_reduction'],
-                 types['approx_type'], alpha=types['alpha'])
+            (
+                attn_output_weights,
+                attn_map["stat"],
+                attn_map["succeed"],
+            ) = compute_single_distance(
+                attn_map["attn"],
+                attn_mask,
+                types["params_reduction"],
+                types["approx_type"],
+                alpha=types["alpha"],
+            )
         else:
-            attn_output_weights = torch.nn.functional.softmax(attn_output_weights, dim=-1)
+            attn_output_weights = torch.nn.functional.softmax(
+                attn_output_weights, dim=-1
+            )
 
-        attn_output_weights = torch.nn.functional.dropout(attn_output_weights, p=self.dropout, training=self.training)
+        attn_output_weights = torch.nn.functional.dropout(
+            attn_output_weights, p=self.dropout, training=self.training
+        )
         attn_output = torch.matmul(attn_output_weights, value)
         return attn_output.transpose(-2, -3), attn_output_weights, attn_map
 
@@ -822,10 +1013,9 @@ class InProjContainer(torch.nn.Module):
         self.key_proj = key_proj
         self.value_proj = value_proj
 
-    def forward(self,
-                query: torch.Tensor,
-                key: torch.Tensor,
-                value: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(
+        self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         r"""Projects the input sequences using in-proj layers.
         Args:
             query, key, value (Tensors): sequence to be projected

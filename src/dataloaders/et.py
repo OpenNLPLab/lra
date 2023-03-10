@@ -15,6 +15,7 @@ from torch.utils import data
 from torch.utils.data import Dataset, DataLoader
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 from src.dataloaders.datasets import SequenceDataset, default_data_path
@@ -356,12 +357,18 @@ class InformerDataset(Dataset):
             mark = self.data_stamp[s_begin:r_end]
         else:
             mark = self.data_stamp[s_begin:s_end]
-            mark = np.concatenate([mark, np.zeros((self.pred_len, mark.shape[-1]))], axis=0)
+            mark = np.concatenate(
+                [mark, np.zeros((self.pred_len, mark.shape[-1]))], axis=0
+            )
 
         if self.eval_mask:
-            mask = np.concatenate([np.zeros(self.seq_len), np.ones(self.pred_len)], axis=0)
+            mask = np.concatenate(
+                [np.zeros(self.seq_len), np.ones(self.pred_len)], axis=0
+            )
         else:
-            mask = np.concatenate([np.zeros(self.seq_len), np.zeros(self.pred_len)], axis=0)
+            mask = np.concatenate(
+                [np.zeros(self.seq_len), np.zeros(self.pred_len)], axis=0
+            )
         mask = mask[:, None]
 
         # Add the mask to the timestamps: # 480, 5
@@ -375,7 +382,12 @@ class InformerDataset(Dataset):
             mark = mark.astype(np.float32)
         mask = mask.astype(np.int64)
 
-        return torch.tensor(seq_x), torch.tensor(seq_y), torch.tensor(mark), torch.tensor(mask)
+        return (
+            torch.tensor(seq_x),
+            torch.tensor(seq_y),
+            torch.tensor(mark),
+            torch.tensor(mask),
+        )
 
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
@@ -398,9 +410,9 @@ class InformerDataset(Dataset):
 
     @property
     def n_tokens_time(self):
-        if self.freq == 'h':
+        if self.freq == "h":
             return [13, 32, 7, 24]
-        elif self.freq == 't':
+        elif self.freq == "t":
             return [13, 32, 7, 24, 4]
         else:
             raise NotImplementedError
@@ -459,12 +471,13 @@ class _Dataset_Weather(InformerDataset):
     def __init__(self, data_path="WTH.csv", target="WetBulbCelsius", **kwargs):
         super().__init__(data_path=data_path, target=target, **kwargs)
 
+
 class _Dataset_ECL(InformerDataset):
     def __init__(self, data_path="ECL.csv", target="MT_320", **kwargs):
         super().__init__(data_path=data_path, target=target, **kwargs)
 
-class InformerSequenceDataset(SequenceDataset):
 
+class InformerSequenceDataset(SequenceDataset):
     @property
     def n_tokens_time(self):
         # Shape of the dates: depends on `timeenc` and `freq`
@@ -494,7 +507,7 @@ class InformerSequenceDataset(SequenceDataset):
         return x, y, *z
 
     def setup(self):
-        self.data_dir = self.data_dir or default_data_path / 'informer' / self._name_
+        self.data_dir = self.data_dir or default_data_path / "informer" / self._name_
 
         self.dataset_train = self._dataset_cls(
             root_path=self.data_dir,
@@ -544,6 +557,7 @@ class InformerSequenceDataset(SequenceDataset):
             eval_mask=self.eval_mask,
         )
 
+
 class ETTHour(InformerSequenceDataset):
     _name_ = "etth"
 
@@ -565,6 +579,7 @@ class ETTHour(InformerSequenceDataset):
         0: "ETTh1.csv",
         1: "ETTh2.csv",
     }
+
 
 class ETTMinute(InformerSequenceDataset):
     _name_ = "ettm"
@@ -588,6 +603,7 @@ class ETTMinute(InformerSequenceDataset):
         1: "ETTm2.csv",
     }
 
+
 class Weather(InformerSequenceDataset):
     _name_ = "weather"
 
@@ -608,6 +624,7 @@ class Weather(InformerSequenceDataset):
     variants = {
         0: "WTH.csv",
     }
+
 
 class ECL(InformerSequenceDataset):
     _name_ = "ecl"

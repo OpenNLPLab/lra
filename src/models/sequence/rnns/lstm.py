@@ -6,8 +6,9 @@ from src.models.sequence import SequenceModule
 from einops import rearrange
 import src.models.nn.utils as U
 
+
 class TorchLSTM(nn.LSTM, SequenceModule):
-    """ Wrapper around nn.LSTM to make it compatible with our RNN interface """
+    """Wrapper around nn.LSTM to make it compatible with our RNN interface"""
 
     def __init__(self, d_model, d_hidden, n_layers=1, learn_h0=False, **kwargs):
         # Rename input_size, hidden_size to d_input, d_model
@@ -16,14 +17,24 @@ class TorchLSTM(nn.LSTM, SequenceModule):
         self.d_hidden = d_hidden
         self.n_layers = n_layers
         self.learn_h0 = learn_h0
-        super().__init__(d_model, d_hidden, num_layers=n_layers, batch_first=True, **kwargs)
+        super().__init__(
+            d_model, d_hidden, num_layers=n_layers, batch_first=True, **kwargs
+        )
 
         self.num_directions = 2 if self.bidirectional else 1
-        self.real_hidden_size = self.proj_size if self.proj_size > 0 else self.hidden_size
+        self.real_hidden_size = (
+            self.proj_size if self.proj_size > 0 else self.hidden_size
+        )
 
         if learn_h0:
-            self.h0 = nn.Parameter(torch.zeros(self.num_layers * self.num_directions, 1, self.real_hidden_size))
-            self.c0 = nn.Parameter(torch.zeros(self.num_layers * self.num_directions, 1, self.hidden_size))
+            self.h0 = nn.Parameter(
+                torch.zeros(
+                    self.num_layers * self.num_directions, 1, self.real_hidden_size
+                )
+            )
+            self.c0 = nn.Parameter(
+                torch.zeros(self.num_layers * self.num_directions, 1, self.hidden_size)
+            )
 
     # def forward(self, inputs, *args, **kwargs):
     #     output, (h_n, c_n) = super().forward(inputs)
@@ -38,15 +49,29 @@ class TorchLSTM(nn.LSTM, SequenceModule):
         # https://pytorch.org/docs/stable/_modules/torch/nn/modules/rnn.html#LSTM
         """
         if not self.learn_h0:
-            h_zeros = torch.zeros(self.num_layers * self.num_directions,
-                                *batch_shape, self.real_hidden_size,
-                                dtype=torch.float, device=device)
-            c_zeros = torch.zeros(self.num_layers * self.num_directions,
-                                *batch_shape, self.hidden_size,
-                                dtype=torch.float, device=device)
+            h_zeros = torch.zeros(
+                self.num_layers * self.num_directions,
+                *batch_shape,
+                self.real_hidden_size,
+                dtype=torch.float,
+                device=device
+            )
+            c_zeros = torch.zeros(
+                self.num_layers * self.num_directions,
+                *batch_shape,
+                self.hidden_size,
+                dtype=torch.float,
+                device=device
+            )
         else:
-            h_zeros = self.h0.expand(self.num_layers * self.num_directions, *batch_shape, self.real_hidden_size)
-            c_zeros = self.c0.expand(self.num_layers * self.num_directions, *batch_shape, self.hidden_size)
+            h_zeros = self.h0.expand(
+                self.num_layers * self.num_directions,
+                *batch_shape,
+                self.real_hidden_size
+            )
+            c_zeros = self.c0.expand(
+                self.num_layers * self.num_directions, *batch_shape, self.hidden_size
+            )
         return (h_zeros, c_zeros)
 
     @property
@@ -62,7 +87,8 @@ class TorchLSTM(nn.LSTM, SequenceModule):
         if self.n_layers == 1:
             return lambda state: state[0]
         else:
-            return lambda state: rearrange(state[0], 'd b h -> b (d h)')
+            return lambda state: rearrange(state[0], "d b h -> b (d h)")
+
 
 # Handle 'transposed' argument and absorb extra args in forward
 TorchLSTM = U.Transpose(U.TupleModule(TorchLSTM))

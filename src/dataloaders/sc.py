@@ -53,6 +53,7 @@ def normalise_data(X, y):
     out = torch.stack(out, dim=-1)
     return out
 
+
 def normalize_all_data(X_train, X_val, X_test):
 
     for i in range(X_train.shape[-1]):
@@ -64,10 +65,12 @@ def normalize_all_data(X_train, X_val, X_test):
 
     return X_train, X_val, X_test
 
+
 def minmax_scale(tensor):
     min_val = torch.amin(tensor, dim=(1, 2), keepdim=True)
     max_val = torch.amax(tensor, dim=(1, 2), keepdim=True)
     return (tensor - min_val) / (max_val - min_val)
+
 
 def mu_law_encode(audio, bits=8):
     """
@@ -86,6 +89,7 @@ def mu_law_encode(audio, bits=8):
     # Quantize signal to the specified number of levels.
     return ((encoded + 1) / 2 * mu + 0.5).to(torch.int32)
 
+
 def mu_law_decode(encoded, bits=8):
     """
     Perform inverse mu-law transformation.
@@ -95,8 +99,9 @@ def mu_law_decode(encoded, bits=8):
     x = (encoded / mu) * 2 - 1
 
     # Invert the mu-law transformation
-    x = torch.sign(x) * ((1 + mu)**(torch.abs(x)) - 1) / mu
+    x = torch.sign(x) * ((1 + mu) ** (torch.abs(x)) - 1) / mu
     return x
+
 
 def split_data(tensor, stratify):
     # 0.7/0.15/0.15 train/val/test split
@@ -177,16 +182,16 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
     ]
 
     def __init__(
-            self,
-            partition: str,  # `train`, `val`, `test`
-            length: int, # sequence length
-            mfcc: bool,  # whether to use MFCC features (`True`) or raw features
-            sr: int,  # subsampling rate: default should be 1 (no subsampling); keeps every kth sample
-            dropped_rate: float,  # rate at which samples are dropped, lies in [0, 100.]
-            path: str,
-            all_classes: bool = False,
-            gen: bool = False,  # whether we are doing speech generation
-            discrete_input: bool = False,  # whether we are using discrete inputs
+        self,
+        partition: str,  # `train`, `val`, `test`
+        length: int,  # sequence length
+        mfcc: bool,  # whether to use MFCC features (`True`) or raw features
+        sr: int,  # subsampling rate: default should be 1 (no subsampling); keeps every kth sample
+        dropped_rate: float,  # rate at which samples are dropped, lies in [0, 100.]
+        path: str,
+        all_classes: bool = False,
+        gen: bool = False,  # whether we are doing speech generation
+        discrete_input: bool = False,  # whether we are using discrete inputs
     ):
         self.dropped_rate = dropped_rate
         self.all_classes = all_classes
@@ -195,7 +200,6 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
 
         self.root = pathlib.Path(path)  # pathlib.Path("./data")
         base_loc = self.root / "SpeechCommands" / "processed_data"
-
 
         if mfcc:
             data_loc = base_loc / "mfcc"
@@ -220,7 +224,9 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
         else:
             self.download()
             if not self.all_classes:
-                train_X, val_X, test_X, train_y, val_y, test_y = self._process_data(mfcc)
+                train_X, val_X, test_X, train_y, val_y, test_y = self._process_data(
+                    mfcc
+                )
             else:
                 train_X, val_X, test_X, train_y, val_y, test_y = self._process_all(mfcc)
 
@@ -238,11 +244,12 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
                 test_y=test_y,
             )
 
-        X, y = self.load_data(data_loc, partition) # (batch, length, 1)
-        if self.gen: y = y.transpose(1, 2)
+        X, y = self.load_data(data_loc, partition)  # (batch, length, 1)
+        if self.gen:
+            y = y.transpose(1, 2)
 
         if not mfcc and not self.gen:
-            X = F.pad(X, (0, 0, 0, length-16000))
+            X = F.pad(X, (0, 0, 0, length - 16000))
 
         # Subsample
         if not mfcc:
@@ -272,18 +279,18 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
     def _process_all(self, mfcc):
         assert self.dropped_rate == 0, "Dropped rate must be 0 for all classes"
         base_loc = self.root / "SpeechCommands"
-        
+
         with open(base_loc / "validation_list.txt", "r") as f:
             validation_list = set([line.rstrip() for line in f])
 
         with open(base_loc / "testing_list.txt", "r") as f:
             testing_list = set([line.rstrip() for line in f])
-            
+
         # X = torch.empty(105829, 16000, 1)
         # y = torch.empty(105829, dtype=torch.long)
         train_X, val_X, test_X = [], [], []
         train_y, val_y, test_y = [], [], []
-        
+
         # val_indices = []
         # test_indices = []
 
@@ -294,11 +301,10 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
             loc = base_loc / foldername
             for filename in os.listdir(loc):
                 audio, _ = torchaudio.load(
-                    loc / filename, channels_first=False,
+                    loc / filename,
+                    channels_first=False,
                 )
-                audio = (
-                        audio / 2 ** 15
-                )
+                audio = audio / 2**15
                 # Pad
                 audio = F.pad(audio, (0, 0, 0, 16000 - audio.shape[0]))
                 # # A few samples are shorter than the full length; for simplicity we discard them.
@@ -306,10 +312,10 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
                 #     continue
                 # breakpoint()
 
-                if str(foldername + '/' + filename) in validation_list:
+                if str(foldername + "/" + filename) in validation_list:
                     val_X.append(audio)
                     val_y.append(y_index)
-                elif str(foldername + '/' + filename) in testing_list:
+                elif str(foldername + "/" + filename) in testing_list:
                     test_X.append(audio)
                     test_y.append(y_index)
                 else:
@@ -373,7 +379,9 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
 
         # Normalize data
         if mfcc:
-            train_X, val_X, test_X = normalize_all_data(train_X.transpose(1, 2), val_X.transpose(1, 2), test_X.transpose(1, 2))
+            train_X, val_X, test_X = normalize_all_data(
+                train_X.transpose(1, 2), val_X.transpose(1, 2), test_X.transpose(1, 2)
+            )
             train_X = train_X.transpose(1, 2)
             val_X = val_X.transpose(1, 2)
             test_X = test_X.transpose(1, 2)
@@ -395,7 +403,6 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
             val_y,
             test_y,
         )
-        
 
     def _process_data(self, mfcc):
         base_loc = self.root / "SpeechCommands"
@@ -412,13 +419,14 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
             loc = base_loc / foldername
             for filename in os.listdir(loc):
                 audio, _ = torchaudio.load(
-                    loc / filename, channels_first=False,
+                    loc / filename,
+                    channels_first=False,
                 )
                 # audio, _ = torchaudio.load_wav(
                 #     loc / filename, channels_first=False, normalization=False
                 # )  # for forward compatbility if they fix it
                 audio = (
-                        audio / 2 ** 15
+                    audio / 2**15
                 )  # Normalization argument doesn't seem to work so we do it manually.
 
                 # A few samples are shorter than the full length; for simplicity we discard them.
@@ -451,16 +459,16 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
             for Xi in X:
                 removed_points = (
                     torch.randperm(X.shape[-1], generator=generator)[
-                    : int(X.shape[-1] * float(self.dropped_rate) / 100.0)
+                        : int(X.shape[-1] * float(self.dropped_rate) / 100.0)
                     ]
-                        .sort()
-                        .values
+                    .sort()
+                    .values
                 )
                 Xi_removed = Xi.clone()
                 Xi_removed[:, removed_points] = float("nan")
                 X_removed.append(Xi_removed)
             X = torch.stack(X_removed, dim=0)
-            
+
         # Normalize data
         if mfcc:
             X = normalise_data(X.transpose(1, 2), y).transpose(1, 2)
@@ -479,19 +487,31 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
 
         if self.gen:
             train_y, val_y, test_y = train_X, val_X, test_X
-            train_y, val_y, test_y = mu_law_encode(train_y), mu_law_encode(val_y), mu_law_encode(test_y)
+            train_y, val_y, test_y = (
+                mu_law_encode(train_y),
+                mu_law_encode(val_y),
+                mu_law_encode(test_y),
+            )
             # train_X, val_X, test_X = train_X[..., :-1], val_X[..., :-1], test_X[..., :-1]
             # # Prepend zero to train_X, val_X, test_X
             # train_X = torch.cat([torch.zeros(train_X.shape[0], 1, train_X.shape[2]), train_X], dim=1)
 
             # train_X, val_X, test_X = torch.roll(train_X, 1, 2), torch.roll(val_X, 1, 2), torch.roll(test_X, 1, 2)
             if not self.discrete_input:
-                train_X, val_X, test_X = torch.roll(mu_law_decode(train_y), 1, 2), torch.roll(mu_law_decode(val_y), 1, 2), torch.roll(mu_law_decode(test_y), 1, 2)
+                train_X, val_X, test_X = (
+                    torch.roll(mu_law_decode(train_y), 1, 2),
+                    torch.roll(mu_law_decode(val_y), 1, 2),
+                    torch.roll(mu_law_decode(test_y), 1, 2),
+                )
             else:
-                train_X, val_X, test_X = torch.roll(train_y, 1, 2), torch.roll(val_y, 1, 2), torch.roll(test_y, 1, 2)
+                train_X, val_X, test_X = (
+                    torch.roll(train_y, 1, 2),
+                    torch.roll(val_y, 1, 2),
+                    torch.roll(test_y, 1, 2),
+                )
             train_X[..., 0], val_X[..., 0], test_X[..., 0] = 0, 0, 0
 
-            assert(train_y.shape == train_X.shape)
+            assert train_y.shape == train_X.shape
 
         return (
             train_X,
@@ -520,6 +540,7 @@ class _SpeechCommands(torch.utils.data.TensorDataset):
 
         return X.transpose(1, 2), y
 
+
 class _SpeechCommandsGeneration(_SpeechCommands):
     SUBSET_CLASSES = [
         "zero",
@@ -535,24 +556,24 @@ class _SpeechCommandsGeneration(_SpeechCommands):
     ]
 
     def __init__(
-            self,
-            partition: str,  # `train`, `val`, `test`
-            length: int, # sequence length
-            mfcc: bool,  # whether to use MFCC features (`True`) or raw features
-            sr: int,  # subsampling rate: default should be 1 (no subsampling); keeps every kth sample
-            dropped_rate: float,  # rate at which samples are dropped, lies in [0, 100.]
-            path: str,
-            all_classes: bool = False,
-            discrete_input: bool = False,
+        self,
+        partition: str,  # `train`, `val`, `test`
+        length: int,  # sequence length
+        mfcc: bool,  # whether to use MFCC features (`True`) or raw features
+        sr: int,  # subsampling rate: default should be 1 (no subsampling); keeps every kth sample
+        dropped_rate: float,  # rate at which samples are dropped, lies in [0, 100.]
+        path: str,
+        all_classes: bool = False,
+        discrete_input: bool = False,
     ):
         super(_SpeechCommandsGeneration, self).__init__(
-                partition = partition,
-                length = length,
-                mfcc = mfcc,
-                sr = sr,
-                dropped_rate = dropped_rate,
-                path = path,
-                all_classes = all_classes,
-                gen = True,
-                discrete_input = discrete_input,
+            partition=partition,
+            length=length,
+            mfcc=mfcc,
+            sr=sr,
+            dropped_rate=dropped_rate,
+            path=path,
+            all_classes=all_classes,
+            gen=True,
+            discrete_input=discrete_input,
         )

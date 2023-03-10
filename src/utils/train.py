@@ -47,14 +47,24 @@ def get_logger(name=__name__, level=logging.INFO) -> logging.Logger:
 
     # this ensures all logging levels get marked with the rank zero decorator
     # otherwise logs would get multiplied for each GPU process in multi-GPU setup
-    for level in ("debug", "info", "warning", "error", "exception", "fatal", "critical"):
+    for level in (
+        "debug",
+        "info",
+        "warning",
+        "error",
+        "exception",
+        "fatal",
+        "critical",
+    ):
         setattr(logger, level, rank_zero_only(getattr(logger, level)))
 
     return logger
 
 
 # def extras(config: DictConfig) -> None:
-def process_config(config: DictConfig) -> DictConfig: # TODO because of filter_keys, this is no longer in place
+def process_config(
+    config: DictConfig,
+) -> DictConfig:  # TODO because of filter_keys, this is no longer in place
     """A couple of optional utilities, controlled by main config file:
     - disabling warnings
     - easier access to debug mode
@@ -65,11 +75,11 @@ def process_config(config: DictConfig) -> DictConfig: # TODO because of filter_k
     """
     log = get_logger()
 
-    OmegaConf.register_new_resolver('eval', eval)
+    OmegaConf.register_new_resolver("eval", eval)
 
     # Filter out keys that were used just for interpolation
     # config = dictconfig_filter_keys(config, lambda k: not k.startswith('__'))
-    config = omegaconf_filter_keys(config, lambda k: not k.startswith('__'))
+    config = omegaconf_filter_keys(config, lambda k: not k.startswith("__"))
 
     # enable adding new keys to config
     OmegaConf.set_struct(config, False)
@@ -84,9 +94,11 @@ def process_config(config: DictConfig) -> DictConfig: # TODO because of filter_k
         log.info("Running in debug mode! <config.debug=True>")
         config.trainer.fast_dev_run = True
 
-    # # force debugger friendly configuration if <config.trainer.fast_dev_run=True>
-    # if config.trainer.get("fast_dev_run"):
-        log.info("Forcing debugger friendly configuration! <config.trainer.fast_dev_run=True>")
+        # # force debugger friendly configuration if <config.trainer.fast_dev_run=True>
+        # if config.trainer.get("fast_dev_run"):
+        log.info(
+            "Forcing debugger friendly configuration! <config.trainer.fast_dev_run=True>"
+        )
         # Debuggers don't like GPUs or multiprocessing
         if config.trainer.get("gpus"):
             config.trainer.gpus = 0
@@ -99,6 +111,7 @@ def process_config(config: DictConfig) -> DictConfig: # TODO because of filter_k
     # OmegaConf.set_struct(config, True) # [21-09-17 AG] I need this for .pop(_name_) pattern among other things
 
     return config
+
 
 @rank_zero_only
 def print_config(
@@ -141,23 +154,29 @@ def print_config(
     with open("config_tree.txt", "w") as fp:
         rich.print(tree, file=fp)
 
+
 def log_optimizer(logger, optimizer, keys):
-    """ Log values of particular keys from the optimizer's param groups """
+    """Log values of particular keys from the optimizer's param groups"""
     keys = sorted(keys)
     for i, g in enumerate(optimizer.param_groups):
         group_hps = {k: g.get(k, None) for k in keys}
-        logger.info(' | '.join([
-            f"Optimizer group {i}",
-            f"{len(g['params'])} tensors",
-        ] + [f"{k} {v}" for k, v in group_hps.items()]))
+        logger.info(
+            " | ".join(
+                [
+                    f"Optimizer group {i}",
+                    f"{len(g['params'])} tensors",
+                ]
+                + [f"{k} {v}" for k, v in group_hps.items()]
+            )
+        )
         # print(f"Optimizer group {i} | {len(g['params'])} tensors | lr {g['lr']} | wd {g.get('weight_decay', None)}")
-
 
 
 """ Old code """
 
+
 def resume(config):
-    pl.seed_everything(config.train.seed, workers=True) # TODO what happens if None?
+    pl.seed_everything(config.train.seed, workers=True)  # TODO what happens if None?
 
     trainer = create_trainer(config)
     # Because we do model creation in setup(), we have to create model manually again
@@ -172,7 +191,7 @@ def resume(config):
     #     hopefully this doesn't mess with the optimizer checkpoint
     #     This currently doesn't seem to break anything, but is very annoying to reason about and who knows if it'll change in future versions
     model.setup()
-    model = model.to('cuda')
+    model = model.to("cuda")
     model.on_post_move_to_device()
     # My best guess to the order of hooks is something like:
     # (1) .setup()
@@ -184,25 +203,30 @@ def resume(config):
 
     trainer.fit(model)
 
+
 def resume_manual(config):
     ### Alternatively to the Trainer(resume_from_checkpoint=) argument, we can explicitly restore trainer and model state
     trainer = pl.Trainer(resume_from_checkpoint=path)
     ### Model
     import pathlib
+
     path = Path(__file__).absolute().parent / config.train.resume
     checkpoint = torch.load(path)
     # Move to device explicitly so we can set up submodules (e.g. Krylov) and load the saved model
-    model = model.to('cuda')
+    model = model.to("cuda")
     model.setup()
     for module in model.modules():
-        if hasattr(module, 'setup'): module.setup()
+        if hasattr(module, "setup"):
+            module.setup()
 
-    model.load_state_dict(checkpoint['state_dict'])
+    model.load_state_dict(checkpoint["state_dict"])
     # delattr(model, 'setup') # Trick to prevent model from being set up multiple times, but runs into a Python bug LOL https://discuss.python.org/t/why-do-setattr-and-delattr-raise-an-attributeerror-in-this-case/7836/4
 
     ### Optimizers
-    optimizers, lr_schedulers, _ = trainer.init_optimizers(model) # third arg is optimizer_frequencies https://github.com/PyTorchLightning/pytorch-lightning/blob/c66d30a4aa9615cf1b81e76e416c162bf9d2f0a3/pytorch_lightning/trainer/optimizers.py#L28
-    for optimizer, optimizer_state in zip(optimizers, checkpoint['optimizer_states']):
+    optimizers, lr_schedulers, _ = trainer.init_optimizers(
+        model
+    )  # third arg is optimizer_frequencies https://github.com/PyTorchLightning/pytorch-lightning/blob/c66d30a4aa9615cf1b81e76e416c162bf9d2f0a3/pytorch_lightning/trainer/optimizers.py#L28
+    for optimizer, optimizer_state in zip(optimizers, checkpoint["optimizer_states"]):
         optimizer.load_state_dict(optimizer_state)
 
     trainer.model = model

@@ -3,11 +3,20 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .utils import logging_info
 
+
 class GLU(nn.Module):
-    def __init__(self, d1, glu_expand_ratio=2, act_fun='None', fina_act="None", dropout=0.0, bias=True):
+    def __init__(
+        self,
+        d1,
+        glu_expand_ratio=2,
+        act_fun="None",
+        fina_act="None",
+        dropout=0.0,
+        bias=True,
+    ):
         super().__init__()
-        
-        d2 = int(d1*glu_expand_ratio)
+
+        d2 = int(d1 * glu_expand_ratio)
         self.d_output = d1
         self.l1 = nn.Linear(d1, d2, bias=bias)
         self.l2 = nn.Linear(d1, d2, bias=bias)
@@ -35,12 +44,16 @@ class GLU(nn.Module):
         elif act_fun == "exp":
             return torch.exp
         elif act_fun == "leak":
+
             def f(x):
                 return F.leaky_relu(x, negative_slope=self.negative_slope)
+
             return f
         elif act_fun == "1+elu":
+
             def f(x):
                 return 1 + F.elu(x)
+
             return f
         elif act_fun == "silu":
             return F.silu

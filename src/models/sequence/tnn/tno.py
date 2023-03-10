@@ -11,6 +11,7 @@ from einops import rearrange, repeat
 from ..utils import logging_info
 from .rpe import Rpe
 
+
 class Tno(nn.Module):
     def __init__(
         self,
@@ -61,11 +62,11 @@ class Tno(nn.Module):
             self.gamma = nn.Parameter(torch.randn(self.h, 1, self.dim))
 
         self.rpe = Rpe(
-            dim=rpe_dim, 
-            outdim=h * dim, 
+            dim=rpe_dim,
+            outdim=h * dim,
             residual=residual,
             act=act,
-            bias=bias, 
+            bias=bias,
         )
 
         if self.causal:
@@ -203,7 +204,7 @@ class Tno(nn.Module):
                 gamma = torch.log(gamma) * coef
                 pos = gamma + pos
             else:
-                gamma = gamma ** coef
+                gamma = gamma**coef
                 pos = gamma * pos
         if self.use_exp:
             a = torch.exp(
@@ -283,7 +284,7 @@ class Tno(nn.Module):
                 pos = gamma + pos
                 neg = torch.flip(gamma, dims=[1]) + neg
             else:
-                gamma = gamma ** coef
+                gamma = gamma**coef
                 pos = gamma * pos
                 neg = torch.flip(gamma, dims=[1]) * neg
         if self.use_exp:
@@ -388,7 +389,7 @@ class Tno(nn.Module):
                 pos = gamma + pos
                 neg = torch.flip(gamma, dims=[1]) + neg
             else:
-                gamma = gamma ** coef
+                gamma = gamma**coef
                 pos = gamma * pos
                 neg = torch.flip(gamma, dims=[1]) * neg
         if self.use_exp:

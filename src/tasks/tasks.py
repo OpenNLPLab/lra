@@ -7,7 +7,10 @@ import torch.nn.functional as F
 from einops import rearrange
 from omegaconf import ListConfig
 
-from src.models.nn.adaptive_softmax import AdaptiveEmbedding, ProjectedAdaptiveLogSoftmax
+from src.models.nn.adaptive_softmax import (
+    AdaptiveEmbedding,
+    ProjectedAdaptiveLogSoftmax,
+)
 from src.models.nn.initialization import weights_init_embedding
 import src.tasks.metrics as M
 import src.models.nn.utils as U
@@ -16,23 +19,28 @@ from src.utils.config import to_list, instantiate_partial, instantiate
 
 
 class BaseTask:
-    """ Abstract class that takes care of:
+    """Abstract class that takes care of:
     - loss function
     - arbitrary metrics
     - (optional) encoder module that interfaces with dataset (inputs) and model
     - (optional) decoder module that interfaces with dataset (targets) and model
     """
+
     encoder = None
     decoder = None
 
-    def __init__(self, dataset=None, model=None, loss=None, metrics=None, torchmetrics=None):
-        """ This class is allowed to grab attributes directly off a constructed dataset and model object """
+    def __init__(
+        self, dataset=None, model=None, loss=None, metrics=None, torchmetrics=None
+    ):
+        """This class is allowed to grab attributes directly off a constructed dataset and model object"""
         self.dataset = dataset
         self.model = model
-        if metrics is None: metrics = []
+        if metrics is None:
+            metrics = []
         self.metric_names = to_list(metrics)
 
-        if torchmetrics is None: torchmetrics = []
+        if torchmetrics is None:
+            torchmetrics = []
         self.torchmetric_names = to_list(torchmetrics)
         self._tracked_torchmetrics = {}
 
@@ -45,14 +53,25 @@ class BaseTask:
         """
         self._tracked_torchmetrics[prefix] = {}
         for name in self.torchmetric_names:
-            if name in ['AUROC', 'StatScores', 'Precision', 'Recall', 'F1']:
-                self._tracked_torchmetrics[prefix][name] = getattr(tm, name)(average='macro', num_classes=self.dataset.d_output, compute_on_step=False).to('cuda')
-            elif '@' in name:
-                k = int(name.split('@')[1])
-                mname = name.split('@')[0]
-                self._tracked_torchmetrics[prefix][name] = getattr(tm, mname)(average='macro', num_classes=self.dataset.d_output, compute_on_step=False, top_k=k).to('cuda')
+            if name in ["AUROC", "StatScores", "Precision", "Recall", "F1"]:
+                self._tracked_torchmetrics[prefix][name] = getattr(tm, name)(
+                    average="macro",
+                    num_classes=self.dataset.d_output,
+                    compute_on_step=False,
+                ).to("cuda")
+            elif "@" in name:
+                k = int(name.split("@")[1])
+                mname = name.split("@")[0]
+                self._tracked_torchmetrics[prefix][name] = getattr(tm, mname)(
+                    average="macro",
+                    num_classes=self.dataset.d_output,
+                    compute_on_step=False,
+                    top_k=k,
+                ).to("cuda")
             else:
-                self._tracked_torchmetrics[prefix][name] = getattr(tm, name)(compute_on_step=False).to('cuda')
+                self._tracked_torchmetrics[prefix][name] = getattr(tm, name)(
+                    compute_on_step=False
+                ).to("cuda")
 
     def _reset_torchmetrics(self, prefix=None):
         """
@@ -76,7 +95,10 @@ class BaseTask:
 
         Generally do this at the end of an epoch.
         """
-        return {name: self._tracked_torchmetrics[prefix][name].compute() for name in self.torchmetric_names}
+        return {
+            name: self._tracked_torchmetrics[prefix][name].compute()
+            for name in self.torchmetric_names
+        }
 
     def torchmetrics(self, x, y, prefix):
         """
@@ -99,11 +121,13 @@ class BaseTask:
         """
         output_metrics = {
             name: M.output_metric_fns[name](x, y)
-            for name in self.metric_names if name in M.output_metric_fns
+            for name in self.metric_names
+            if name in M.output_metric_fns
         }
         loss_metrics = {
             name: M.loss_metric_fns[name](x, y, self.loss)
-            for name in self.metric_names if name in M.loss_metric_fns
+            for name in self.metric_names
+            if name in M.loss_metric_fns
         }
         return {**output_metrics, **loss_metrics}
 
@@ -112,12 +136,14 @@ class Scalar(nn.Module):
     def __init__(self, c=1):
         super().__init__()
         self.c = c
+
     def forward(self, x):
         return x * self.c
 
+
 class LMTask(BaseTask):
     def __init__(self, tied=False, rescale=True, init=None, **kwargs):
-        super().__init__(loss='cross_entropy', **kwargs)
+        super().__init__(loss="cross_entropy", **kwargs)
         n_tokens = self.dataset.n_tokens
         d_model = self.model.d_model
         d_output = self.model.d_output
@@ -128,7 +154,7 @@ class LMTask(BaseTask):
             scale = U.Identity()
 
         embedding = U.Embedding(n_tokens, d_model)
-        nn.init.normal_(embedding.weight, mean=0, std=d_model**-.5)
+        nn.init.normal_(embedding.weight, mean=0, std=d_model**-0.5)
         encoder = nn.Sequential(
             embedding,
             scale,
@@ -144,19 +170,19 @@ class LMTask(BaseTask):
         if init is not None:
             self.encoder.apply(functools.partial(weights_init_embedding, init_cfg=init))
 
-class ForecastingTask(BaseTask):
 
+class ForecastingTask(BaseTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    
+
 class AdaptiveLMTask(BaseTask):
     def __init__(
         self,
         div_val,
-        cutoffs : List[int],
-        tie_weights : bool,
-        tie_projs : List[bool],
+        cutoffs: List[int],
+        tie_weights: bool,
+        tie_projs: List[bool],
         init_scale=1.0,
         bias_scale=0.0,
         dropemb=0.0,
@@ -187,8 +213,11 @@ class AdaptiveLMTask(BaseTask):
         # Construct decoder/loss
         emb_projs = encoder.emb_projs
         loss = ProjectedAdaptiveLogSoftmax(
-            n_tokens, d_output, d_output,
-            cutoffs, div_val=div_val,
+            n_tokens,
+            d_output,
+            d_output,
+            cutoffs,
+            div_val=div_val,
             tie_projs=tie_projs,
             out_projs=emb_projs,
             out_layers_weights=emb_layers,
@@ -201,7 +230,7 @@ class AdaptiveLMTask(BaseTask):
 
 
 registry = {
-    'base': BaseTask,
-    'lm': LMTask,
-    'adaptivelm': AdaptiveLMTask,
+    "base": BaseTask,
+    "lm": LMTask,
+    "adaptivelm": AdaptiveLMTask,
 }

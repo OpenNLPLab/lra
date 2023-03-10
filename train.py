@@ -39,11 +39,11 @@ class SequenceLightningModule(pl.LightningModule):
         self.dataset = SequenceDataset.registry[self.hparams.dataset._name_](
             **{
                 # Arguments for configuring dataloader when using TBPTT
-                "tbptt": self.hparams.train.state.mode == 'tbptt',
+                "tbptt": self.hparams.train.state.mode == "tbptt",
                 "chunk_len": self.hparams.train.state.chunk_len,
                 "overlap_len": self.hparams.train.state.overlap_len,
                 # Dataset arguments
-                **self.hparams.dataset, 
+                **self.hparams.dataset,
             }
         )
         # Check hparams
@@ -58,7 +58,6 @@ class SequenceLightningModule(pl.LightningModule):
         # seq_len = config['dataset']['l_max']
         # frame = inspect.currentframe()          # define a frame to track
         # self.gpu_tracker = MemTracker(frame, arch, seq_len)         # define a GPU tracker
-
 
     def setup(self, stage=None):
         if not self.hparams.train.disable_dataset:
@@ -77,8 +76,10 @@ class SequenceLightningModule(pl.LightningModule):
         encoder_cfg = utils.to_list(self.hparams.encoder) + utils.to_list(
             self.hparams.model.pop("encoder", None)
         )
-        decoder_cfg = utils.to_list(self.hparams.model.pop("decoder", None)) + utils.to_list(self.hparams.decoder)
-        
+        decoder_cfg = utils.to_list(
+            self.hparams.model.pop("decoder", None)
+        ) + utils.to_list(self.hparams.decoder)
+
         # Instantiate model
         self.model = utils.instantiate(registry.model, self.hparams.model)
         # parameters = filter(lambda p: p.requires_grad, self.model.parameters())
@@ -108,7 +109,14 @@ class SequenceLightningModule(pl.LightningModule):
         self._initialize_state()
 
     def _check_config(self):
-        assert self.hparams.train.state.mode in [None, "none", "null", "reset", "bptt", "tbptt"]
+        assert self.hparams.train.state.mode in [
+            None,
+            "none",
+            "null",
+            "reset",
+            "bptt",
+            "tbptt",
+        ]
         assert (
             (n := self.hparams.train.state.n_context) is None
             or isinstance(n, int)
@@ -119,10 +127,9 @@ class SequenceLightningModule(pl.LightningModule):
             or isinstance(n, int)
             and n >= 0
         )
-        assert (
-            not (self.hparams.train.state.mode == 'tbptt') or 
-            (self.hparams.train.state.chunk_len is not None and 
-            self.hparams.train.state.overlap_len is not None)
+        assert not (self.hparams.train.state.mode == "tbptt") or (
+            self.hparams.train.state.chunk_len is not None
+            and self.hparams.train.state.overlap_len is not None
         ), "If tbptt is True, chunk_len and overlap_len must be specified."
 
     def _initialize_state(self):
@@ -155,7 +162,7 @@ class SequenceLightningModule(pl.LightningModule):
         n_context = self.hparams.train.state.get(key)
 
         # Don't need to do anything if 0 context steps
-        if n_context == 0 and self.hparams.train.state.mode not in ['tbptt']:
+        if n_context == 0 and self.hparams.train.state.mode not in ["tbptt"]:
             return
 
         # Reset state if needed
@@ -173,9 +180,11 @@ class SequenceLightningModule(pl.LightningModule):
             self._memory_chunks.append(batch)
             self._memory_chunks = self._memory_chunks[-n_context:]
 
-        elif self.hparams.train.state.mode == 'tbptt':
+        elif self.hparams.train.state.mode == "tbptt":
             _, _, *z = batch
-            reset = z[-1]  # if tbptt, last element of z should be whether to reset state!
+            reset = z[
+                -1
+            ]  # if tbptt, last element of z should be whether to reset state!
             if reset:
                 self._reset_state(batch)
             else:
@@ -189,7 +198,7 @@ class SequenceLightningModule(pl.LightningModule):
         # z holds arguments such as sequence length
         x, y, *z = batch
         # w can model-specific constructions such as key_padding_mask for transformers or state for RNNs
-        
+
         # TODO gpu memory tracker
         # self.gpu_tracker.track()
         x, *w = self.encoder(x, *z)
@@ -524,7 +533,7 @@ def test(config):
     model_infer = SequenceLightningModule(config)
     try_dataloader = model_infer.train_dataloader()
     inputs, labels = next(iter(try_dataloader))
-    m=1
+    m = 1
 
 
 def benchmark_step(config):

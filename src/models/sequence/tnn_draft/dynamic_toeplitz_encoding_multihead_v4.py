@@ -273,7 +273,7 @@ class DynamicToepliztMultiheadV4(nn.Module):
                 gamma = torch.log(gamma) * coef
                 pos = gamma + pos
             else:
-                gamma = gamma ** coef
+                gamma = gamma**coef
                 pos = gamma * pos
         if self.use_exp:
             a = torch.exp(
@@ -353,7 +353,7 @@ class DynamicToepliztMultiheadV4(nn.Module):
                 pos = gamma + pos
                 neg = torch.flip(gamma, dims=[1]) + neg
             else:
-                gamma = gamma ** coef
+                gamma = gamma**coef
                 pos = gamma * pos
                 neg = torch.flip(gamma, dims=[1]) * neg
         if self.use_exp:
@@ -458,7 +458,7 @@ class DynamicToepliztMultiheadV4(nn.Module):
                 pos = gamma + pos
                 neg = torch.flip(gamma, dims=[1]) + neg
             else:
-                gamma = gamma ** coef
+                gamma = gamma**coef
                 pos = gamma * pos
                 neg = torch.flip(gamma, dims=[1]) * neg
         if self.use_exp:

@@ -5,7 +5,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from functools import partial
 
-from src.models.sequence.rnns.cells.memory import MemoryCell, forward_aliases, backward_aliases, bilinear_aliases, zoh_aliases
+from src.models.sequence.rnns.cells.memory import (
+    MemoryCell,
+    forward_aliases,
+    backward_aliases,
+    bilinear_aliases,
+    zoh_aliases,
+)
 from src.models.hippo.transition import (
     LegSAdaptiveTransitionManual,
     LegTAdaptiveTransitionManual,
@@ -15,37 +21,41 @@ from src.models.hippo.transition import (
     LagTTriDInverseAdaptiveTransition,
 )
 
+
 class TimeMemoryCell(MemoryCell):
-    """ MemoryCell with timestamped data
+    """MemoryCell with timestamped data
 
     Assumes that first channel of inputs are timestamps
     """
 
     def __init__(
-            self,
-            d_input, d_model, memory_size, memory_order,
-            measure='legs',
-            method='trid',
-            discretization='bilinear',
-            **kwargs
-        ):
+        self,
+        d_input,
+        d_model,
+        memory_size,
+        memory_order,
+        measure="legs",
+        method="trid",
+        discretization="bilinear",
+        **kwargs
+    ):
         if memory_order < 0:
             memory_order = d_model
 
-        super().__init__(d_input-1, d_model, memory_size, memory_order, **kwargs)
+        super().__init__(d_input - 1, d_model, memory_size, memory_order, **kwargs)
 
-        assert measure in ['legs', 'lagt', 'legt']
-        assert method in ['dense', 'trid']
+        assert measure in ["legs", "lagt", "legt"]
+        assert method in ["dense", "trid"]
         transitions = {
-            'dense': {
-                'legs': LegSAdaptiveTransitionManual,
-                'legt': LegTAdaptiveTransitionManual,
-                'lagt': LagTAdaptiveTransitionManual,
+            "dense": {
+                "legs": LegSAdaptiveTransitionManual,
+                "legt": LegTAdaptiveTransitionManual,
+                "lagt": LagTAdaptiveTransitionManual,
             },
-            'trid': {
-                'legs': LegSTriDInverseAdaptiveTransition,
-                'legt': LegTTriDInverseAdaptiveTransition,
-                'lagt': LagTTriDInverseAdaptiveTransition,
+            "trid": {
+                "legs": LegSTriDInverseAdaptiveTransition,
+                "legt": LegTTriDInverseAdaptiveTransition,
+                "lagt": LagTTriDInverseAdaptiveTransition,
             },
         }
         self.transition = transitions[method][measure](self.memory_order)
@@ -56,10 +66,11 @@ class TimeMemoryCell(MemoryCell):
             self.transition_fn = partial(self.transition.backward_diff, **kwargs)
         elif discretization in bilinear_aliases:
             self.transition_fn = partial(self.transition.bilinear, **kwargs)
-        else: assert False
+        else:
+            assert False
 
     def update_memory(self, m, u, t0, t1):
-        """ This class is intended to be subclassed to the LTI or LSI cases """
+        """This class is intended to be subclassed to the LTI or LSI cases"""
         raise NotImplementedError
 
     def forward(self, input, state):
@@ -68,7 +79,9 @@ class TimeMemoryCell(MemoryCell):
 
         # Update the memory
         u = self.forward_memory(input, h, m)
-        m = self.update_memory(m, u, prev_timestamp, timestamp) # (batch, memory_size, memory_order)
+        m = self.update_memory(
+            m, u, prev_timestamp, timestamp
+        )  # (batch, memory_size, memory_order)
 
         # Update hidden
         h = self.forward_hidden(input, h, m)
@@ -78,13 +91,14 @@ class TimeMemoryCell(MemoryCell):
 
         return output, next_state
 
+
 class TimeLSICell(TimeMemoryCell):
-    """ A cell implementing "Linear Scale Invariant" dynamics: c' = Ac + Bf with timestamped inputs.
+    """A cell implementing "Linear Scale Invariant" dynamics: c' = Ac + Bf with timestamped inputs.
 
     This class can handle the setting where there is timescale shift, even if the model does not know about it.
     """
 
-    name = 'tlsi'
+    name = "tlsi"
 
     def update_memory(self, m, u, t0, t1):
         """
@@ -94,35 +108,41 @@ class TimeLSICell(TimeMemoryCell):
         t1: (B,) current time
         """
 
-        if torch.eq(t1, 0.).any():
+        if torch.eq(t1, 0.0).any():
             return F.pad(u.unsqueeze(-1), (0, self.memory_order - 1))
         else:
-            dt = ((t1-t0)/t1).unsqueeze(-1)
+            dt = ((t1 - t0) / t1).unsqueeze(-1)
             m = self.transition_fn(dt, m, u)
         return m
 
+
 class TimeLTICell(TimeMemoryCell):
-    """ A cell implementing Linear Time Invariant dynamics: c' = Ac + Bf with timestamped inputs.
+    """A cell implementing Linear Time Invariant dynamics: c' = Ac + Bf with timestamped inputs.
 
     Unlike HiPPO-LegS with timestamps, this class will not work if there is timescale shift that it does not know about.
     However, unlike generic RNNs, it does work if it knows the sampling rate change.
     """
 
-    name = 'tlti'
+    name = "tlti"
 
     def __init__(
-            self,
-            d_input, d_model, memory_size=1, memory_order=-1,
-            measure='legt',
-            dt=1.0,
-            **kwargs
-        ):
+        self,
+        d_input,
+        d_model,
+        memory_size=1,
+        memory_order=-1,
+        measure="legt",
+        dt=1.0,
+        **kwargs
+    ):
         if memory_order < 0:
             memory_order = d_model
 
         self.dt = dt
 
-        super().__init__(d_input, d_model, memory_size, memory_order, measure=measure, **kwargs)
+        super().__init__(
+            d_input, d_model, memory_size, memory_order, measure=measure, **kwargs
+        )
 
     def update_memory(self, m, u, t0, t1):
         """
@@ -132,6 +152,6 @@ class TimeLTICell(TimeMemoryCell):
         t1: (B,) current time
         """
 
-        dt = self.dt*(t1-t0).unsqueeze(-1)
+        dt = self.dt * (t1 - t0).unsqueeze(-1)
         m = self.transition_fn(dt, m, u)
         return m

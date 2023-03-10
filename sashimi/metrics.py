@@ -4,6 +4,7 @@ from scipy import linalg
 from scipy.stats import norm, entropy
 from sklearn.cluster import KMeans
 
+
 def fid(feat_data, feat_gen):
     """
     Calculate Frechet Inception Distance
@@ -19,16 +20,21 @@ def fid(feat_data, feat_gen):
 
         covmean, _ = linalg.sqrtm(sigma_data.dot(sigma_gen), disp=False)
         if not np.isfinite(covmean).all():
-            print("fid calculation produces singular product; adding perturbation to diagonal of cov estimates")
+            print(
+                "fid calculation produces singular product; adding perturbation to diagonal of cov estimates"
+            )
             offset = np.eye(sigma_data.shape[0]) * 1e-4
             covmean, _ = linalg.sqrtm((sigma_data + offset).dot(sigma_gen + offset))
 
         # Now calculate the FID
-        fid_value = np.sum(np.square(mu_gen - mu_data)) + np.trace(sigma_gen + sigma_data - 2*covmean)
+        fid_value = np.sum(np.square(mu_gen - mu_data)) + np.trace(
+            sigma_gen + sigma_data - 2 * covmean
+        )
 
         return fid_value
     except ValueError:
         return np.inf
+
 
 def inception_score(probs_gen):
     """
@@ -41,20 +47,23 @@ def inception_score(probs_gen):
     probs_gen = probs_gen[np.random.permutation(len(probs_gen))]
 
     # Split probs_gen into two halves
-    probs_gen_1 = probs_gen[:len(probs_gen)//2]
-    probs_gen_2 = probs_gen[len(probs_gen)//2:]
+    probs_gen_1 = probs_gen[: len(probs_gen) // 2]
+    probs_gen_2 = probs_gen[len(probs_gen) // 2 :]
 
     # Calculate average label distribution for split 2
     mean_2 = np.mean(probs_gen_2, axis=0)
 
     # Compute the mean kl-divergence between the probability distributions
     # of the generated and average label distributions
-    kl = entropy(probs_gen_1, np.repeat(mean_2[None, :], len(probs_gen_1), axis=0)).mean()
+    kl = entropy(
+        probs_gen_1, np.repeat(mean_2[None, :], len(probs_gen_1), axis=0)
+    ).mean()
 
     # Compute the expected score
     is_score = np.exp(kl)
 
     return is_score
+
 
 def modified_inception_score(probs_gen, n=10000):
     """
@@ -82,6 +91,7 @@ def modified_inception_score(probs_gen, n=10000):
 
     return mis_score
 
+
 def am_score(probs_data, probs_gen):
     """
     Calculate AM Score
@@ -99,12 +109,12 @@ def two_proportions_z_test(p1, n1, p2, n2, significance_level, z_threshold=None)
     # Per http://stattrek.com/hypothesis-test/difference-in-proportions.aspx
     # See also http://www.itl.nist.gov/div898/software/dataplot/refman1/auxillar/binotest.htm
     p = (p1 * n1 + p2 * n2) / (n1 + n2)
-    se = np.sqrt(p * (1 - p) * (1/n1 + 1/n2))
+    se = np.sqrt(p * (1 - p) * (1 / n1 + 1 / n2))
     z = (p1 - p2) / se
     # Allow defining a threshold in terms as Z (difference relative to the SE) rather than in p-values.
     if z_threshold is not None:
         return abs(z) > z_threshold
-    p_values = 2.0 * norm.cdf(-1.0 * np.abs(z))    # Two-tailed test
+    p_values = 2.0 * norm.cdf(-1.0 * np.abs(z))  # Two-tailed test
     return p_values < significance_level
 
 
@@ -127,7 +137,9 @@ def ndb_score(feat_data, feat_gen):
     prop_gen = counts_gen / len(labels_gen)
 
     # Calculate number of bins with statistically different proportions
-    different_bins = two_proportions_z_test(prop_data, len(labels_data), prop_gen, len(labels_gen), 0.05)
+    different_bins = two_proportions_z_test(
+        prop_data, len(labels_data), prop_gen, len(labels_gen), 0.05
+    )
     ndb = np.count_nonzero(different_bins)
 
-    return ndb/50.
+    return ndb / 50.0

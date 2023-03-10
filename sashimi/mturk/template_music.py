@@ -1,4 +1,3 @@
-
 TEMPL = """
 <style>
 th, td {{
@@ -113,7 +112,7 @@ n = int(sys.argv[1])
 
 rows = []
 for i in range(n):
-  rows.append(ROW_TEMPL.format(i=i))
-rows = '\n'.join(rows)
+    rows.append(ROW_TEMPL.format(i=i))
+rows = "\n".join(rows)
 
 print(TEMPL.format(rows=rows))

@@ -14,10 +14,10 @@ from torch.nn.utils import weight_norm
 
 
 def Linear1d(
-        in_channels: int,
-        out_channels: int,
-        stride: int = 1,
-        bias: bool = True,
+    in_channels: int,
+    out_channels: int,
+    stride: int = 1,
+    bias: bool = True,
 ) -> torch.nn.Module:
     """
     Implements a Linear Layer in terms of a point-wise convolution.
@@ -26,10 +26,10 @@ def Linear1d(
 
 
 def Linear2d(
-        in_channels: int,
-        out_channels: int,
-        stride: int = 1,
-        bias: bool = True,
+    in_channels: int,
+    out_channels: int,
+    stride: int = 1,
+    bias: bool = True,
 ) -> torch.nn.Module:
     """
     Implements a Linear Layer in terms of a point-wise convolution.
@@ -53,9 +53,9 @@ def Sine():
 
 class LayerNorm(nn.Module):
     def __init__(
-            self,
-            num_channels: int,
-            eps: float = 1e-12,
+        self,
+        num_channels: int,
+        eps: float = 1e-12,
     ):
         """Uses GroupNorm implementation with group=1 for speed."""
         super().__init__()
@@ -81,7 +81,7 @@ class Expression(torch.nn.Module):
 
 
 def Multiply(
-        omega_0: float,
+    omega_0: float,
 ):
     """
     out = omega_0 * x
@@ -90,8 +90,8 @@ def Multiply(
 
 
 def causal_padding(
-        x: torch.Tensor,
-        kernel: torch.Tensor,
+    x: torch.Tensor,
+    kernel: torch.Tensor,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     # 1. Pad the input signal & kernel tensors.
     # Check if sizes are odd. If not, add a pad of zero to make them odd.
@@ -105,9 +105,9 @@ def causal_padding(
 
 
 def causal_conv(
-        x: torch.Tensor,
-        kernel: torch.Tensor,
-        bias: Optional[torch.Tensor] = None,
+    x: torch.Tensor,
+    kernel: torch.Tensor,
+    bias: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
     """
     Args:
@@ -124,10 +124,10 @@ def causal_conv(
 
 
 def causal_fftconv(
-        x: torch.Tensor,
-        kernel: torch.Tensor,
-        bias: Optional[torch.Tensor] = None,
-        double_precision: bool = False,
+    x: torch.Tensor,
+    kernel: torch.Tensor,
+    bias: Optional[torch.Tensor] = None,
+    double_precision: bool = False,
 ) -> torch.Tensor:
     """
     Args:
@@ -177,16 +177,16 @@ def causal_fftconv(
 
 class KernelNet(torch.nn.Module):
     def __init__(
-            self,
-            in_channels: int,
-            out_channels: int,
-            hidden_channels: int,
-            activation_function: str,
-            norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: float,
-            weight_dropout: float,
+        self,
+        in_channels: int,
+        out_channels: int,
+        hidden_channels: int,
+        activation_function: str,
+        norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: float,
+        weight_dropout: float,
     ):
         """
         Creates an 3-layer MLP, which parameterizes a convolutional kernel as:
@@ -251,9 +251,9 @@ class KernelNet(torch.nn.Module):
             net_layer = 1
             for (i, m) in enumerate(self.modules()):
                 if (
-                        isinstance(m, torch.nn.Conv1d)
-                        or isinstance(m, torch.nn.Conv2d)
-                        or isinstance(m, torch.nn.Linear)
+                    isinstance(m, torch.nn.Conv1d)
+                    or isinstance(m, torch.nn.Conv2d)
+                    or isinstance(m, torch.nn.Linear)
                 ):
                     if net_layer == 1:
                         m.weight.data.uniform_(
@@ -276,9 +276,9 @@ class KernelNet(torch.nn.Module):
             intermediate_response = None
             for (i, m) in enumerate(self.modules()):
                 if (
-                        isinstance(m, torch.nn.Conv1d)
-                        or isinstance(m, torch.nn.Conv2d)
-                        or isinstance(m, torch.nn.Linear)
+                    isinstance(m, torch.nn.Conv1d)
+                    or isinstance(m, torch.nn.Conv2d)
+                    or isinstance(m, torch.nn.Linear)
                 ):
                     m.weight.data.normal_(
                         mean,
@@ -302,8 +302,8 @@ class KernelNet(torch.nn.Module):
                             range = torch.linspace(-1.0, 1.0, steps=m.weight.shape[0])
                             range = range + (range[1] - range[0])
                             range = (
-                                    range * intermediate_response[0].squeeze()
-                                    + intermediate_response[1]
+                                range * intermediate_response[0].squeeze()
+                                + intermediate_response[1]
                             )
 
                             bias = -torch.einsum(
@@ -319,16 +319,16 @@ class KernelNet(torch.nn.Module):
 
 class CKConv(torch.nn.Module):
     def __init__(
-            self,
-            in_channels: int,
-            out_channels: int,
-            hidden_channels: int,
-            activation_function: str,
-            norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: float,
-            weight_dropout: float,
+        self,
+        in_channels: int,
+        out_channels: int,
+        hidden_channels: int,
+        activation_function: str,
+        norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: float,
+        weight_dropout: float,
     ):
         """
         Creates a Continuous Kernel Convolution.
@@ -385,8 +385,8 @@ class CKConv(torch.nn.Module):
             h = n // 2
             G = (
                 lambda x: 1
-                          / (self.sigma * sqrt(2 * pi))
-                          * exp(-float(x) ** 2 / (2 * self.sigma ** 2))
+                / (self.sigma * sqrt(2 * pi))
+                * exp(-float(x) ** 2 / (2 * self.sigma**2))
             )
 
             smoothing_ker = [G(x) for x in range(-h, h + 1)]
@@ -430,9 +430,9 @@ class CKConv(torch.nn.Module):
             # Creates the vector of relative positions.
             self.rel_positions = (
                 torch.linspace(-1.0, max_relative_pos, x.shape[-1])
-                    .cuda()
-                    .unsqueeze(0)
-                    .unsqueeze(0)
+                .cuda()
+                .unsqueeze(0)
+                .unsqueeze(0)
             )  # -> With form: [batch_size=1, in_channels=1, x_dimension]
 
             # calculate and save the sr ratio for later
@@ -449,8 +449,8 @@ class CKConv(torch.nn.Module):
 
     @staticmethod
     def calculate_max(
-            train_length: int,
-            current_length: int,
+        train_length: int,
+        current_length: int,
     ) -> float:
         """
         Calculates the maximum relative position for the current length based on the input length.
@@ -482,17 +482,17 @@ class CKConv(torch.nn.Module):
 
 class CKBlock(torch.nn.Module):
     def __init__(
-            self,
-            in_channels: int,
-            out_channels: int,
-            kernelnet_hidden_channels: int,
-            kernelnet_activation_function: str,
-            kernelnet_norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: bool,
-            dropout: float,
-            weight_dropout: float,
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernelnet_hidden_channels: int,
+        kernelnet_activation_function: str,
+        kernelnet_norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: bool,
+        dropout: float,
+        weight_dropout: float,
     ):
         """
         Creates a Residual Block with CKConvs as:
@@ -570,18 +570,18 @@ class CKBlock(torch.nn.Module):
 
 class CKCNN(torch.nn.Module):
     def __init__(
-            self,
-            hidden_channels: int,
-            num_blocks: int,  # 2
-            kernelnet_hidden_channels: int,
-            kernelnet_activation_function: str,
-            kernelnet_norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: bool,  # sensitive to this param: good values <= 70
-            dropout: float,
-            weight_dropout: float,
-            pool: bool,  # Always False in our experiments.
+        self,
+        hidden_channels: int,
+        num_blocks: int,  # 2
+        kernelnet_hidden_channels: int,
+        kernelnet_activation_function: str,
+        kernelnet_norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: bool,  # sensitive to this param: good values <= 70
+        dropout: float,
+        weight_dropout: float,
+        pool: bool,  # Always False in our experiments.
     ):
         super(CKCNN, self).__init__()
 
@@ -616,19 +616,19 @@ class CKCNN(torch.nn.Module):
 
 class CopyMemory_CKCNN(CKCNN):
     def __init__(
-            self,
-            in_channels: int,
-            hidden_channels: int,
-            num_blocks: int,
-            kernelnet_hidden_channels: int,
-            kernelnet_activation_function: str,
-            kernelnet_norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: bool,
-            dropout: float,
-            weight_dropout: float,
-            pool: bool,
+        self,
+        in_channels: int,
+        hidden_channels: int,
+        num_blocks: int,
+        kernelnet_hidden_channels: int,
+        kernelnet_activation_function: str,
+        kernelnet_norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: bool,
+        dropout: float,
+        weight_dropout: float,
+        pool: bool,
     ):
         super().__init__(
             in_channels,
@@ -663,19 +663,19 @@ class CopyMemory_CKCNN(CKCNN):
 
 class AddProblem_CKCNN(CKCNN):
     def __init__(
-            self,
-            in_channels: int,
-            hidden_channels: int,
-            num_blocks: int,
-            kernelnet_hidden_channels: int,
-            kernelnet_activation_function: str,
-            kernelnet_norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: bool,
-            dropout: float,
-            weight_dropout: float,
-            pool: bool,
+        self,
+        in_channels: int,
+        hidden_channels: int,
+        num_blocks: int,
+        kernelnet_hidden_channels: int,
+        kernelnet_activation_function: str,
+        kernelnet_norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: bool,
+        dropout: float,
+        weight_dropout: float,
+        pool: bool,
     ):
         super().__init__(
             in_channels,
@@ -710,22 +710,22 @@ class AddProblem_CKCNN(CKCNN):
 
 class ClassificationCKCNN(CKCNN):
     def __init__(
-            self,
-            # d_input: int,
-            # d_output: int,
-            d_model: int,
-            num_blocks: int,
-            kernelnet_hidden_channels: int,
-            kernelnet_activation_function: str,
-            kernelnet_norm_type: str,
-            dim_linear: int,
-            bias: bool,
-            omega_0: bool,
-            dropout: float,
-            weight_dropout: float,
-            pool: bool,
-            wd: float,
-            # **kwargs,
+        self,
+        # d_input: int,
+        # d_output: int,
+        d_model: int,
+        num_blocks: int,
+        kernelnet_hidden_channels: int,
+        kernelnet_activation_function: str,
+        kernelnet_norm_type: str,
+        dim_linear: int,
+        bias: bool,
+        omega_0: bool,
+        dropout: float,
+        weight_dropout: float,
+        pool: bool,
+        wd: float,
+        # **kwargs,
     ):
         super().__init__(
             # d_input,
@@ -751,16 +751,17 @@ class ClassificationCKCNN(CKCNN):
         x = x.transpose(1, 2)
         x = self.backbone(x)
         x = x.transpose(1, 2)
-        return x, None # Have to return a state
+        return x, None  # Have to return a state
 
     def loss(self):
         return self.wd.forward(model=self)
 
+
 class LnLoss(torch.nn.Module):
     def __init__(
-            self,
-            weight_loss: float,
-            norm_type: int,
+        self,
+        weight_loss: float,
+        norm_type: int,
     ):
         """
         Computes the Ln loss on the CKConv kernels in a CKCNN.
@@ -772,8 +773,8 @@ class LnLoss(torch.nn.Module):
         self.norm_type = norm_type
 
     def forward(
-            self,
-            model: CKConv,
+        self,
+        model: CKConv,
     ):
         loss = 0.0
         # Go through modules that are instances of CKConvs and gather the sampled filters

@@ -1,6 +1,7 @@
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
     import pathlib
+
     p = pathlib.Path().absolute()
     print("Adding path: ", p)
     sys.path.append(str(p))
@@ -25,31 +26,32 @@ else:
 from src.models.sequence.ss.kernel import HippoSSKernel
 from src.models.nn import LinearActivation, Activation, Normalization
 
+
 class S4(nn.Module):
     requires_length = True
 
     def __init__(
-            self,
-            d_model,
-            d_state=64,
-            l_max=1, # Maximum length of sequence. Fine if not provided: the kernel will keep doubling in length until longer than sequence. However, this can be marginally slower if the true length is not a power of 2
-            channels=1, # maps 1-dim to C-dim
-            bidirectional=False,
-            # Arguments for FF
-            activation='gelu', # activation in between SS and FF
-            ln=False, # Extra normalization
-            postact=None, # activation after FF
-            initializer=None, # initializer on FF
-            weight_norm=False, # weight normalization on FF
-            hyper_act=None, # Use a "hypernetwork" multiplication
-            dropout=0.0,
-            transposed=True, # axis ordering (B, L, D) or (B, D, L)
-            verbose=False,
-            shift=False,
-            linear=False,
-            # SSM Kernel arguments
-            **kernel_args,
-        ):
+        self,
+        d_model,
+        d_state=64,
+        l_max=1,  # Maximum length of sequence. Fine if not provided: the kernel will keep doubling in length until longer than sequence. However, this can be marginally slower if the true length is not a power of 2
+        channels=1,  # maps 1-dim to C-dim
+        bidirectional=False,
+        # Arguments for FF
+        activation="gelu",  # activation in between SS and FF
+        ln=False,  # Extra normalization
+        postact=None,  # activation after FF
+        initializer=None,  # initializer on FF
+        weight_norm=False,  # weight normalization on FF
+        hyper_act=None,  # Use a "hypernetwork" multiplication
+        dropout=0.0,
+        transposed=True,  # axis ordering (B, L, D) or (B, D, L)
+        verbose=False,
+        shift=False,
+        linear=False,
+        # SSM Kernel arguments
+        **kernel_args,
+    ):
         """
         d_state: the dimension of the state, also denoted by N
         l_max: the maximum sequence length, also denoted by L
@@ -65,6 +67,7 @@ class S4(nn.Module):
         super().__init__()
         if verbose:
             import src.utils.train
+
             log = src.utils.train.get_logger(__name__)
             log.info(f"Constructing S4 (H, N, L) = ({d_model}, {d_state}, {l_max})")
 
@@ -89,9 +92,10 @@ class S4(nn.Module):
         if self.bidirectional:
             channels *= 2
 
-
         # SSM Kernel
-        self.kernel = HippoSSKernel(self.h, N=self.n, L=l_max, channels=channels, verbose=verbose, **kernel_args)
+        self.kernel = HippoSSKernel(
+            self.h, N=self.n, L=l_max, channels=channels, verbose=verbose, **kernel_args
+        )
 
         # Pointwise
         if not self.linear:
@@ -99,14 +103,14 @@ class S4(nn.Module):
             dropout_fn = nn.Dropout2d if self.transposed else nn.Dropout
             self.dropout = dropout_fn(dropout) if dropout > 0.0 else nn.Identity()
             if self.ln:
-                self.norm = Normalization(self.h*self.channels, transposed=transposed)
+                self.norm = Normalization(self.h * self.channels, transposed=transposed)
             else:
                 self.norm = nn.Identity()
 
         # position-wise output transform to mix features
         if not self.linear:
             self.output_linear = LinearActivation(
-                self.h*self.channels,
+                self.h * self.channels,
                 self.h,
                 transposed=self.transposed,
                 initializer=initializer,
@@ -115,46 +119,52 @@ class S4(nn.Module):
                 weight_norm=weight_norm,
             )
 
-
-    def forward(self, u, state=None, **kwargs): # absorbs return_output and transformer src mask
+    def forward(
+        self, u, state=None, **kwargs
+    ):  # absorbs return_output and transformer src mask
         """
         u: (B H L) if self.transposed else (B L H)
         state: (H N) never needed unless you know what you're doing
 
         Returns: same shape as u
         """
-        if not self.transposed: u = u.transpose(-1, -2)
+        if not self.transposed:
+            u = u.transpose(-1, -2)
         L = u.size(-1)
 
         # Compute SS Kernel
-        k, k_state = self.kernel(L=L, state=state) # (C H L) (B C H L)
+        k, k_state = self.kernel(L=L, state=state)  # (C H L) (B C H L)
 
         # Convolution
         if self.bidirectional:
-            k0, k1 = rearrange(k, '(s c) h l -> s c h l', s=2)
-            k = F.pad(k0, (0, L)) \
-                    + F.pad(k1.flip(-1), (L, 0)) \
-
+            k0, k1 = rearrange(k, "(s c) h l -> s c h l", s=2)
+            k = F.pad(k0, (0, L)) + F.pad(k1.flip(-1), (L, 0))
         if self.shift:
             # Try flip and pad to correct for potential off-by-one
-            k_f = torch.fft.rfft(F.pad(k.flip(-1), (L, 0)), n=2*L) # (C H L)
-            u_f = torch.fft.rfft(F.pad(u.flip(-1), (L, 0)), n=2*L) # (B H L)
-            y_f = contract('bhl,chl->bchl', u_f, k_f) # k_f.unsqueeze(-4) * u_f.unsqueeze(-3) # (B C H L)
-            y = torch.fft.irfft(y_f, n=2*L)[..., L:].flip(-1) # (B C H L)
+            k_f = torch.fft.rfft(F.pad(k.flip(-1), (L, 0)), n=2 * L)  # (C H L)
+            u_f = torch.fft.rfft(F.pad(u.flip(-1), (L, 0)), n=2 * L)  # (B H L)
+            y_f = contract(
+                "bhl,chl->bchl", u_f, k_f
+            )  # k_f.unsqueeze(-4) * u_f.unsqueeze(-3) # (B C H L)
+            y = torch.fft.irfft(y_f, n=2 * L)[..., L:].flip(-1)  # (B C H L)
         else:
-            k_f = torch.fft.rfft(k, n=2*L) # (C H L)
-            u_f = torch.fft.rfft(u, n=2*L) # (B H L)
-            y_f = contract('bhl,chl->bchl', u_f, k_f) # k_f.unsqueeze(-4) * u_f.unsqueeze(-3) # (B C H L)
-            y = torch.fft.irfft(y_f, n=2*L)[..., :L] # (B C H L)
-
-
+            k_f = torch.fft.rfft(k, n=2 * L)  # (C H L)
+            u_f = torch.fft.rfft(u, n=2 * L)  # (B H L)
+            y_f = contract(
+                "bhl,chl->bchl", u_f, k_f
+            )  # k_f.unsqueeze(-4) * u_f.unsqueeze(-3) # (B C H L)
+            y = torch.fft.irfft(y_f, n=2 * L)[..., :L]  # (B C H L)
 
         # Compute D term in state space equation - essentially a skip connection
-        y = y + contract('bhl,ch->bchl', u, self.D) # u.unsqueeze(-3) * self.D.unsqueeze(-1)
+        y = y + contract(
+            "bhl,ch->bchl", u, self.D
+        )  # u.unsqueeze(-3) * self.D.unsqueeze(-1)
 
         # Compute state update
         if state is not None:
-            assert not self.bidirectional, "Bidirectional not supported with state forwarding"
+            assert (
+                not self.bidirectional
+            ), "Bidirectional not supported with state forwarding"
             y = y + k_state
             next_state = self.kernel.forward_state(u, state)
         else:
@@ -162,16 +172,17 @@ class S4(nn.Module):
 
         # Optional hyper-network multiplication
         if self.hyper:
-            y, yh = rearrange(y, 'b (s c) h l -> s b c h l', s=2)
+            y, yh = rearrange(y, "b (s c) h l -> s b c h l", s=2)
             y = self.hyper_activation(yh) * y
 
         # Reshape to flatten channels
-        y = rearrange(y, '... c h l -> ... (c h) l')
+        y = rearrange(y, "... c h l -> ... (c h) l")
 
         if not self.linear:
             y = self.dropout(self.activation(y))
 
-        if not self.transposed: y = y.transpose(-1, -2)
+        if not self.transposed:
+            y = y.transpose(-1, -2)
 
         if not self.linear:
             y = self.norm(y)
@@ -183,7 +194,7 @@ class S4(nn.Module):
         self.kernel.setup_step()
 
     def step(self, u, state):
-        """ Step one time step as a recurrent model. Intended to be used during validation.
+        """Step one time step as a recurrent model. Intended to be used during validation.
 
         u: (B H)
         state: (B H N)
@@ -191,9 +202,9 @@ class S4(nn.Module):
         """
         assert not self.training
 
-        y, next_state = self.kernel.step(u, state) # (B C H)
+        y, next_state = self.kernel.step(u, state)  # (B C H)
         y = y + u.unsqueeze(-2) * self.D
-        y = rearrange(y, '... c h -> ... (c h)')
+        y = rearrange(y, "... c h -> ... (c h)")
         y = self.activation(y)
         if self.transposed:
             y = self.output_linear(y.unsqueeze(-1)).squeeze(-1)
@@ -214,7 +225,7 @@ class S4(nn.Module):
 
     @property
     def state_to_tensor(self):
-        return lambda state: rearrange('... h n -> ... (h n)', state)
+        return lambda state: rearrange("... h n -> ... (h n)", state)
 
 
 def test_state(random_init=False, **kwargs):
@@ -230,13 +241,14 @@ def test_state(random_init=False, **kwargs):
     s4.to(device)
     s4.eval()
     for module in s4.modules():
-        if hasattr(module, 'setup_step'): module.setup_step()
+        if hasattr(module, "setup_step"):
+            module.setup_step()
 
     u = torch.ones(B, H, L).to(device)
     initial_state = s4.default_state(B)
     if random_init:
         if initial_state.size(-1) == N:
-            initial_state = initial_state[..., :N//2]
+            initial_state = initial_state[..., : N // 2]
         initial_state = torch.randn_like(initial_state)
         initial_state = torch.cat([initial_state, initial_state.conj()], dim=-1)
 
@@ -272,11 +284,12 @@ def test_state(random_init=False, **kwargs):
     utils.compare_outputs(final_state, state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from benchmark import utils
+
     torch.manual_seed(42)
 
-    device = 'cuda' # 'cpu'
+    device = "cuda"  # 'cpu'
     device = torch.device(device)
 
-    test_state(random_init=True, mode='nplr', measure='legt', rank=2)
+    test_state(random_init=True, mode="nplr", measure="legt", rank=2)

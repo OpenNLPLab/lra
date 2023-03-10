@@ -11,69 +11,81 @@ from src.models.nn.exprnn.orthogonal import modrelu
 
 
 def Activation(activation=None, size=None, dim=-1):
-    if activation in [ None, 'id', 'identity', 'linear' ]:
+    if activation in [None, "id", "identity", "linear"]:
         return nn.Identity()
-    elif activation == 'tanh':
+    elif activation == "tanh":
         return nn.Tanh()
-    elif activation == 'relu':
+    elif activation == "relu":
         return nn.ReLU()
-    elif activation == 'gelu':
+    elif activation == "gelu":
         return nn.GELU()
-    elif activation in ['swish', 'silu']:
+    elif activation in ["swish", "silu"]:
         return nn.SiLU()
-    elif activation == 'glu':
+    elif activation == "glu":
         return nn.GLU(dim=dim)
-    elif activation == 'sigmoid':
+    elif activation == "sigmoid":
         return nn.Sigmoid()
-    elif activation == 'modrelu':
+    elif activation == "modrelu":
         return Modrelu(size)
     else:
-        raise NotImplementedError("hidden activation '{}' is not implemented".format(activation))
+        raise NotImplementedError(
+            "hidden activation '{}' is not implemented".format(activation)
+        )
+
 
 def get_initializer(name, activation=None):
-    if activation in [ None, 'id', 'identity', 'linear', 'modrelu' ]:
-        nonlinearity = 'linear'
-    elif activation in ['relu', 'tanh', 'sigmoid']:
+    if activation in [None, "id", "identity", "linear", "modrelu"]:
+        nonlinearity = "linear"
+    elif activation in ["relu", "tanh", "sigmoid"]:
         nonlinearity = activation
-    elif activation in ['gelu', 'swish', 'silu']:
-        nonlinearity = 'relu' # Close to ReLU so approximate with ReLU's gain
+    elif activation in ["gelu", "swish", "silu"]:
+        nonlinearity = "relu"  # Close to ReLU so approximate with ReLU's gain
     else:
-        raise NotImplementedError(f"get_initializer: activation {activation} not supported")
+        raise NotImplementedError(
+            f"get_initializer: activation {activation} not supported"
+        )
 
-    if name == 'uniform':
+    if name == "uniform":
         initializer = partial(torch.nn.init.kaiming_uniform_, nonlinearity=nonlinearity)
-    elif name == 'normal':
+    elif name == "normal":
         initializer = partial(torch.nn.init.kaiming_normal_, nonlinearity=nonlinearity)
-    elif name == 'xavier':
+    elif name == "xavier":
         initializer = torch.nn.init.xavier_normal_
-    elif name == 'zero':
+    elif name == "zero":
         initializer = partial(torch.nn.init.constant_, val=0)
-    elif name == 'one':
+    elif name == "one":
         initializer = partial(torch.nn.init.constant_, val=1)
     else:
-        raise NotImplementedError(f"get_initializer: initializer type {name} not supported")
+        raise NotImplementedError(
+            f"get_initializer: initializer type {name} not supported"
+        )
 
     return initializer
+
 
 class Modrelu(modrelu):
     def reset_parameters(self):
         self.b.data.uniform_(-0.01, 0.01)
 
+
 def LinearActivation(
-        d_input, d_output, bias=True,
-        zero_bias_init=False,
-        transposed=False,
-        initializer=None,
-        activation=None,
-        activate=False, # Apply activation as part of this module
-        weight_norm=False,
-        **kwargs,
-    ):
-    """ Returns a linear nn.Module with control over axes order, initialization, and activation """
+    d_input,
+    d_output,
+    bias=True,
+    zero_bias_init=False,
+    transposed=False,
+    initializer=None,
+    activation=None,
+    activate=False,  # Apply activation as part of this module
+    weight_norm=False,
+    **kwargs,
+):
+    """Returns a linear nn.Module with control over axes order, initialization, and activation"""
 
     # Construct core module
     linear_cls = TransposedLinear if transposed else nn.Linear
-    if activation == 'glu': d_output *= 2
+    if activation == "glu":
+        d_output *= 2
     linear = linear_cls(d_input, d_output, bias=bias, **kwargs)
 
     # Initialize weight
@@ -95,13 +107,13 @@ def LinearActivation(
 
 
 class TransposedLinear(nn.Module):
-    """ Linear module on the second-to-last dimension """
+    """Linear module on the second-to-last dimension"""
 
     def __init__(self, d_input, d_output, bias=True):
         super().__init__()
 
         self.weight = nn.Parameter(torch.empty(d_output, d_input))
-        nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5)) # nn.Linear default init
+        nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))  # nn.Linear default init
         # nn.init.kaiming_uniform_(self.weight, nonlinearity='linear') # should be equivalent
 
         if bias:
@@ -112,14 +124,15 @@ class TransposedLinear(nn.Module):
             self.bias = 0.0
 
     def forward(self, x):
-        return contract('... u l, v u -> ... v l', x, self.weight) + self.bias
+        return contract("... u l, v u -> ... v l", x, self.weight) + self.bias
 
 
 class TransposedLN(nn.Module):
-    """ LayerNorm module over second-to-last dimension
+    """LayerNorm module over second-to-last dimension
 
     This is slow and a dedicated CUDA/Triton implementation shuld provide substantial end-to-end speedup
     """
+
     def __init__(self, d, scalar=True):
         super().__init__()
         self.scalar = scalar
@@ -132,13 +145,14 @@ class TransposedLN(nn.Module):
     def forward(self, x):
         if self.scalar:
             s, m = torch.std_mean(x, dim=-2, unbiased=False, keepdim=True)
-            y = (self.s/s) * (x-m+self.m)
+            y = (self.s / s) * (x - m + self.m)
         else:
-            y = self.ln(x.transpose(-1,-2)).transpose(-1,-2)
+            y = self.ln(x.transpose(-1, -2)).transpose(-1, -2)
         return y
-    
+
+
 class SimpleRMSNorm(nn.Module):
-    def __init__(self, d, p=-1., eps=1e-2, bias=False):
+    def __init__(self, d, p=-1.0, eps=1e-2, bias=False):
         """
             Root Mean Square Layer Normalization
         :param d: model size
@@ -155,50 +169,54 @@ class SimpleRMSNorm(nn.Module):
         norm_x = x.norm(2, dim=-1, keepdim=True)
         d_x = self.d
 
-        rms_x = norm_x * d_x ** (-1. / 2)
+        rms_x = norm_x * d_x ** (-1.0 / 2)
         x_normed = x / (rms_x + self.eps)
 
         return x_normed
+
 
 class Normalization(nn.Module):
     def __init__(
         self,
         d,
-        transposed=False, # Length dimension is -1 or -2
-        _name_='layer',
-        **kwargs
+        transposed=False,  # Length dimension is -1 or -2
+        _name_="layer",
+        **kwargs,
     ):
         super().__init__()
         self.transposed = transposed
 
-        if _name_ == 'layer':
-            self.channel = True # Normalize over channel dimension
+        if _name_ == "layer":
+            self.channel = True  # Normalize over channel dimension
             if self.transposed:
                 self.norm = TransposedLN(d, **kwargs)
             else:
                 self.norm = nn.LayerNorm(d, **kwargs)
-        elif _name_ == 'instance':
+        elif _name_ == "instance":
             self.channel = False
-            norm_args = {'affine': False, 'track_running_stats': False}
+            norm_args = {"affine": False, "track_running_stats": False}
             norm_args.update(kwargs)
-            self.norm = nn.InstanceNorm1d(d, **norm_args) # (True, True) performs very poorly
-        elif _name_ == 'batch':
+            self.norm = nn.InstanceNorm1d(
+                d, **norm_args
+            )  # (True, True) performs very poorly
+        elif _name_ == "batch":
             self.channel = False
-            norm_args = {'affine': True, 'track_running_stats': True}
+            norm_args = {"affine": True, "track_running_stats": True}
             norm_args.update(kwargs)
             self.norm = nn.BatchNorm1d(d, **norm_args)
-        elif _name_ == 'none':
+        elif _name_ == "none":
             self.channel = True
             self.norm = nn.Identity()
         elif _name_ == "synbatch":
             self.channel = False
-            norm_args = {'affine': True, 'track_running_stats': True}
+            norm_args = {"affine": True, "track_running_stats": True}
             norm_args.update(kwargs)
             self.norm = nn.SyncBatchNorm(d, **norm_args)
         elif _name_ == "simplerms":
             self.channel = False
             self.norm = SimpleRMSNorm(d)
-        else: raise NotImplementedError
+        else:
+            raise NotImplementedError
 
     def forward(self, x):
         # The cases of LayerNorm / no normalization are automatically handled in all cases

@@ -14,6 +14,7 @@ from torch import Tensor, nn
 from torch.nn import Parameter
 from ..utils import logging_info
 
+
 def orthogonal_matrix_chunk(cols, device=None, dtype=None):
     unstructured_block = torch.randn((cols, cols), device=device)
     q, r = torch.linalg.qr(unstructured_block.cpu(), mode="reduced")
@@ -94,7 +95,7 @@ def favorp_projection(
     data_dash = torch.einsum(
         "bh...d,hjd->bh...j", (data_normalizer * data), projection_matrix
     )
-    diag_data = torch.sum(data ** 2, dim=-1)
+    diag_data = torch.sum(data**2, dim=-1)
     diag_data = (diag_data / 2.0) * data_normalizer * data_normalizer
     diag_data = diag_data.unsqueeze(-1)
 

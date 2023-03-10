@@ -15,6 +15,7 @@ import src.models.nn.utils as U
 
 try:
     from apex import amp
+
     APEX_AVAILABLE = True
 except:
     APEX_AVAILABLE = False
@@ -25,10 +26,14 @@ except:
 # By default Performer uses eps=0.0 here
 def linear_attention(q, k, v, eps=0.0, need_weights=False):
     k_cumsum = k.sum(dim=-2)
-    D_inv = 1. / (torch.einsum('...nd,...d->...n', q, k_cumsum.type_as(q)) + eps)
-    context = torch.einsum('...nd,...ne->...de', k, v)
-    out = torch.einsum('...de,...nd,...n->...ne', context, q, D_inv)
-    attn = None if not need_weights else torch.einsum('...te,...se,...s->...ts', q, k, D_inv)
+    D_inv = 1.0 / (torch.einsum("...nd,...d->...n", q, k_cumsum.type_as(q)) + eps)
+    context = torch.einsum("...nd,...ne->...de", k, v)
+    out = torch.einsum("...de,...nd,...n->...ne", context, q, D_inv)
+    attn = (
+        None
+        if not need_weights
+        else torch.einsum("...te,...se,...s->...ts", q, k, D_inv)
+    )
     return out, attn
 
 
@@ -40,29 +45,40 @@ def null_context():
 # efficient causal linear attention, created by EPFL
 def causal_linear_attention(q, k, v, eps=1e-6, need_weights=False):
     from fast_transformers.causal_product import CausalDotProduct
+
     autocast_enabled = torch.is_autocast_enabled()
     is_half = isinstance(q, torch.cuda.HalfTensor)
-    assert not is_half or APEX_AVAILABLE, 'half tensors can only be used if nvidia apex is available'
-    cuda_context = null_context if not autocast_enabled else partial(autocast, enabled = False)
+    assert (
+        not is_half or APEX_AVAILABLE
+    ), "half tensors can only be used if nvidia apex is available"
+    cuda_context = (
+        null_context if not autocast_enabled else partial(autocast, enabled=False)
+    )
 
-    causal_dot_product_fn = amp.float_function(CausalDotProduct.apply) if is_half else CausalDotProduct.apply
+    causal_dot_product_fn = (
+        amp.float_function(CausalDotProduct.apply)
+        if is_half
+        else CausalDotProduct.apply
+    )
 
     k_cumsum = k.cumsum(dim=-2) + eps
-    D_inv = 1. / torch.einsum('...nd,...nd->...n', q, k_cumsum.type_as(q))
+    D_inv = 1.0 / torch.einsum("...nd,...nd->...n", q, k_cumsum.type_as(q))
 
     with cuda_context():
         if autocast_enabled:
             q, k, v = map(lambda t: t.float(), (q, k, v))
         out = causal_dot_product_fn(q, k, v)
         if need_weights:
-            attn = torch.einsum('...te,...se,...s', q, k, D_inv)
-            causal_mask = torch.triu(torch.ones(q.shape[-2], k.shape[-2], dtype=torch.bool,
-                                                device=k.device), diagonal=1)
+            attn = torch.einsum("...te,...se,...s", q, k, D_inv)
+            causal_mask = torch.triu(
+                torch.ones(q.shape[-2], k.shape[-2], dtype=torch.bool, device=k.device),
+                diagonal=1,
+            )
             attn.masked_fill_(causal_mask, 0.0)
         else:
             attn = None
 
-    out = torch.einsum('...nd,...n->...nd', out, D_inv)
+    out = torch.einsum("...nd,...n->...nd", out, D_inv)
     return out, None
 
 
@@ -88,22 +104,34 @@ class LinearAttention(nn.Module):
         eps: float, a small number to ensure the numerical stability of the
              denominator (default: 1e-6)
     """
+
     # def __init__(self, query_dims, feature_map_cfg=None, eps=1e-6):
-    def __init__(self, d_model, n_heads, feature_map_cfg=None, eps=1e-6, dropout=0.0): # TODO dropout not used
+    def __init__(
+        self, d_model, n_heads, feature_map_cfg=None, eps=1e-6, dropout=0.0
+    ):  # TODO dropout not used
         super().__init__()
         query_dims = d_model // n_heads
         self.n_heads = n_heads
         self.feature_map = (
-            hydra.utils.instantiate(feature_map_cfg, query_dims) if feature_map_cfg is not None
+            hydra.utils.instantiate(feature_map_cfg, query_dims)
+            if feature_map_cfg is not None
             else elu_feature_map(query_dims)
         )
         self.eps = eps
 
-    def forward(self, query, key, value, attn_mask=None, key_padding_mask=None, need_weights=False):
+    def forward(
+        self,
+        query,
+        key,
+        value,
+        attn_mask=None,
+        key_padding_mask=None,
+        need_weights=False,
+    ):
         # Permute the dimensions to BHTE instead of BTHE
-        query = rearrange(query, 'b t (h e) -> b h t e', h=self.n_heads)
-        key = rearrange(key, 'b s (h e) -> b h s e', h=self.n_heads)
-        value = rearrange(value, 'b s (h d) -> b h s d', h=self.n_heads)
+        query = rearrange(query, "b t (h e) -> b h t e", h=self.n_heads)
+        key = rearrange(key, "b s (h e) -> b h s e", h=self.n_heads)
+        value = rearrange(value, "b s (h d) -> b h s d", h=self.n_heads)
 
         # Apply the feature map to the query and key
         self.feature_map.new_feature_map(query.device)
@@ -114,19 +142,27 @@ class LinearAttention(nn.Module):
         # all_ones or is causal
         causal = attn_mask is not None and attn_mask.lower_triangular
         if not (attn_mask is None or attn_mask.all_ones or causal):
-            raise RuntimeError(("LinearAttention does not support arbitrary attention masks"))
+            raise RuntimeError(
+                ("LinearAttention does not support arbitrary attention masks")
+            )
         if causal:
-            assert query.shape[1] == key.shape[1], 'query and key must have the same sequence length'
+            assert (
+                query.shape[1] == key.shape[1]
+            ), "query and key must have the same sequence length"
 
         if key_padding_mask is not None:
-            K.masked_fill_(~rearrange(key_padding_mask.bool_matrix, 'b s -> b 1 s 1'), 0.0)
+            K.masked_fill_(
+                ~rearrange(key_padding_mask.bool_matrix, "b s -> b 1 s 1"), 0.0
+            )
         attn_fn = causal_linear_attention if causal else linear_attention
         out, attn = attn_fn(Q, K, value, eps=self.eps, need_weights=need_weights)
-        out = rearrange(out, 'b h s d -> b s (h d)')
+        out = rearrange(out, "b h s d -> b s (h d)")
         return out, attn
 
+
 class Performer(SequenceModule):
-    """ [21-09-29] TODO the MHA class should take options for attention like full, performer, etc. Currently this is essentially duplicated from MultiheadAttention class """
+    """[21-09-29] TODO the MHA class should take options for attention like full, performer, etc. Currently this is essentially duplicated from MultiheadAttention class"""
+
     def __init__(self, d_model, n_heads, *args, causal=True, **kwargs):
         super().__init__()
         self.d_model = d_model
@@ -135,15 +171,23 @@ class Performer(SequenceModule):
         self.causal = causal
 
     def forward(self, src, attn_mask=None, key_padding_mask=None, state=None, **kwargs):
-        """ state should represent a mask and key padding mask """
+        """state should represent a mask and key padding mask"""
         if self.causal and attn_mask is None:
             attn_mask = TriangularCausalMask(src.size(-2), device=src.device)
         # attn_mask, key_padding_mask = state
         # Note that this returns None for the second argument
-        y, z = self.mha(src, src, src, attn_mask=attn_mask, key_padding_mask=key_padding_mask, need_weights=False)
+        y, z = self.mha(
+            src,
+            src,
+            src,
+            attn_mask=attn_mask,
+            key_padding_mask=key_padding_mask,
+            need_weights=False,
+        )
         return y, None
 
     def step(self, x, state):
         raise NotImplementedError
+
 
 Performer = U.Transpose(Performer)

@@ -6,7 +6,7 @@ from torchdiffeq import odeint, odeint_adjoint
 import bisect
 
 
-def rdeint(logsig, h0, func, method='rk4', adjoint=False, return_sequences=False):
+def rdeint(logsig, h0, func, method="rk4", adjoint=False, return_sequences=False):
     """Analogous to odeint but for RDEs.
     Note that we do not have time intervals here. This is because the log-ode method is always evaluated on [0, 1] and
     thus are grid is always [0, 1, ..., num_intervals+1].
@@ -27,11 +27,16 @@ def rdeint(logsig, h0, func, method='rk4', adjoint=False, return_sequences=False
     cell = _NRDECell(logsig_getter, func)
 
     # Set options
-    t, options, = set_options(logsig, return_sequences=return_sequences)
+    (
+        t,
+        options,
+    ) = set_options(logsig, return_sequences=return_sequences)
 
     # Solve
     odeint_func = odeint_adjoint if adjoint else odeint
-    output = odeint_func(func=cell, y0=h0, t=t, method=method, options=options).transpose(0, 1)
+    output = odeint_func(
+        func=cell, y0=h0, t=t, method=method, options=options
+    ).transpose(0, 1)
 
     return output
 
@@ -50,9 +55,9 @@ def set_options(logsig, return_sequences=False, eps=1e-5):
     length = logsig.size(1) + 1
     if return_sequences:
         t = torch.arange(0, length, dtype=torch.float).to(logsig.device)
-        options = {'eps': eps}
+        options = {"eps": eps}
     else:
-        options = {'step_size': 1, 'eps': eps}
+        options = {"step_size": 1, "eps": eps}
         t = torch.Tensor([0, length]).to(logsig.device)
     return t, options
 
@@ -65,6 +70,7 @@ class _GetLogsignature:
     logsignature on [5, 6]. This function simply holds the logsignature, and interval end times, and returns the
     correct logsignature given any time.
     """
+
     def __init__(self, logsig):
         self.knots = range(logsig.size(1))
         self.logsig = logsig
@@ -81,6 +87,7 @@ class _NRDECell(nn.Module):
     given a function f, this class applies that function to the hidden state, and then applies that result linearly onto
     the correct piece of the logsignature.
     """
+
     def __init__(self, logsig_getter, func):
         super().__init__()
         self.logsig_getter = logsig_getter
@@ -101,17 +108,20 @@ class NeuralRDE(nn.Module):
     hidden state, that is:
         dH = f(H)dX;    Y = L(H).
     """
-    def __init__(self,
-                 initial_dim,
-                 logsig_dim,
-                 hidden_dim,
-                 output_dim,
-                 hidden_hidden_dim=15,
-                 num_layers=3,
-                 apply_final_linear=True,
-                 solver='midpoint',
-                 adjoint=False,
-                 return_sequences=False):
+
+    def __init__(
+        self,
+        initial_dim,
+        logsig_dim,
+        hidden_dim,
+        output_dim,
+        hidden_hidden_dim=15,
+        num_layers=3,
+        apply_final_linear=True,
+        solver="midpoint",
+        adjoint=False,
+        return_sequences=False,
+    ):
         """
         Args:
             initial_dim (int): We use the initial value (t_0 x_0) as an initial condition else we have translation
@@ -143,24 +153,41 @@ class NeuralRDE(nn.Module):
         self.initial_linear = nn.Linear(initial_dim, hidden_dim)
 
         # The net applied to h_prev
-        self.func = _NRDEFunc(hidden_dim, logsig_dim, hidden_dim=hidden_hidden_dim, num_layers=num_layers)
+        self.func = _NRDEFunc(
+            hidden_dim, logsig_dim, hidden_dim=hidden_hidden_dim, num_layers=num_layers
+        )
 
         # Linear classifier to apply to final layer
-        self.final_linear = nn.Linear(self.hidden_dim, self.output_dim) if apply_final_linear else lambda x: x
+        self.final_linear = (
+            nn.Linear(self.hidden_dim, self.output_dim)
+            if apply_final_linear
+            else lambda x: x
+        )
 
     def forward(self, inputs):
         # Setup the inital hidden layer
-        assert len(inputs) == 2, "`inputs` must be a 2-tuple containing `(inital_values, logsig)`."
+        assert (
+            len(inputs) == 2
+        ), "`inputs` must be a 2-tuple containing `(inital_values, logsig)`."
         initial, logsig = inputs
         h0 = self.initial_linear(initial)
 
         # Perform the adjoint operation
         out = rdeint(
-            logsig, h0, self.func, method=self.solver, adjoint=self.adjoint, return_sequences=self.return_sequences
+            logsig,
+            h0,
+            self.func,
+            method=self.solver,
+            adjoint=self.adjoint,
+            return_sequences=self.return_sequences,
         )
 
         # Outputs
-        outputs = self.final_linear(out[:, -1, :]) if not self.return_sequences else self.final_linear(out)
+        outputs = (
+            self.final_linear(out[:, -1, :])
+            if not self.return_sequences
+            else self.final_linear(out)
+        )
 
         return outputs
 
@@ -173,6 +200,7 @@ class _NRDEFunc(nn.Module):
     and the output dim must be of size `input_dim * logsig_dim`. Simply reshape the output onto a tensor of size
     `[batch, input_dim, logsig_dim]`.
     """
+
     def __init__(self, input_dim, logsig_dim, num_layers=1, hidden_dim=15):
         super().__init__()
         self.input_dim = input_dim
@@ -181,22 +209,32 @@ class _NRDEFunc(nn.Module):
         self.num_layers = num_layers
 
         # Additional layers are just hidden to hidden with relu activation
-        additional_layers = [nn.ReLU(), nn.Linear(hidden_dim, hidden_dim)] * (num_layers - 1) if num_layers > 1 else []
+        additional_layers = (
+            [nn.ReLU(), nn.Linear(hidden_dim, hidden_dim)] * (num_layers - 1)
+            if num_layers > 1
+            else []
+        )
 
         # The net applied to h_prev
-        self.net = nn.Sequential(*[
-            nn.Linear(input_dim, hidden_dim),
-            *additional_layers,
-            nn.Tanh(),
-            nn.Linear(hidden_dim, input_dim * logsig_dim),
-        ]) if num_layers > 0 else nn.Linear(input_dim, input_dim * logsig_dim)
+        self.net = (
+            nn.Sequential(
+                *[
+                    nn.Linear(input_dim, hidden_dim),
+                    *additional_layers,
+                    nn.Tanh(),
+                    nn.Linear(hidden_dim, input_dim * logsig_dim),
+                ]
+            )
+            if num_layers > 0
+            else nn.Linear(input_dim, input_dim * logsig_dim)
+        )
 
     def forward(self, h):
         return self.net(h).view(-1, self.input_dim, self.logsig_dim)
 
 
-if __name__ == '__main__':
-    
+if __name__ == "__main__":
+
     B = 1
     D = 256
     LS = 512
@@ -205,6 +243,7 @@ if __name__ == '__main__':
     x = torch.randn(B, 1)
     logsig = torch.randn(B, L, LS)
     import time
+
     start_time = time.time()
     print(nrde.forward((x, logsig)))
     print(time.time() - start_time)

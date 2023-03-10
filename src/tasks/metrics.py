@@ -5,6 +5,7 @@ from src.tasks.mixture import mixture_loss, mixture_loss_kd
 from sklearn.metrics import f1_score, roc_auc_score
 from functools import partial
 
+
 def binary_cross_entropy(logits, y):
     # BCE loss requires squeezing last dimension of logits so it has the same shape as y
     # requires y to be float, since it's overloaded to represent a probability
@@ -36,7 +37,10 @@ def accuracy_at_k(logits, y, k=1):
         # Mixup leads to this case: use argmax class
         y = y.argmax(dim=-1)
     y = y.view(-1)
-    return torch.topk(logits, k, dim=-1)[1].eq(y.unsqueeze(-1)).any(dim=-1).float().mean()
+    return (
+        torch.topk(logits, k, dim=-1)[1].eq(y.unsqueeze(-1)).any(dim=-1).float().mean()
+    )
+
 
 def f1_binary(logits, y):
     logits = logits.view(-1, logits.shape[-1])
@@ -115,7 +119,7 @@ def mae(outs, y, len_batch=None):
 
 # Metrics that can depend on the loss
 def loss(x, y, loss_fn):
-    """ This metric may be useful because the training loss may add extra regularization (e.g. weight decay implemented as L2 penalty), while adding this as a metric skips the additional losses """
+    """This metric may be useful because the training loss may add extra regularization (e.g. weight decay implemented as L2 penalty), while adding this as a metric skips the additional losses"""
     return loss_fn(x, y)
 
 
@@ -124,7 +128,7 @@ def rmse(x, y, loss_fn):
 
 
 def bpb(x, y, loss_fn):
-    """ bits per byte (image density estimation, speech generation, char LM) """
+    """bits per byte (image density estimation, speech generation, char LM)"""
     return loss_fn(x, y) / math.log(2)
 
 
@@ -138,9 +142,9 @@ output_metric_fns = {
     "cross_entropy": cross_entropy,
     "binary_accuracy": binary_accuracy,
     "accuracy": accuracy,
-    'accuracy@3': partial(accuracy_at_k, k=3),
-    'accuracy@5': partial(accuracy_at_k, k=5),
-    'accuracy@10': partial(accuracy_at_k, k=10),
+    "accuracy@3": partial(accuracy_at_k, k=3),
+    "accuracy@5": partial(accuracy_at_k, k=5),
+    "accuracy@10": partial(accuracy_at_k, k=10),
     "eval_loss": loss,
     "mixture": mixture_loss,
     "mixture_kd": mixture_loss_kd,

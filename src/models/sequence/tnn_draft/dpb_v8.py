@@ -30,7 +30,13 @@ class SimpleRMSNorm(nn.Module):
 
 class DynamicPosBiasV8(nn.Module):
     def __init__(
-        self, dim, outdim, residual, act="relu", bias=True, layers=3,
+        self,
+        dim,
+        outdim,
+        residual,
+        act="relu",
+        bias=True,
+        layers=3,
     ):
         super().__init__()
         self.residual = residual

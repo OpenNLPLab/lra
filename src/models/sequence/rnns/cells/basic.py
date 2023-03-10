@@ -4,26 +4,28 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from src.models.nn import LinearActivation, Activation # , get_initializer
+from src.models.nn import LinearActivation, Activation  # , get_initializer
 from src.models.nn.gate import Gate
 from src.models.nn.orthogonal import OrthogonalLinear
 from src.models.sequence.base import SequenceModule
 
+
 class CellBase(SequenceModule):
-    """ Abstract class for our recurrent cell interface.
+    """Abstract class for our recurrent cell interface.
 
     Passes input through
     """
+
     registry = {}
 
     # https://www.python.org/dev/peps/pep-0487/#subclass-registration
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         # Only register classes with @name attribute
-        if hasattr(cls, 'name') and cls.name is not None:
+        if hasattr(cls, "name") and cls.name is not None:
             cls.registry[cls.name] = cls
 
-    name = 'id'
+    name = "id"
     valid_keys = []
 
     @property
@@ -56,12 +58,13 @@ class CellBase(SequenceModule):
         pass
 
     def forward(self, input, hidden):
-        """ Returns output, next_state """
+        """Returns output, next_state"""
         return input, input
 
     def default_state(self, *batch_shape, device=None):
         return torch.zeros(
-            *batch_shape, self.d_model,
+            *batch_shape,
+            self.d_model,
             device=device,
             requires_grad=False,
         )
@@ -83,41 +86,44 @@ class CellBase(SequenceModule):
 
 
 class RNNCell(CellBase):
-    name = 'rnn'
+    name = "rnn"
 
-    valid_keys = ['hx', 'hh', 'bias']
+    valid_keys = ["hx", "hh", "bias"]
 
     default_initializers = {
-        'hx': 'xavier',
-        'hh': 'xavier',
+        "hx": "xavier",
+        "hh": "xavier",
     }
 
     default_architecture = {
-        'bias': True,
+        "bias": True,
     }
 
     def __init__(
-            self, d_input, d_model,
-            hidden_activation='tanh',
-            orthogonal=False,
-            ortho_args=None,
-            zero_bias_init=False,
-            **kwargs
-        ):
+        self,
+        d_input,
+        d_model,
+        hidden_activation="tanh",
+        orthogonal=False,
+        ortho_args=None,
+        zero_bias_init=False,
+        **kwargs
+    ):
 
         self.hidden_activation = hidden_activation
         self.orthogonal = orthogonal
         self.ortho_args = ortho_args
-        self.zero_bias_init=zero_bias_init
+        self.zero_bias_init = zero_bias_init
 
         super().__init__(d_input, d_model, **kwargs)
 
     def reset_parameters(self):
         self.W_hx = LinearActivation(
-            self.d_input, self.d_model,
-            bias=self.architecture['bias'],
+            self.d_input,
+            self.d_model,
+            bias=self.architecture["bias"],
             zero_bias_init=self.zero_bias_init,
-            initializer=self.initializers['hx'],
+            initializer=self.initializers["hx"],
             activation=self.hidden_activation,
             # apply_activation=False,
             activate=False,
@@ -131,16 +137,17 @@ class RNNCell(CellBase):
 
             if self.ortho_args is None:
                 self.ortho_args = {}
-            self.ortho_args['d_input'] = self.d_model
-            self.ortho_args['d_output'] = self.d_model
+            self.ortho_args["d_input"] = self.d_model
+            self.ortho_args["d_output"] = self.d_model
 
             self.W_hh = OrthogonalLinear(**self.ortho_args)
         else:
             self.W_hh = LinearActivation(
-                self.d_model, self.d_model,
-                bias=self.architecture['bias'],
+                self.d_model,
+                self.d_model,
+                bias=self.architecture["bias"],
                 zero_bias_init=self.zero_bias_init,
-                initializer=self.initializers['hh'],
+                initializer=self.initializers["hh"],
                 activation=self.hidden_activation,
                 # apply_activation=False,
                 activate=False,
@@ -155,16 +162,14 @@ class RNNCell(CellBase):
 
         return hidden, hidden
 
+
 class GatedRNNCell(RNNCell):
-    name = 'gru'
+    name = "gru"
 
     def __init__(
-            self, d_input, d_model,
-            gate='G', # 'N' | 'G' | 'R' | 'UR'
-            reset='G',
-            **kwargs
-        ):
-        self.gate  = gate
+        self, d_input, d_model, gate="G", reset="G", **kwargs  # 'N' | 'G' | 'R' | 'UR'
+    ):
+        self.gate = gate
         self.reset = reset
         super().__init__(d_input, d_model, **kwargs)
 
@@ -172,30 +177,45 @@ class GatedRNNCell(RNNCell):
         super().reset_parameters()
         # self.reset_gate()
 
-    # def reset_gate(self):
+        # def reset_gate(self):
         preact_ctor = LinearActivation
-        preact_args = [self.d_input + self.d_model, self.d_model, self.architecture['bias']]
-        self.W_g     = Gate(self.d_model, preact_ctor, preact_args, mechanism=self.gate)
-        self.W_reset = Gate(self.d_model, preact_ctor, preact_args, mechanism=self.reset)
+        preact_args = [
+            self.d_input + self.d_model,
+            self.d_model,
+            self.architecture["bias"],
+        ]
+        self.W_g = Gate(self.d_model, preact_ctor, preact_args, mechanism=self.gate)
+        self.W_reset = Gate(
+            self.d_model, preact_ctor, preact_args, mechanism=self.reset
+        )
 
     def forward(self, input, h):
         hx = torch.cat((input, h), dim=-1)
         reset = self.W_reset(hx)
 
-        _, update = super().forward(input, reset*h)
+        _, update = super().forward(input, reset * h)
 
         g = self.W_g(hx)
-        h = (1.-g) * h + g * update
+        h = (1.0 - g) * h + g * update
 
         return h, h
 
+
 class ExpRNNCell(RNNCell):
-    """ Note: there is a subtle distinction between this and the ExpRNN original cell in the initialization of hx
+    """Note: there is a subtle distinction between this and the ExpRNN original cell in the initialization of hx
     this shouldn't make a difference
     (original ExpRNN cell located in models.nn.exprnn.orthogonal.OrthogonalRNN)
     """
 
-    name = 'exprnn'
+    name = "exprnn"
 
-    def __init__(self, d_input, d_model, orthogonal=True, hidden_activation='modrelu', **kwargs):
-        super().__init__(d_input, d_model, orthogonal=orthogonal, hidden_activation=hidden_activation, **kwargs)
+    def __init__(
+        self, d_input, d_model, orthogonal=True, hidden_activation="modrelu", **kwargs
+    ):
+        super().__init__(
+            d_input,
+            d_model,
+            orthogonal=orthogonal,
+            hidden_activation=hidden_activation,
+            **kwargs,
+        )

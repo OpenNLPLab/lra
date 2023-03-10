@@ -4,15 +4,26 @@ from torch import nn
 from src.models.sequence.base import SequenceModule
 from src.models.nn import LinearActivation
 
+
 class FF(SequenceModule):
-    def __init__(self, d_input, expand=2, d_output=None, transposed=False, activation='gelu', initializer=None, dropout=0.0):
+    def __init__(
+        self,
+        d_input,
+        expand=2,
+        d_output=None,
+        transposed=False,
+        activation="gelu",
+        initializer=None,
+        dropout=0.0,
+    ):
         super().__init__()
         self.d_output = d_input if d_output is None else d_output
         self.transposed = transposed
         d_inner = expand * d_input
 
         linear1 = LinearActivation(
-            d_input, d_inner,
+            d_input,
+            d_inner,
             transposed=transposed,
             activation=activation,
             initializer=initializer,
@@ -22,7 +33,8 @@ class FF(SequenceModule):
         drop = dropout_cls(dropout) if dropout > 0.0 else nn.Identity()
 
         linear2 = LinearActivation(
-            d_inner, self.d_output,
+            d_inner,
+            self.d_output,
             transposed=transposed,
             activation=None,
             initializer=initializer,
@@ -45,4 +57,3 @@ class FF(SequenceModule):
             return self.ff(x.unsqueeze(-1)).squeeze(-1), state
         else:
             return self.ff(x), state
-

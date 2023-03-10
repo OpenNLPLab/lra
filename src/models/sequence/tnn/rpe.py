@@ -37,10 +37,12 @@ class Rpe(nn.Module):
         self.act = act
         self.pos_proj = nn.Linear(1, self.pos_dim, bias=bias)
         self.pos1 = nn.Sequential(
-            self.get_act(), nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
+            self.get_act(),
+            nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
         )
         self.pos2 = nn.Sequential(
-            self.get_act(), nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
+            self.get_act(),
+            nn.Linear(self.pos_dim, self.pos_dim, bias=bias),
         )
         self.pos3 = nn.Sequential(
             nn.LayerNorm(self.pos_dim),

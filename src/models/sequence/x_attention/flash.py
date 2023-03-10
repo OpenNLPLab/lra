@@ -31,7 +31,7 @@ def rope(x, dim):
     freq_seq = -torch.arange(half_size, dtype=x.dtype, device=x.device) / float(
         half_size
     )
-    inv_freq = 10000 ** freq_seq
+    inv_freq = 10000**freq_seq
     sinusoid = torch.einsum("...,d->...d", position, inv_freq)
     sin = sinusoid.sin()
     cos = sinusoid.cos()
@@ -47,7 +47,7 @@ class ScaleNorm(nn.Module):
         self.scala = nn.Parameter(torch.ones(1))
 
     def forward(self, x):
-        mean_square = (x ** 2).mean(dim=-1, keepdim=True)
+        mean_square = (x**2).mean(dim=-1, keepdim=True)
         x = x * torch.rsqrt(mean_square + self.eps) * self.scala
         return x
 

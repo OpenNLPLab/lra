@@ -14,6 +14,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("print_config")
 
+
 def get_activation_fn(activation):
     logger.info(f"activation: {activation}")
     if activation == "gelu":
@@ -29,20 +30,25 @@ def get_activation_fn(activation):
     elif activation == "leak":
         return F.leaky_relu
     elif activation == "1+elu":
+
         def f(x):
             return 1 + F.elu(x)
+
         return f
     elif activation == "2+elu":
-            def f(x):
-                return 2 + F.elu(x)
-            return f
+
+        def f(x):
+            return 2 + F.elu(x)
+
+        return f
     elif activation == "silu":
         return F.silu
     else:
         return lambda x: x
-    
+
+
 class SimpleRMSNorm(nn.Module):
-    def __init__(self, d, p=-1., eps=1e-8, bias=False):
+    def __init__(self, d, p=-1.0, eps=1e-8, bias=False):
         """
             Root Mean Square Layer Normalization
         :param d: model size
@@ -59,11 +65,12 @@ class SimpleRMSNorm(nn.Module):
         norm_x = x.norm(2, dim=-1, keepdim=True)
         d_x = self.d
 
-        rms_x = norm_x * d_x ** (-1. / 2)
+        rms_x = norm_x * d_x ** (-1.0 / 2)
         x_normed = x / (rms_x + self.eps)
 
         return x_normed
-    
+
+
 def get_norm_fn(norm_type):
     if norm_type == "simplermsnorm":
         return SimpleRMSNorm

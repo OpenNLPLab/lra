@@ -36,16 +36,21 @@ def fid(feat_data, feat_gen):
 
         covmean, _ = linalg.sqrtm(sigma_data.dot(sigma_gen), disp=False)
         if not np.isfinite(covmean).all():
-            print("fid calculation produces singular product; adding perturbation to diagonal of cov estimates")
+            print(
+                "fid calculation produces singular product; adding perturbation to diagonal of cov estimates"
+            )
             offset = np.eye(sigma_data.shape[0]) * 1e-4
             covmean, _ = linalg.sqrtm((sigma_data + offset).dot(sigma_gen + offset))
 
         # Now calculate the FID
-        fid_value = np.sum(np.square(mu_gen - mu_data)) + np.trace(sigma_gen + sigma_data - 2*covmean)
+        fid_value = np.sum(np.square(mu_gen - mu_data)) + np.trace(
+            sigma_gen + sigma_data - 2 * covmean
+        )
 
         return fid_value
     except ValueError:
         return np.inf
+
 
 def inception_score(probs_gen):
     """
@@ -58,20 +63,23 @@ def inception_score(probs_gen):
     probs_gen = probs_gen[np.random.permutation(len(probs_gen))]
 
     # Split probs_gen into two halves
-    probs_gen_1 = probs_gen[:len(probs_gen)//2]
-    probs_gen_2 = probs_gen[len(probs_gen)//2:]
+    probs_gen_1 = probs_gen[: len(probs_gen) // 2]
+    probs_gen_2 = probs_gen[len(probs_gen) // 2 :]
 
     # Calculate average label distribution for split 2
     mean_2 = np.mean(probs_gen_2, axis=0)
 
     # Compute the mean kl-divergence between the probability distributions
     # of the generated and average label distributions
-    kl = entropy(probs_gen_1, np.repeat(mean_2[None, :], len(probs_gen_1), axis=0)).mean()
+    kl = entropy(
+        probs_gen_1, np.repeat(mean_2[None, :], len(probs_gen_1), axis=0)
+    ).mean()
 
     # Compute the expected score
     is_score = np.exp(kl)
 
     return is_score
+
 
 def modified_inception_score(probs_gen, n=10000):
     """
@@ -99,6 +107,7 @@ def modified_inception_score(probs_gen, n=10000):
 
     return mis_score
 
+
 def am_score(probs_data, probs_gen):
     """
     Calculate AM Score
@@ -116,12 +125,12 @@ def two_proportions_z_test(p1, n1, p2, n2, significance_level, z_threshold=None)
     # Per http://stattrek.com/hypothesis-test/difference-in-proportions.aspx
     # See also http://www.itl.nist.gov/div898/software/dataplot/refman1/auxillar/binotest.htm
     p = (p1 * n1 + p2 * n2) / (n1 + n2)
-    se = np.sqrt(p * (1 - p) * (1/n1 + 1/n2))
+    se = np.sqrt(p * (1 - p) * (1 / n1 + 1 / n2))
     z = (p1 - p2) / se
     # Allow defining a threshold in terms as Z (difference relative to the SE) rather than in p-values.
     if z_threshold is not None:
         return abs(z) > z_threshold
-    p_values = 2.0 * norm.cdf(-1.0 * np.abs(z))    # Two-tailed test
+    p_values = 2.0 * norm.cdf(-1.0 * np.abs(z))  # Two-tailed test
     return p_values < significance_level
 
 
@@ -144,11 +153,12 @@ def ndb_score(feat_data, feat_gen):
     prop_gen = counts_gen / len(labels_gen)
 
     # Calculate number of bins with statistically different proportions
-    different_bins = two_proportions_z_test(prop_data, len(labels_data), prop_gen, len(labels_gen), 0.05)
+    different_bins = two_proportions_z_test(
+        prop_data, len(labels_data), prop_gen, len(labels_gen), 0.05
+    )
     ndb = np.count_nonzero(different_bins)
 
-    return ndb/50.
-
+    return ndb / 50.0
 
 
 def _nested_getattr(obj, attr, *args):
@@ -173,6 +183,7 @@ class ActivationExtractor:
         self.input = input
         self.output = output
 
+
 class ActivationOp:
     def __init__(
         self,
@@ -191,11 +202,10 @@ class ActivationOp:
         target_module.register_forward_hook(self.extractor.add_hook)
 
 
+CLASSES = "zero, one, two, three, four, five, six, seven, eight, nine".split(", ")
 
-CLASSES = 'zero, one, two, three, four, five, six, seven, eight, nine'.split(', ')
 
 class SpeechCommandsDataset(Dataset):
-    
     def __init__(self, folder, transform=None, classes=CLASSES, samples=False):
 
         self.classes = classes
@@ -227,7 +237,7 @@ class SpeechCommandsDataset(Dataset):
 
     def __getitem__(self, index):
         path, target = self.data[index]
-        data = {'path': path, 'target': target}
+        data = {"path": path, "target": target}
 
         if self.transform is not None:
             data = self.transform(data)
@@ -235,16 +245,42 @@ class SpeechCommandsDataset(Dataset):
         return data
 
 
-parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument("--train-dataset-dir", type=str, default='datasets/speech_commands/train', help='path of test dataset')
-parser.add_argument("--test-dataset-dir", type=str, default='datasets/speech_commands/test', help='path of test dataset')
-parser.add_argument("--sample-dir", type=str, default='datasets/speech_commands/test', help='path of test dataset')
-parser.add_argument("--batch-size", type=int, default=128, help='batch size')
-parser.add_argument("--dataload-workers-nums", type=int, default=4, help='number of workers for dataloader')
-parser.add_argument("--input", choices=['mel32'], default='mel32', help='input of NN')
-parser.add_argument("--threshold", action='store_true', help='tune thresholds to reject samples')
-parser.add_argument("--save-probs", action='store_true', help='save classifier probs on samples')
-parser.add_argument("model", help='a pretrained neural network model')
+parser = argparse.ArgumentParser(
+    description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+parser.add_argument(
+    "--train-dataset-dir",
+    type=str,
+    default="datasets/speech_commands/train",
+    help="path of test dataset",
+)
+parser.add_argument(
+    "--test-dataset-dir",
+    type=str,
+    default="datasets/speech_commands/test",
+    help="path of test dataset",
+)
+parser.add_argument(
+    "--sample-dir",
+    type=str,
+    default="datasets/speech_commands/test",
+    help="path of test dataset",
+)
+parser.add_argument("--batch-size", type=int, default=128, help="batch size")
+parser.add_argument(
+    "--dataload-workers-nums",
+    type=int,
+    default=4,
+    help="number of workers for dataloader",
+)
+parser.add_argument("--input", choices=["mel32"], default="mel32", help="input of NN")
+parser.add_argument(
+    "--threshold", action="store_true", help="tune thresholds to reject samples"
+)
+parser.add_argument(
+    "--save-probs", action="store_true", help="save classifier probs on samples"
+)
+parser.add_argument("model", help="a pretrained neural network model")
 args = parser.parse_args()
 
 model = torch.load(args.model)
@@ -256,18 +292,20 @@ if use_gpu:
     model.cuda()
 
 n_mels = 32
-if args.input == 'mel40':
+if args.input == "mel40":
     n_mels = 40
 
-feature_transform = Compose([ToMelSpectrogram(n_mels=n_mels), ToTensor('mel_spectrogram', 'input')])
+feature_transform = Compose(
+    [ToMelSpectrogram(n_mels=n_mels), ToTensor("mel_spectrogram", "input")]
+)
 transform = Compose([LoadAudio(), FixAudioLength(), feature_transform])
 
 train_dataset = SpeechCommandsDataset(args.train_dataset_dir, transform)
 train_dataloader = DataLoader(
-    train_dataset, 
-    batch_size=args.batch_size, 
-    sampler=None, 
-    pin_memory=use_gpu, 
+    train_dataset,
+    batch_size=args.batch_size,
+    sampler=None,
+    pin_memory=use_gpu,
     num_workers=args.dataload_workers_nums,
     drop_last=False,
     shuffle=False,
@@ -275,29 +313,33 @@ train_dataloader = DataLoader(
 
 test_dataset = SpeechCommandsDataset(args.test_dataset_dir, transform)
 test_dataloader = DataLoader(
-    test_dataset, 
-    batch_size=args.batch_size, 
-    sampler=None, 
-    pin_memory=use_gpu, 
+    test_dataset,
+    batch_size=args.batch_size,
+    sampler=None,
+    pin_memory=use_gpu,
     num_workers=args.dataload_workers_nums,
     drop_last=False,
     shuffle=False,
 )
 
 samples_dataset = SpeechCommandsDataset(
-    args.sample_dir, 
-    transform, 
-    samples=False if args.sample_dir.rstrip("/").endswith('test') or args.sample_dir.rstrip("/").endswith('train') else True,
+    args.sample_dir,
+    transform,
+    samples=False
+    if args.sample_dir.rstrip("/").endswith("test")
+    or args.sample_dir.rstrip("/").endswith("train")
+    else True,
 )
 samples_dataloader = DataLoader(
-    samples_dataset, 
-    batch_size=args.batch_size, 
-    sampler=None, 
-    pin_memory=use_gpu, 
+    samples_dataset,
+    batch_size=args.batch_size,
+    sampler=None,
+    pin_memory=use_gpu,
     num_workers=args.dataload_workers_nums,
     drop_last=False,
     shuffle=False,
 )
+
 
 @torch.no_grad()
 def test(dataloader):
@@ -315,9 +357,9 @@ def test(dataloader):
 
     pbar = tqdm(dataloader, unit="audios", unit_scale=dataloader.batch_size)
     for batch in pbar:
-        inputs = batch['input']
+        inputs = batch["input"]
         inputs = inputs.unsqueeze(1)
-        targets = batch['target']
+        targets = batch["target"]
 
         if use_gpu:
             inputs = inputs.cuda()
@@ -336,28 +378,33 @@ def test(dataloader):
 
     probs = np.concatenate(probs)
     activations = np.concatenate(activations)
-    accuracy = correct/total
-    print("accuracy: %f%%" % (100*accuracy))
+    accuracy = correct / total
+    print("accuracy: %f%%" % (100 * accuracy))
     return probs, activations
 
+
 # Run test if train_probs and train_activations are not on disk
-if not os.path.exists('cache/train_probs.npy') or not os.path.exists('cache/train_activations.npy'):
+if not os.path.exists("cache/train_probs.npy") or not os.path.exists(
+    "cache/train_activations.npy"
+):
     train_probs, train_activations = test(train_dataloader)
-    np.save('cache/train_probs.npy', train_probs)
-    np.save('cache/train_activations.npy', train_activations)
+    np.save("cache/train_probs.npy", train_probs)
+    np.save("cache/train_activations.npy", train_activations)
 else:
-    train_probs = np.load('cache/train_probs.npy')
-    train_activations = np.load('cache/train_activations.npy')
+    train_probs = np.load("cache/train_probs.npy")
+    train_activations = np.load("cache/train_activations.npy")
 
 # Same for test
-if not os.path.exists('cache/test_probs.npy') or not os.path.exists('cache/test_activations.npy'):
+if not os.path.exists("cache/test_probs.npy") or not os.path.exists(
+    "cache/test_activations.npy"
+):
     test_probs, test_activations = test(test_dataloader)
-    os.makedirs('cache', exist_ok=True)
-    np.save('cache/test_probs.npy', test_probs)
-    np.save('cache/test_activations.npy', test_activations)
+    os.makedirs("cache", exist_ok=True)
+    np.save("cache/test_probs.npy", test_probs)
+    np.save("cache/test_activations.npy", test_activations)
 else:
-    test_probs = np.load('cache/test_probs.npy')
-    test_activations = np.load('cache/test_activations.npy')
+    test_probs = np.load("cache/test_probs.npy")
+    test_activations = np.load("cache/test_activations.npy")
 
 ###############################################################################
 # Calculate all scores
@@ -366,20 +413,20 @@ else:
 print("------------------")
 print("Train Set Scores")
 print("------------------")
-print('\tFID:', fid(train_activations, train_activations))
-print('\tInception:', inception_score(train_probs))
-print('\tM Inception:', modified_inception_score(train_probs))
-print('\tAM:', am_score(train_probs, train_probs))
+print("\tFID:", fid(train_activations, train_activations))
+print("\tInception:", inception_score(train_probs))
+print("\tM Inception:", modified_inception_score(train_probs))
+print("\tAM:", am_score(train_probs, train_probs))
 # print('\tNDB:', 0.)
 
 
 print("------------------")
 print("Test Set Scores")
 print("------------------")
-print('\tFID:', fid(train_activations, test_activations))
-print('\tInception:', inception_score(test_probs))
-print('\tM Inception:', modified_inception_score(test_probs))
-print('\tAM:', am_score(train_probs, test_probs))
+print("\tFID:", fid(train_activations, test_activations))
+print("\tInception:", inception_score(test_probs))
+print("\tM Inception:", modified_inception_score(test_probs))
+print("\tAM:", am_score(train_probs, test_probs))
 # print('\tNDB:', ndb_score(train_activations, test_activations))
 
 # Train -> Samples
@@ -387,15 +434,20 @@ samples_probs, samples_activations = test(samples_dataloader)
 
 
 if args.threshold:
-    
+
     n_val = len(samples_probs) // 2
     n_test = len(samples_probs) // 2
-    print("Tuning thresholds using IS: using %d samples for tuning and %d for calculating metrics" % (n_val, n_test))
+    print(
+        "Tuning thresholds using IS: using %d samples for tuning and %d for calculating metrics"
+        % (n_val, n_test)
+    )
 
     # Split into two parts, one for tuning thresholds and one for calculating metrics
-    val_indices = sorted(np.random.choice(len(samples_probs), size=n_val, replace=False))
+    val_indices = sorted(
+        np.random.choice(len(samples_probs), size=n_val, replace=False)
+    )
     test_indices = sorted(np.array(list(set(range(10240)) - set(val_indices))))
-    
+
     samples_probs_val = samples_probs[val_indices]
     samples_probs_test = samples_probs[test_indices]
 
@@ -403,15 +455,19 @@ if args.threshold:
     samples_activations_test = samples_activations[test_indices]
 
     # Iterate over all thresholds
-    all_scores = {'fid': {}, 'is': {}}
-    for lower_threshold in tqdm(np.arange(0., 0.5, 0.1)):
+    all_scores = {"fid": {}, "is": {}}
+    for lower_threshold in tqdm(np.arange(0.0, 0.5, 0.1)):
         for upper_threshold in tqdm(np.arange(0.6, 1.0, 0.05)):
-            all_scores['is'][(lower_threshold, upper_threshold)] = inception_score(samples_probs_val[int(lower_threshold * n_val):int(upper_threshold * n_val)])
-    
+            all_scores["is"][(lower_threshold, upper_threshold)] = inception_score(
+                samples_probs_val[
+                    int(lower_threshold * n_val) : int(upper_threshold * n_val)
+                ]
+            )
+
     # Find the best score and calculate all metrics on the test set
-    best_value = 0.
+    best_value = 0.0
     best_thresholds_is = None
-    for threshold, value in all_scores['is'].items():
+    for threshold, value in all_scores["is"].items():
         if value > best_value:
             best_thresholds_is = threshold
 
@@ -419,33 +475,37 @@ if args.threshold:
     print("Tuned Thresholds")
     print("------------------")
     print("\tBest thresholds (by IS tuning):", best_thresholds_is)
-    print("\tBest IS score (on dev set):", all_scores['is'][best_thresholds_is])
+    print("\tBest IS score (on dev set):", all_scores["is"][best_thresholds_is])
 
-    sample_activations_test_inception = samples_activations_test[int(best_thresholds_is[0] * n_test):int(best_thresholds_is[1] * n_test)]
-    sample_probs_test_inception = samples_probs_test[int(best_thresholds_is[0] * n_test):int(best_thresholds_is[1] * n_test)]
+    sample_activations_test_inception = samples_activations_test[
+        int(best_thresholds_is[0] * n_test) : int(best_thresholds_is[1] * n_test)
+    ]
+    sample_probs_test_inception = samples_probs_test[
+        int(best_thresholds_is[0] * n_test) : int(best_thresholds_is[1] * n_test)
+    ]
 
     print("------------------")
     print("Sample Scores (with Tuned Thresholds)")
     print("------------------")
-    print('\tFID:', fid(train_activations, sample_activations_test_inception))
-    print('\tInception:', inception_score(sample_probs_test_inception))
-    print('\tM Inception:', modified_inception_score(sample_probs_test_inception))
-    print('\tAM:', am_score(train_probs, sample_probs_test_inception))
+    print("\tFID:", fid(train_activations, sample_activations_test_inception))
+    print("\tInception:", inception_score(sample_probs_test_inception))
+    print("\tM Inception:", modified_inception_score(sample_probs_test_inception))
+    print("\tAM:", am_score(train_probs, sample_probs_test_inception))
     # print('\tNDB:', ndb_score(train_activations, sample_activations_test_inception))
 
 else:
     print("------------------")
     print("Sample Scores (no Threshold Tuning)")
     print("------------------")
-    print('\tFID:', fid(train_activations, samples_activations))
-    print('\tInception:', inception_score(samples_probs))
-    print('\tM Inception:', modified_inception_score(samples_probs))
-    print('\tAM:', am_score(train_probs, samples_probs))
+    print("\tFID:", fid(train_activations, samples_activations))
+    print("\tInception:", inception_score(samples_probs))
+    print("\tM Inception:", modified_inception_score(samples_probs))
+    print("\tAM:", am_score(train_probs, samples_probs))
     # print('\tNDB:', ndb_score(train_activations, samples_activations))
 
 if args.save_probs:
     filename = args.sample_dir.rstrip("/").split("/")[-1]
-    np.save(f'cache/{filename}-resnext-probs.npy', samples_probs)
+    np.save(f"cache/{filename}-resnext-probs.npy", samples_probs)
 
 # Info about probs
 # print(np.unique(np.argmax(samples_probs, axis=1), return_counts=True))

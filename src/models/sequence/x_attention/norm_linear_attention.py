@@ -15,6 +15,7 @@ from ..utils import logging_info
 
 # N, L, H, E: batch, length, head, dim
 
+
 class NormLinearAttention(nn.Module):
     def __init__(
         self,
@@ -114,7 +115,7 @@ class NormLinearAttention(nn.Module):
         self.use_elu = use_elu
         self.use_leak = use_leak
         self.use_bound = use_bound
-        self.bound = d_model ** -0.5
+        self.bound = d_model**-0.5
         self.causal = causal
         self.use_gelu = use_gelu
         self.mem_use_gelu = mem_use_gelu

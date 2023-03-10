@@ -17,7 +17,6 @@ from src.models.sequence.pool import DownPool, UpPool
 from src.models.sequence.block import SequenceResidualBlock
 
 
-
 class SequenceUNet(SequenceModule):
     """
     layer is a Namespace that specifies '_name_', referring to a constructor, and a list of arguments to that layer constructor. This layer must subscribe to the interface (i) takes a hidden dimension H and sequence length L (ii) forward pass transforms input sequence of shape (B, H, L) to output (B, H, L)
@@ -25,7 +24,12 @@ class SequenceUNet(SequenceModule):
 
     def __init__(
         self,
-        d_model, n_layers, pool=[], expand=1, ff=2, cff=0,
+        d_model,
+        n_layers,
+        pool=[],
+        expand=1,
+        ff=2,
+        cff=0,
         prenorm=False,
         dropout=0.0,
         dropres=0.0,
@@ -46,29 +50,29 @@ class SequenceUNet(SequenceModule):
 
         # Layer arguments
         layer_cfg = layer.copy()
-        layer_cfg['dropout'] = dropout
-        layer_cfg['transposed'] = self.transposed
-        layer_cfg['initializer'] = initializer
-        layer_cfg['l_max'] = L
+        layer_cfg["dropout"] = dropout
+        layer_cfg["transposed"] = self.transposed
+        layer_cfg["initializer"] = initializer
+        layer_cfg["l_max"] = L
         print("layer config", layer_cfg)
 
         ff_cfg = {
-            '_name_': 'ff',
-            'expand': ff,
-            'transposed': self.transposed,
-            'activation': 'gelu',
-            'initializer': initializer, # TODO
-            'dropout': dropout, # TODO untie dropout
+            "_name_": "ff",
+            "expand": ff,
+            "transposed": self.transposed,
+            "activation": "gelu",
+            "initializer": initializer,  # TODO
+            "dropout": dropout,  # TODO untie dropout
         }
 
         def _residual(d, i, layer):
             return SequenceResidualBlock(
                 d,
-                i, # temporary placeholder for i_layer
+                i,  # temporary placeholder for i_layer
                 prenorm=prenorm,
                 dropout=dropres,
                 layer=layer,
-                residual=residual if residual is not None else 'R',
+                residual=residual if residual is not None else "R",
                 norm=norm,
                 pool=None,
             )
@@ -77,21 +81,25 @@ class SequenceUNet(SequenceModule):
         d_layers = []
         for p in pool:
             for i in range(n_layers):
-                d_layers.append(_residual(H, i+1, layer_cfg))
-                if ff > 0: d_layers.append(_residual(H, i+1, ff_cfg))
+                d_layers.append(_residual(H, i + 1, layer_cfg))
+                if ff > 0:
+                    d_layers.append(_residual(H, i + 1, ff_cfg))
 
             # Add sequence downsampling and feature expanding
-            d_layers.append(DownPool(H, H*expand, pool=p, transposed=self.transposed)) # TODO take expansion argument instead
+            d_layers.append(
+                DownPool(H, H * expand, pool=p, transposed=self.transposed)
+            )  # TODO take expansion argument instead
             L //= p
-            layer_cfg['l_max'] = L
+            layer_cfg["l_max"] = L
             H *= expand
         self.d_layers = nn.ModuleList(d_layers)
 
         # Center block
-        c_layers = [ ]
+        c_layers = []
         for i in range(n_layers):
-            c_layers.append(_residual(H, i+1, layer_cfg))
-            if cff > 0: c_layers.append(_residual(H, i+1, ff_cfg))
+            c_layers.append(_residual(H, i + 1, layer_cfg))
+            if cff > 0:
+                c_layers.append(_residual(H, i + 1, ff_cfg))
         self.c_layers = nn.ModuleList(c_layers)
 
         # Up blocks
@@ -99,12 +107,15 @@ class SequenceUNet(SequenceModule):
         for p in pool[::-1]:
             H //= expand
             L *= p
-            layer_cfg['l_max'] = L
-            u_layers.append(UpPool(H*expand, H, pool=p, transposed=self.transposed)) # TODO
+            layer_cfg["l_max"] = L
+            u_layers.append(
+                UpPool(H * expand, H, pool=p, transposed=self.transposed)
+            )  # TODO
 
             for i in range(n_layers):
-                u_layers.append(_residual(H, i+1, layer_cfg))
-                if ff > 0: u_layers.append(_residual(H, i+1, ff_cfg))
+                u_layers.append(_residual(H, i + 1, layer_cfg))
+                if ff > 0:
+                    u_layers.append(_residual(H, i + 1, ff_cfg))
         self.u_layers = nn.ModuleList(u_layers)
 
         assert H == d_model
@@ -123,10 +134,11 @@ class SequenceUNet(SequenceModule):
         input: (batch, length, d_input)
         output: (batch, length, d_output)
         """
-        if self.transposed: x = x.transpose(1, 2)
+        if self.transposed:
+            x = x.transpose(1, 2)
 
         # Down blocks
-        outputs = [] # Store all layers for SequenceUNet structure
+        outputs = []  # Store all layers for SequenceUNet structure
         for layer in self.d_layers:
             outputs.append(x)
             x, _ = layer(x)
@@ -142,13 +154,14 @@ class SequenceUNet(SequenceModule):
             x = x + outputs.pop()
 
         # feature projection
-        if self.transposed: x = x.transpose(1, 2) # (batch, length, expand)
+        if self.transposed:
+            x = x.transpose(1, 2)  # (batch, length, expand)
         x = self.norm(x)
 
-        return x, None # required to return a state
+        return x, None  # required to return a state
 
     def default_state(self, *args, **kwargs):
-        """ x: (batch) """
+        """x: (batch)"""
         layers = list(self.d_layers) + list(self.c_layers) + list(self.u_layers)
         return [layer.default_state(*args, **kwargs) for layer in layers]
 
@@ -161,19 +174,20 @@ class SequenceUNet(SequenceModule):
         state = state[::-1]
 
         # Down blocks
-        outputs = [] # Store all layers for SequenceUNet structure
+        outputs = []  # Store all layers for SequenceUNet structure
         next_state = []
         for layer in self.d_layers:
             outputs.append(x)
             x, _next_state = layer.step(x, state=state.pop(), **kwargs)
             next_state.append(_next_state)
-            if x is None: break
+            if x is None:
+                break
 
         # Center block
         if x is None:
             # Skip computations since we've downsized
             skipped = len(self.d_layers) - len(outputs)
-            for _ in range(skipped+len(self.c_layers)+skipped):
+            for _ in range(skipped + len(self.c_layers) + skipped):
                 next_state.append(state.pop())
             u_layers = list(self.u_layers)[skipped:]
         else:
@@ -197,24 +211,30 @@ class SequenceUNet(SequenceModule):
         modules = self.modules()
         next(modules)
         for layer in modules:
-            if hasattr(layer, 'cache_all'): layer.cache_all()
+            if hasattr(layer, "cache_all"):
+                layer.cache_all()
+
 
 def prepare_generation(model):
     model.eval()
-    if hasattr(model, 'cache_all'): model.cache_all()
+    if hasattr(model, "cache_all"):
+        model.cache_all()
+
 
 @torch.inference_mode()
 def generate_recurrent(model, batch_size=None, x=None):
     from src.tasks.mixture import mixture_sample
-# TODO incorporate normalization function for dataset
-# TODO handle or document non-mixture case
+
+    # TODO incorporate normalization function for dataset
+    # TODO handle or document non-mixture case
     """ generate remaining L-L' samples given x: (B, L', C) a context for the model """
 
     if x is None:
         assert batch_size is not None
         x = torch.zeros(batch_size, model.d_model, device=device)
         state = model.default_state(batch_size, device=device)
-    else: raise NotImplementedError("Conditional generation not implemented yet")
+    else:
+        raise NotImplementedError("Conditional generation not implemented yet")
 
     xs = []
     for i in range(model.L):
@@ -227,24 +247,29 @@ def generate_recurrent(model, batch_size=None, x=None):
     sample = torch.stack(xs, dim=1)
     print("recurrent sample shape", sample.shape)
 
+
 @torch.no_grad()
 def generate_global(model, batch_size=None, x=None, length=None):
     from tasks.mixture import mixture_sample
+
     """ generate remaining L-L' samples given x: (B, L', C) a context for the model """
 
     if x is None:
         assert batch_size is not None
         x = torch.zeros(batch_size, model.L, model.d_input, device=device)
-    else: raise NotImplementedError("Conditional generation not implemented yet")
+    else:
+        raise NotImplementedError("Conditional generation not implemented yet")
 
-    if length is None: length = model.L
+    if length is None:
+        length = model.L
     for i in range(length):
         print("pixel", i)
         y = model(x)
-        y = torch.cat([y, y.new_zeros(batch_size, 1, model.d_output)], dim=1) # TODO handle sequence shape properly
+        y = torch.cat(
+            [y, y.new_zeros(batch_size, 1, model.d_output)], dim=1
+        )  # TODO handle sequence shape properly
         z = mixture_sample(y[:, i, :])
         # TODO postprocess: clamp, divide into buckets, renormalize
         z = z.unsqueeze(-1)
         x[:, i, :] = z
     print("global sample shape", x.shape)
-

@@ -1,14 +1,15 @@
 import torch.nn as nn
 
+
 class Rpe(nn.Module):
     def __init__(
-        self, 
-        dim, 
-        outdim, 
-        residual, 
-        act="relu", 
-        bias=True, 
-        layers=2, 
+        self,
+        dim,
+        outdim,
+        residual,
+        act="relu",
+        bias=True,
+        layers=2,
         norm_type="simplermsnorm",
     ):
         super().__init__()
@@ -30,7 +31,7 @@ class Rpe(nn.Module):
             self.get_act(),
             nn.Linear(self.pos_dim, self.outdim, bias=bias),
         )
-        
+
     def get_act(self):
         if self.act == "silu":
             return nn.SiLU(inplace=True)

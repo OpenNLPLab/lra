@@ -11,11 +11,11 @@ from src.models.sequence.block import SequenceResidualBlock
 class Sashimi(SequenceModule):
     def __init__(
         self,
-        d_model, 
-        n_layers, 
-        pool=[], 
-        expand=1, 
-        ff=2, 
+        d_model,
+        n_layers,
+        pool=[],
+        expand=1,
+        ff=2,
         prenorm=False,
         dropout=0.0,
         dropres=0.0,
@@ -36,7 +36,9 @@ class Sashimi(SequenceModule):
 
         self.interp = interp
         if interp > 0:
-            assert l_max % interp == 0, "Interpolation level must be a factor of the length"
+            assert (
+                l_max % interp == 0
+            ), "Interpolation level must be a factor of the length"
             l_max = l_max // interp
 
         L = l_max
@@ -45,18 +47,18 @@ class Sashimi(SequenceModule):
 
         # Layer arguments
         layer_cfg = layer.copy()
-        layer_cfg['dropout'] = dropout
-        layer_cfg['transposed'] = self.transposed
+        layer_cfg["dropout"] = dropout
+        layer_cfg["transposed"] = self.transposed
         # layer_cfg['initializer'] = initializer
-        layer_cfg['l_max'] = L
+        layer_cfg["l_max"] = L
 
         ff_cfg = {
-            '_name_': 'ff',
-            'expand': ff,
-            'transposed': self.transposed,
-            'activation': 'gelu',
-            'initializer': initializer,
-            'dropout': dropout,
+            "_name_": "ff",
+            "expand": ff,
+            "transposed": self.transposed,
+            "activation": "gelu",
+            "initializer": initializer,
+            "dropout": dropout,
         }
 
         def _residual(d, i, layer):
@@ -66,7 +68,7 @@ class Sashimi(SequenceModule):
                 prenorm=prenorm,
                 dropout=dropres,
                 layer=layer,
-                residual=residual if residual is not None else 'R',
+                residual=residual if residual is not None else "R",
                 norm=norm,
                 pool=None,
             )
@@ -75,17 +77,26 @@ class Sashimi(SequenceModule):
         d_layers = []
         for p in pool:
             # Add sequence downsampling and feature expanding
-            d_layers.append(DownPool(H, H*expand, stride=p, transposed=self.transposed, activation=act_pool))
+            d_layers.append(
+                DownPool(
+                    H,
+                    H * expand,
+                    stride=p,
+                    transposed=self.transposed,
+                    activation=act_pool,
+                )
+            )
             L //= p
-            layer_cfg['l_max'] = L
+            layer_cfg["l_max"] = L
             H *= expand
         self.d_layers = nn.ModuleList(d_layers)
 
         # Center block
-        c_layers = [ ]
+        c_layers = []
         for i in range(n_layers):
-            c_layers.append(_residual(H, i+1, layer_cfg))
-            if ff > 0: c_layers.append(_residual(H, i+1, ff_cfg))
+            c_layers.append(_residual(H, i + 1, layer_cfg))
+            if ff > 0:
+                c_layers.append(_residual(H, i + 1, ff_cfg))
         self.c_layers = nn.ModuleList(c_layers)
 
         # Up blocks
@@ -94,15 +105,24 @@ class Sashimi(SequenceModule):
             block = []
             H //= expand
             L *= p
-            layer_cfg['l_max'] = L
-            block.append(UpPool(H*expand, H, stride=p, transposed=self.transposed, activation=act_pool))
+            layer_cfg["l_max"] = L
+            block.append(
+                UpPool(
+                    H * expand,
+                    H,
+                    stride=p,
+                    transposed=self.transposed,
+                    activation=act_pool,
+                )
+            )
 
             for i in range(n_layers):
-                block.append(_residual(H, i+1, layer_cfg))
-                if ff > 0: block.append(_residual(H, i+1, ff_cfg))
+                block.append(_residual(H, i + 1, layer_cfg))
+                if ff > 0:
+                    block.append(_residual(H, i + 1, ff_cfg))
 
             u_layers.append(nn.ModuleList(block))
-        
+
         self.u_layers = nn.ModuleList(u_layers)
 
         assert H == d_model
@@ -115,8 +135,9 @@ class Sashimi(SequenceModule):
             for i in range(int(math.log2(interp))):
                 block = []
                 for j in range(2):
-                    block.append(_residual(H, i+1, layer_cfg))
-                    if ff > 0: block.append(_residual(H, i+1, ff_cfg))
+                    block.append(_residual(H, i + 1, layer_cfg))
+                    if ff > 0:
+                        block.append(_residual(H, i + 1, ff_cfg))
 
                 interp_layers.append(nn.ModuleList(block))
 
@@ -135,7 +156,7 @@ class Sashimi(SequenceModule):
             # Interpolation will be used to reconstruct "missing" frames
             # Subsample the input sequence and run the SNet on that
             x_all = x
-            x = x[:, ::self.interp, :]
+            x = x[:, :: self.interp, :]
 
             y = torch.zeros_like(x_all)
             # Run the interpolating layers
@@ -144,16 +165,19 @@ class Sashimi(SequenceModule):
                 # Pad to the right and discard the output of the first input
                 # (creates dependence on the next time step for interpolation)
                 z = x_all[:, ::interp_level, :]
-                if self.transposed: z = z.transpose(1, 2)
+                if self.transposed:
+                    z = z.transpose(1, 2)
                 for layer in block:
                     z, _ = layer(z)
 
-                z = F.pad(z[:, :, 1:], (0, 1), mode='replicate')
-                if self.transposed: z = z.transpose(1, 2)
-                y[:, interp_level//2 - 1::interp_level, :] += z
+                z = F.pad(z[:, :, 1:], (0, 1), mode="replicate")
+                if self.transposed:
+                    z = z.transpose(1, 2)
+                y[:, interp_level // 2 - 1 :: interp_level, :] += z
                 interp_level = int(interp_level // 2)
 
-        if self.transposed: x = x.transpose(1, 2)
+        if self.transposed:
+            x = x.transpose(1, 2)
 
         # Down blocks
         outputs = []
@@ -165,7 +189,9 @@ class Sashimi(SequenceModule):
         # Center block
         for layer in self.c_layers:
             x, _ = layer(x)
-        x = x + outputs.pop() # add a skip connection to the last output of the down block
+        x = (
+            x + outputs.pop()
+        )  # add a skip connection to the last output of the down block
 
         for block in self.u_layers:
             for layer in block:
@@ -174,21 +200,28 @@ class Sashimi(SequenceModule):
                     # Before modeling layer in the block
                     x = x + outputs.pop()
                     outputs.append(x)
-            x = x + outputs.pop() # add a skip connection from the input of the modeling part of this up block
+            x = (
+                x + outputs.pop()
+            )  # add a skip connection from the input of the modeling part of this up block
 
         # feature projection
-        if self.transposed: x = x.transpose(1, 2) # (batch, length, expand)
+        if self.transposed:
+            x = x.transpose(1, 2)  # (batch, length, expand)
         x = self.norm(x)
 
         if self.interp > 0:
-            y[:, self.interp - 1::self.interp, :] = x
+            y[:, self.interp - 1 :: self.interp, :] = x
             x = y
 
-        return x, None # required to return a state
+        return x, None  # required to return a state
 
     def default_state(self, *args, **kwargs):
-        """ x: (batch) """
-        layers = list(self.d_layers) + list(self.c_layers) + [layer for block in self.u_layers for layer in block]
+        """x: (batch)"""
+        layers = (
+            list(self.d_layers)
+            + list(self.c_layers)
+            + [layer for block in self.u_layers for layer in block]
+        )
         return [layer.default_state(*args, **kwargs) for layer in layers]
 
     def step(self, x, state, **kwargs):
@@ -200,13 +233,14 @@ class Sashimi(SequenceModule):
         state = state[::-1]
 
         # Down blocks
-        outputs = [] # Store all layers for SaShiMi
+        outputs = []  # Store all layers for SaShiMi
         next_state = []
         for layer in self.d_layers:
             outputs.append(x)
             x, _next_state = layer.step(x, state=state.pop(), **kwargs)
             next_state.append(_next_state)
-            if x is None: break
+            if x is None:
+                break
 
         # Center block
         if x is None:

@@ -108,24 +108,30 @@ class Lrpe(nn.Module):
         elif self.p_matrix == 3:
             return self.householder
         elif self.p_matrix == 4:
+
             def f(x):
                 return torch.fft.fft(x, norm="ortho")
+
             return f
         elif self.p_matrix == 5:
             return self.odd_even_permutation
 
     def get_p_transpose(self):
         if self.p_matrix == 1:
+
             def f(x):
                 return x
+
             return f
         elif self.p_matrix == 2:
             return self.idct
         elif self.p_matrix == 3:
             return self.householder
         elif self.p_matrix == 4:
+
             def f(x):
                 return torch.fft.ifft(x, norm="ortho")
+
             return f
         elif self.p_matrix == 5:
             return self.odd_even_permutation_transpose

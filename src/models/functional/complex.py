@@ -17,7 +17,7 @@ try:
     import cupy as cp
 except:
     use_cupy = False
-use_pt_native = hasattr(torch, 'view_as_complex')
+use_pt_native = hasattr(torch, "view_as_complex")
 
 
 def complex_mul_native(X, Y):
@@ -29,8 +29,7 @@ def conjugate_native(X):
 
 
 def torch2numpy(X):
-    """Convert a torch float32 tensor to a numpy array, sharing the same memory.
-    """
+    """Convert a torch float32 tensor to a numpy array, sharing the same memory."""
     return X.detach().numpy()
 
 
@@ -53,24 +52,31 @@ def real_to_complex(X):
 
 
 def conjugate_torch(X):
-    assert X.shape[-1] == 2, 'Last dimension must be 2'
+    assert X.shape[-1] == 2, "Last dimension must be 2"
     return X * torch.tensor((1, -1), dtype=X.dtype, device=X.device)
 
 
 class Conjugate(torch.autograd.Function):
-    '''X is a complex64 tensors but stored as float32 tensors, with last dimension = 2.
-    '''
+    """X is a complex64 tensors but stored as float32 tensors, with last dimension = 2."""
+
     @staticmethod
     def forward(ctx, X):
-        assert X.shape[-1] == 2, 'Last dimension must be 2'
+        assert X.shape[-1] == 2, "Last dimension must be 2"
         if X.is_cuda:
             if use_cupy:
                 # TODO: do we need .contiguous here? I think it doesn't work if the last dimension isn't contiguous
-                return cupy2torch(torch2cupy(X).view('complex64').conj().view('float32'))
+                return cupy2torch(
+                    torch2cupy(X).view("complex64").conj().view("float32")
+                )
             else:
                 return conjugate_torch(X)
         else:
-            return torch.from_numpy(np.ascontiguousarray(torch2numpy(X)).view('complex64').conj().view('float32'))
+            return torch.from_numpy(
+                np.ascontiguousarray(torch2numpy(X))
+                .view("complex64")
+                .conj()
+                .view("float32")
+            )
 
     @staticmethod
     def backward(ctx, grad):
@@ -81,39 +87,47 @@ conjugate = conjugate_native if use_pt_native else Conjugate.apply
 
 
 def complex_mul_torch(X, Y):
-    assert X.shape[-1] == 2 and Y.shape[-1] == 2, 'Last dimension must be 2'
+    assert X.shape[-1] == 2 and Y.shape[-1] == 2, "Last dimension must be 2"
     return torch.stack(
-        (X[..., 0] * Y[..., 0] - X[..., 1] * Y[..., 1],
-         X[..., 0] * Y[..., 1] + X[..., 1] * Y[..., 0]),
-        dim=-1)
+        (
+            X[..., 0] * Y[..., 0] - X[..., 1] * Y[..., 1],
+            X[..., 0] * Y[..., 1] + X[..., 1] * Y[..., 0],
+        ),
+        dim=-1,
+    )
 
 
 def complex_mul_numpy(X, Y):
-    assert X.shape[-1] == 2 and Y.shape[-1] == 2, 'Last dimension must be 2'
-    X_np = np.ascontiguousarray(torch2numpy(X)).view('complex64')
-    Y_np = np.ascontiguousarray(torch2numpy(Y)).view('complex64')
-    return torch.from_numpy((X_np * Y_np).view('float32'))
+    assert X.shape[-1] == 2 and Y.shape[-1] == 2, "Last dimension must be 2"
+    X_np = np.ascontiguousarray(torch2numpy(X)).view("complex64")
+    Y_np = np.ascontiguousarray(torch2numpy(Y)).view("complex64")
+    return torch.from_numpy((X_np * Y_np).view("float32"))
 
 
 class ComplexMul(torch.autograd.Function):
-    '''X and Y are complex64 tensors but stored as float32 tensors, with last dimension = 2.
-    '''
+    """X and Y are complex64 tensors but stored as float32 tensors, with last dimension = 2."""
+
     @staticmethod
     def forward(ctx, X, Y):
-        assert X.shape[-1] == 2 and Y.shape[-1] == 2, 'Last dimension must be 2'
+        assert X.shape[-1] == 2 and Y.shape[-1] == 2, "Last dimension must be 2"
         ctx.save_for_backward(X, Y)
         if X.is_cuda:
-            assert Y.is_cuda, 'X and Y must both be torch.cuda.FloatTensor'
+            assert Y.is_cuda, "X and Y must both be torch.cuda.FloatTensor"
             if use_cupy:
                 # TODO: do we need .contiguous here? I think it doesn't work if the last dimension isn't contiguous
-                return cupy2torch((torch2cupy(X).view('complex64') * torch2cupy(Y).view('complex64')).view('float32'))
+                return cupy2torch(
+                    (
+                        torch2cupy(X).view("complex64")
+                        * torch2cupy(Y).view("complex64")
+                    ).view("float32")
+                )
             else:
                 return complex_mul_torch(X, Y)
         else:
-            assert not Y.is_cuda, 'X and Y must both be torch.FloatTensor'
-            X_np = np.ascontiguousarray(torch2numpy(X)).view('complex64')
-            Y_np = np.ascontiguousarray(torch2numpy(Y)).view('complex64')
-            return torch.from_numpy((X_np * Y_np).view('float32'))
+            assert not Y.is_cuda, "X and Y must both be torch.FloatTensor"
+            X_np = np.ascontiguousarray(torch2numpy(X)).view("complex64")
+            Y_np = np.ascontiguousarray(torch2numpy(Y)).view("complex64")
+            return torch.from_numpy((X_np * Y_np).view("float32"))
 
     @staticmethod
     def backward(ctx, grad):
@@ -139,6 +153,7 @@ class ComplexMul(torch.autograd.Function):
         #     grad_Y = grad_Y.sum(tuple(range(grad.dim() - Y.dim())))
         return grad_X, grad_Y
 
+
 complex_mul = ComplexMul.apply if use_cupy else complex_mul_torch
 if use_pt_native:
     complex_mul = complex_mul_native
@@ -153,11 +168,11 @@ if use_pt_native:
 
 # TODO maybe optimizations to be had by wrapping this into a function
 
-    # real = X.select(-1, 0) * Y.select(-1, 0) - X.select(-1, 1) * Y.select(-1, 1)
-    # imag = X.select(-1, 0) * Y.select(-1, 1) + X.select(-1, 1) * Y.select(-1, 0)
-    # return torch.stack( (real, imag), dim=-1)
+# real = X.select(-1, 0) * Y.select(-1, 0) - X.select(-1, 1) * Y.select(-1, 1)
+# imag = X.select(-1, 0) * Y.select(-1, 1) + X.select(-1, 1) * Y.select(-1, 0)
+# return torch.stack( (real, imag), dim=-1)
 
-    # return torch.stack(
-    #     (X[..., 0] * Y[..., 0] - X[..., 1] * Y[..., 1],
-    #      X[..., 0] * Y[..., 1] + X[..., 1] * Y[..., 0]),
-    #     dim=-1)
+# return torch.stack(
+#     (X[..., 0] * Y[..., 0] - X[..., 1] * Y[..., 1],
+#      X[..., 0] * Y[..., 1] + X[..., 1] * Y[..., 0]),
+#     dim=-1)

@@ -9,13 +9,15 @@ import torch.nn as nn
 from torch.nn import Parameter
 import torch.nn.functional as F
 import torch.utils.data
+
 # from params import *
 
 from src.models.sequence import SequenceModule
 from src.models.nn.components import Normalization
 
+
 class ResidualBlock(nn.Module):
-    def __init__(self, d, layer, norm='none', dropout=0.0):
+    def __init__(self, d, layer, norm="none", dropout=0.0):
         super().__init__()
         self.d = d
         self.layer = layer
@@ -26,9 +28,10 @@ class ResidualBlock(nn.Module):
         y = self.layer(x)
         y = F.leaky_relu(y, negative_slope=0.2)
         y = self.drop(y)
-        y = x+y
+        y = x + y
         y = self.norm(y)
         return y
+
 
 class Conv1DBlock(nn.Module):
     def __init__(
@@ -41,26 +44,40 @@ class Conv1DBlock(nn.Module):
         # padding=12,
         # alpha=0.2,
         n_layers=1,
-        norm='none',
+        norm="none",
         dropout=0,
     ):
         super().__init__()
         layers = []
         # Residual convolution layers
         # padding = (kernel_size-1, 0) if causal else (kernel_size-1)//2
-        padding = (kernel_size-1)//2
-        for _ in range(n_layers-1):
-            layers.append(ResidualBlock(
-                input_channels,
-                nn.Conv1d(input_channels, input_channels, kernel_size, stride=1, padding=padding),
-                norm=norm,
-                dropout=dropout,
-            ))
+        padding = (kernel_size - 1) // 2
+        for _ in range(n_layers - 1):
+            layers.append(
+                ResidualBlock(
+                    input_channels,
+                    nn.Conv1d(
+                        input_channels,
+                        input_channels,
+                        kernel_size,
+                        stride=1,
+                        padding=padding,
+                    ),
+                    norm=norm,
+                    dropout=dropout,
+                )
+            )
 
         # Final non-residual conv layer with channel upsizing
-        layers.append(nn.Conv1d(
-            input_channels, output_channels, kernel_size, stride=stride, padding=padding,
-        ))
+        layers.append(
+            nn.Conv1d(
+                input_channels,
+                output_channels,
+                kernel_size,
+                stride=stride,
+                padding=padding,
+            )
+        )
         layers.append(
             Normalization(output_channels, True, norm)
             # nn.BatchNorm1d(output_channels)
@@ -80,13 +97,13 @@ class WaveGANDiscriminator(SequenceModule):
         self,
         d_model=1,
         d_output=10,
-        l_output=0, # Unused, absorbs argument from sequence
+        l_output=0,  # Unused, absorbs argument from sequence
         model_size=64,
         n_layers=1,
         kernel_size=25,
         # alpha=0.2,
-        norm='none',
-        causal=True, # Currently doesn't work
+        norm="none",
+        causal=True,  # Currently doesn't work
         verbose=False,
         l_max=16384,
         # use_batch_norm=False,
@@ -180,7 +197,7 @@ class WaveGANDiscriminator(SequenceModule):
         self.causal = causal
         # self.fc_d_input = 256 * model_size
         if self.causal:
-            self.fc_d_input = 16*model_size
+            self.fc_d_input = 16 * model_size
         else:
             self.fc_d_input = self.l_max // 64 * model_size
 
@@ -226,18 +243,18 @@ class WaveGANDiscriminator(SequenceModule):
         y: (batch, 1, d_output)
         """
         x = x.permute(0, 2, 1)
-        x = F.pad(x, (0, self.l_max-x.shape[-1]))
+        x = F.pad(x, (0, self.l_max - x.shape[-1]))
         for conv in self.conv_layers:
             x = conv(x)
             if self.verbose:
                 print(x.shape)
         if self.causal:
-            x = self.fc1(x.transpose(-1, -2)) # (B, L, output)
+            x = self.fc1(x.transpose(-1, -2))  # (B, L, output)
 
             if self.l_output == 0:
                 return x[:, -1, :], None
             else:
-                return x[:, -self.l_output:, :], None
+                return x[:, -self.l_output :, :], None
         else:
             assert self.l_output == 0
             x = x.reshape(-1, self.fc_d_input)
@@ -258,7 +275,7 @@ if __name__ == "__main__":
             d_output=10,
             verbose=True,
             # use_batch_norm=True,
-            norm='batch',
+            norm="batch",
             causal=False,
             n_layers=2,
             dropout=0.1,

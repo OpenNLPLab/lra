@@ -12,6 +12,7 @@ from torch.nn import Dropout, Parameter
 from ..utils import logging_info
 from .tno import Tno
 
+
 class Gtu2d(nn.Module):
     def __init__(
         self,

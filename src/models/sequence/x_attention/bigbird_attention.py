@@ -144,7 +144,7 @@ class BigBirdAttention(nn.Module):
 
     @staticmethod
     def torch_bmm_nd(inp_1, inp_2, ndim=None):
-        """ Fast nd matrix multiplication """
+        """Fast nd matrix multiplication"""
         # faster replacement of torch.einsum ("bhqk,bhkd->bhqd")
         return torch.bmm(
             inp_1.reshape((-1,) + inp_1.shape[-2:]),
@@ -153,7 +153,7 @@ class BigBirdAttention(nn.Module):
 
     @staticmethod
     def torch_bmm_nd_transpose(inp_1, inp_2, ndim=None):
-        """ Fast nd matrix multiplication with transpose """
+        """Fast nd matrix multiplication with transpose"""
         # faster replacement of torch.einsum (bhqd,bhkd->bhqk)
         return torch.bmm(
             inp_1.reshape((-1,) + inp_1.shape[-2:]),
@@ -1161,16 +1161,16 @@ def create_masks_for_block_sparse_attn(attention_mask: torch.Tensor, block_size:
 
     def create_band_mask_from_inputs(from_blocked_mask, to_blocked_mask):
         """
-            Create 3D attention mask from a 2D tensor mask.
-            Args:
-                from_blocked_mask: 2D Tensor of shape [batch_size,
-                from_seq_length//from_block_size, from_block_size].
-                to_blocked_mask: int32 Tensor of shape [batch_size,
-                to_seq_length//to_block_size, to_block_size].
-            Returns:
-                float Tensor of shape [batch_size, 1, from_seq_length//from_block_size-4, from_block_size,
-                3*to_block_size].
-            """
+        Create 3D attention mask from a 2D tensor mask.
+        Args:
+            from_blocked_mask: 2D Tensor of shape [batch_size,
+            from_seq_length//from_block_size, from_block_size].
+            to_blocked_mask: int32 Tensor of shape [batch_size,
+            to_seq_length//to_block_size, to_block_size].
+        Returns:
+            float Tensor of shape [batch_size, 1, from_seq_length//from_block_size-4, from_block_size,
+            3*to_block_size].
+        """
         exp_blocked_to_pad = torch.cat(
             [
                 to_blocked_mask[:, 1:-3],

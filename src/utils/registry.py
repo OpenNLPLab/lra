@@ -19,7 +19,7 @@ scheduler = {
 }
 
 model = {
-    "transformer":"src.models.baselines.transformer.Transformer",
+    "transformer": "src.models.baselines.transformer.Transformer",
     "model": "src.models.sequence.SequenceModel",
     "unet": "src.models.sequence.SequenceUNet",
     "lstm": "src.models.sequence.rnns.lstm.TorchLSTM",
@@ -71,28 +71,28 @@ layer = {
     "rnn": "src.models.sequence.rnns.rnn.RNN",
     "mha": "src.models.sequence.mha.MultiheadAttention",
     # x_attention
-    "linearattn":"src.models.sequence.x_attention.norm_linear_attention.NormLinearAttention",
-    "localattn":"src.models.sequence.x_attention.norm_local_attention.NormLocalAttention",
-    "ls_attn":"src.models.sequence.x_attention.ls_attention.LSAttentionNonCausal",
-    "performer_attn":"src.models.sequence.x_attention.performer.MultiheadPerformerAttention",
-    "flash_attn":"src.models.sequence.x_attention.flash.FlashAttention",
-    "flash_linear_attn":"src.models.sequence.x_attention.flash_linear.FlashLinearAttention",
-    "cosformer_attn":"src.models.sequence.x_attention.cosformer.CosformerAttention",
-    "bigbird_attn":"src.models.sequence.x_attention.bigbird_attention.BigBirdAttention",
-    "linformer_attn":"src.models.sequence.x_attention.linformer_attention.LinformerAttention",
-    "reformer_attn":"src.models.sequence.x_attention.reformer_attention.LSHAttention",
-    "nystorm_attn":"src.models.sequence.x_attention.nystorm_attention.NystromAttention",
+    "linearattn": "src.models.sequence.x_attention.norm_linear_attention.NormLinearAttention",
+    "localattn": "src.models.sequence.x_attention.norm_local_attention.NormLocalAttention",
+    "ls_attn": "src.models.sequence.x_attention.ls_attention.LSAttentionNonCausal",
+    "performer_attn": "src.models.sequence.x_attention.performer.MultiheadPerformerAttention",
+    "flash_attn": "src.models.sequence.x_attention.flash.FlashAttention",
+    "flash_linear_attn": "src.models.sequence.x_attention.flash_linear.FlashLinearAttention",
+    "cosformer_attn": "src.models.sequence.x_attention.cosformer.CosformerAttention",
+    "bigbird_attn": "src.models.sequence.x_attention.bigbird_attention.BigBirdAttention",
+    "linformer_attn": "src.models.sequence.x_attention.linformer_attention.LinformerAttention",
+    "reformer_attn": "src.models.sequence.x_attention.reformer_attention.LSHAttention",
+    "nystorm_attn": "src.models.sequence.x_attention.nystorm_attention.NystromAttention",
     # tnn_draft
-    "tno_v2":"src.models.sequence.tnn_draft.tno_v2.TNOV2",
-    "tno":"src.models.sequence.tnn_draft.tno.TNO",
-    "tno2d":"src.models.sequence.tnn_draft.tno2d.TNO",
+    "tno_v2": "src.models.sequence.tnn_draft.tno_v2.TNOV2",
+    "tno": "src.models.sequence.tnn_draft.tno.TNO",
+    "tno2d": "src.models.sequence.tnn_draft.tno2d.TNO",
     # tnn
-    "gtu":"src.models.sequence.tnn.gtu.Gtu",
-    "gtu2d":"src.models.sequence.tnn.gtu2d.Gtu2d",
+    "gtu": "src.models.sequence.tnn.gtu.Gtu",
+    "gtu2d": "src.models.sequence.tnn.gtu2d.Gtu2d",
     # fft
-    "fnet":"src.models.sequence.fft.fnet.FNetFairseqLayer",
+    "fnet": "src.models.sequence.fft.fnet.FNetFairseqLayer",
     # mlp
-    "synthesizer":"src.models.sequence.mlp.synthesizer.SynthesizerDense",
+    "synthesizer": "src.models.sequence.mlp.synthesizer.SynthesizerDense",
     # origin
     "conv1d": "src.models.sequence.conv1d.Conv1d",
     "attsimp": "src.models.sequence.mha.AttentionSimple",
@@ -114,10 +114,10 @@ callbacks = {
 }
 
 layer_decay = {
-    'convnext_timm_tiny': 'src.models.baselines.convnext_timm.get_num_layer_for_convnext_tiny',
+    "convnext_timm_tiny": "src.models.baselines.convnext_timm.get_num_layer_for_convnext_tiny",
 }
 
 model_state_hook = {
-    'convnext_timm_tiny_2d_to_3d': 'src.models.baselines.convnext_timm.convnext_timm_tiny_2d_to_3d',
-    'convnext_timm_tiny_s4nd_2d_to_3d': 'src.models.baselines.convnext_timm.convnext_timm_tiny_s4nd_2d_to_3d',
+    "convnext_timm_tiny_2d_to_3d": "src.models.baselines.convnext_timm.convnext_timm_tiny_2d_to_3d",
+    "convnext_timm_tiny_s4nd_2d_to_3d": "src.models.baselines.convnext_timm.convnext_timm_tiny_s4nd_2d_to_3d",
 }

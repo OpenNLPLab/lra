@@ -50,11 +50,11 @@ class Gtu2d(nn.Module):
         self.act = get_activation_fn(act_fun)
         # tno
         self.toep1 = Tno(
-            h=n_heads, 
+            h=n_heads,
             dim=self.head_dim,
-            rpe_dim=rpe_embedding, 
-            causal=causal, 
-            use_decay=use_decay, 
+            rpe_dim=rpe_embedding,
+            causal=causal,
+            use_decay=use_decay,
             use_multi_decay=use_multi_decay,
             residual=residual,
             act=rpe_act,
@@ -66,11 +66,11 @@ class Gtu2d(nn.Module):
             norm_type=norm_type,
         )
         self.toep2 = Tno(
-            h=n_heads, 
+            h=n_heads,
             dim=self.head_dim,
-            rpe_dim=rpe_embedding, 
-            causal=causal, 
-            use_decay=use_decay, 
+            rpe_dim=rpe_embedding,
+            causal=causal,
+            use_decay=use_decay,
             use_multi_decay=use_multi_decay,
             residual=residual,
             act=rpe_act,
@@ -85,9 +85,9 @@ class Gtu2d(nn.Module):
         self.norm_type = norm_type
         self.use_norm = use_norm
         self.pre_norm = get_norm_fn(self.norm_type)(d2)
-        
+
         # self.par_init()
-        
+
     def par_init(self):
         nn.init.normal_(self.u_proj.weight, std=0.02)
         nn.init.normal_(self.u_proj.bias, std=0.02)
@@ -95,29 +95,28 @@ class Gtu2d(nn.Module):
         nn.init.normal_(self.v_proj.bias, std=0.02)
         nn.init.normal_(self.o.weight, std=0.02)
         nn.init.normal_(self.o.bias, std=0.02)
-    
+
     def forward(self, x, state=None):
         # x: b, h * w, d
         n = x.shape[1]
         H = int(np.sqrt(n))
-        W = n //  H
+        W = n // H
         n_heads = self.n_heads
-        
+
         u = self.act(self.u_proj(x))
         v = self.act(self.v_proj(x))
         # reshape
-        v = rearrange(v, 'b (H W) (h d) -> b h H W d', h=n_heads, H=H, W=W)
+        v = rearrange(v, "b (H W) (h d) -> b h H W d", h=n_heads, H=H, W=W)
         o1 = self.toep1(v, dim=-2, normalize=self.normalize)
         o1 = self.toep2(o1, dim=-3, normalize=self.normalize)
         o2 = self.toep2(v, dim=-3, normalize=self.normalize)
         o2 = self.toep1(o2, dim=-2, normalize=self.normalize)
         output = o1 + o2
-        output = rearrange(output, 'b h H W d -> b (H W) (h d)')
+        output = rearrange(output, "b h H W d -> b (H W) (h d)")
         # dropout
         if self.p > 0:
             output = self.dropout(output)
         output = u * output
         output = self.o(output)
-        
-        return output, None
 
+        return output, None

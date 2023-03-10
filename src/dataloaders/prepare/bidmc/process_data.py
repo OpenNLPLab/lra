@@ -8,7 +8,7 @@ from sktime.utils.data_io import load_from_tsfile_to_dataframe
 import data_loader as data
 
 # DATA_PATH = "/mnt/lustre/share_data/hanxiaodong/lra_data/"
-DATA_PATH='data/'
+DATA_PATH = "data/"
 # DATASET = 'RR'
 
 
@@ -34,7 +34,7 @@ def split_data(
 
 
 def _to_numpy(X):
-    """ Convert DataFrame of series into numpy array """
+    """Convert DataFrame of series into numpy array"""
     return np.stack([np.stack(x) for x in X.to_numpy()]).swapaxes(-1, -2)
 
 
