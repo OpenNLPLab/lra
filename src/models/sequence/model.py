@@ -7,6 +7,7 @@ import functools
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from einops import rearrange
 from omegaconf import DictConfig
 from src.models.nn.components import Normalization
@@ -81,6 +82,13 @@ class SequenceModel(SequenceModule):
         gtu_gamma=0.999,
         gtu_rpe_dim=16,
         expand_ratio_gtu=2,
+        # hgru
+        param_share=True,
+        use_triton=False,
+        use_lower_bound=True,
+        causal=False,
+        forward_type=-1,
+        use_real=False,
     ):
         super().__init__()
         # Save arguments needed for forward pass
@@ -224,6 +232,13 @@ class SequenceModel(SequenceModule):
                     _layer["dropout"] = dropout
                 # Ensure all layers are shaped the same way
             layers = layer * n_layers
+        elif layer[0]["_name_"] in ["hgru1d", "hgru2d"]:
+            for _layer in layer:
+                # If layers don't specify dropout, add it
+                if _layer.get("dropout", None) is None:
+                    _layer["dropout"] = dropout
+                # Ensure all layers are shaped the same way
+            layers = layer * n_layers
         else:
             # Some special arguments are passed into each layer
             for _layer in layer:
@@ -233,7 +248,11 @@ class SequenceModel(SequenceModule):
                 # Ensure all layers are shaped the same way
                 _layer["transposed"] = transposed
             layers = layer * n_layers
-
+            
+        self.layer_name = layer[0]["_name_"]
+        if "hgru" in self.layer_name:
+            self.lower_bounds = nn.Parameter(torch.ones(n_layers, d_model), requires_grad=True)
+            
         # Instantiate layers
         _layers = []
         d = d_model
@@ -290,13 +309,25 @@ class SequenceModel(SequenceModule):
         outputs = inputs
         prev_states = [None] * len(self.layers) if state is None else state
         next_states = []
+        if "hgru" in self.layer_name:
+            lower_bounds = F.softmax(self.lower_bounds, dim=0)
+            lower_bound = torch.zeros(self.d_output).to(outputs)
+        
+        cnt = 0
         for layer, prev_state in zip(self.layers, prev_states):
+            if "hgru" in self.layer_name:
+                kwargs["lower_bound"] = lower_bound
             outputs, state = layer(
                 outputs, *args, state=prev_state, **kwargs
             )  # TODO handle state
             next_states.append(state)
             if self.track_norms:
                 output_norms.append(torch.mean(outputs.detach() ** 2))
+            if "hgru" in self.layer_name:
+                # skip glu
+                if cnt % 2 == 0:
+                    lower_bound += lower_bounds[cnt // 2]
+            cnt += 1
         outputs = self.norm(outputs)
 
         if self.transposed:

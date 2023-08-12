@@ -62,7 +62,7 @@ class GLU(nn.Module):
         else:
             return lambda x: x
 
-    def forward(self, x, state):
+    def forward(self, x, state, **kwargs):
         o1 = self.l1(x)
         weight = self.act_fun(o1)
         if self.p > 0.0:

@@ -18,7 +18,6 @@ import src.models.nn.utils as U
 from src.dataloaders import SequenceDataset  # TODO make registry
 from src.models.baselines.transformer import Transformer
 from tqdm.auto import tqdm
-from gpu_mem_track import MemTracker
 import inspect
 
 log = src.utils.train.get_logger(__name__)

@@ -99,6 +99,9 @@ layer = {
     "performer": "src.models.sequence.attention.linear.Performer",
     "s4_2dconv": "src.models.sequence.ss.s4_2dconv.S42DConv",
     # 'packedrnn': 'models.sequence.rnns.packedrnn.PackedRNN',
+    # hgru
+    "hgru1d": "src.models.sequence.rnns.hgru.Hgru1dModule",
+    "hgru2d": "src.models.sequence.rnns.hgru.Hgru2dModule",
 }
 
 callbacks = {
