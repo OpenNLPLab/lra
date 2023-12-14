@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /pipeline: imdb
-  - /model: hgru1d
+  - /model: hgrn1d
   - override /scheduler: cosine_warmup
 
 decoder:

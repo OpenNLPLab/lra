@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /pipeline: pathx
-  - /model: hgru2d
+  - /model: hgrn2d
   - override /scheduler: cosine_warmup
 
 scheduler:
